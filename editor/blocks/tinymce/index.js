@@ -4,6 +4,7 @@ const Editable = wp.blocks.Editable;
 wp.blocks.registerBlock( 'ephox/tinymce', {
 	title: 'TinyMCE',
 	icon: 'smiley',
+	category: 'common',
 
 	attributes: {
 		value: html()
