@@ -1,7 +1,7 @@
 const { html } = wp.blocks.query;
 const Editable = wp.blocks.Editable;
 
-wp.blocks.registerBlock( 'ephox/tinymce', {
+wp.blocks.registerBlock( 'core/tinymce', {
 	title: 'TinyMCE',
 	icon: 'smiley',
 	category: 'common',
@@ -10,16 +10,16 @@ wp.blocks.registerBlock( 'ephox/tinymce', {
 		value: html()
 	},
 
-	edit( attributes, onChange ) {
+	edit( { attributes, onChange } ) {
 		return (
-			<Editable
+				<Editable
 				value={ attributes.value }
 				onChange={ ( value ) => onChange( { value } ) }
 			/>
 		);
 	},
 
-	save( attributes ) {
-		return attributes.value;
+	save( { attributes } ) {
+		return <p>{ attributes.value }</p>;
 	}
 } );
