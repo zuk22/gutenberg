@@ -49,6 +49,10 @@ function gutenberg_register_scripts() {
 
 	// Editor Styles.
 	wp_register_style( 'wp-blocks', plugins_url( 'blocks/build/style.css', __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . 'blocks/build/style.css' ) );
+
+	// Dummy skin
+	wp_register_style( 'wp-skin-ui', plugins_url( 'blocks/components/editable/skin/dummy/skin.min.css', __FILE__) );
+	wp_register_style( 'wp-skin-content', plugins_url( 'blocks/components/editable/skin/dummy/content.inline.min.css', __FILE__) );
 }
 add_action( 'init', 'gutenberg_register_scripts' );
 
