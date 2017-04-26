@@ -4,34 +4,34 @@
 	border: 1px solid mix(rgb(red($btn-border-right), green($btn-border-right), blue($btn-border-right)), $panel-bg, 30%);
 	border-color: $btn-border-top $btn-border-right $btn-border-bottom $btn-border-left;
 	position: relative;
-	text-shadow: $text-shadow;
+	color: $btn-text;
 
 	@include inline-block();
 	@include border-radius(3px);
-	@include box-shadow($btn-box-shadow);
 	@include vertical-gradient($btn-bg, $btn-bg-hlight);
 
 	&:hover, &:focus {
-		color: $btn-text;
-		@include vertical-gradient(darken($btn-bg, 5%), darken($btn-bg-hlight, 5%));
+		color: $btn-text-hover;
 		border-color: $btn-border-hover;
 	}
 
 	&.#{$prefix}-disabled button, &.#{$prefix}-disabled:hover button {
 		cursor: default;
-		@include box-shadow(none);
 		@include opacity($btn-box-disabled-opacity);
 	}
 
-	&.#{$prefix}-active, &.#{$prefix}-active:hover {
-		@include vertical-gradient(darken($btn-bg, 10%), darken($btn-bg-hlight, 5%));
-		@include box-shadow($btn-box-shadow-active);
-		border-color: darken($btn-bg, 20%);
+	&.#{$prefix}-active {
+		color: $btn-text-inverse;
+		background-color: $btn-bg-hover;
+		border-color: $btn-border-active;
+	}
+
+	&.#{$prefix}-active:hover { 
+		color: $btn-text-hover;
+		border-color: $btn-border-hover;
 	}
 
 	&:active {
-		@include vertical-gradient(darken($btn-bg, 7%), darken($btn-bg-hlight, 5%));
-		@include box-shadow($btn-box-shadow-active);
 		border-color: $btn-border-active;
 
 	}
@@ -43,7 +43,7 @@
 	line-height: $line-height;
 	*line-height: $line-height - 4px;
 	cursor: pointer;
-	color: $btn-text;
+	color: inherit;
 	text-align: center;
 
 	// Fixes for default inner padding of button

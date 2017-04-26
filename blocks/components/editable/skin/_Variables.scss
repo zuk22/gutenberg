@@ -14,7 +14,7 @@ $font-size:                      14px;
 $line-height:                    20px;
 $has-gradients:                  false;
 $has-radius:                     false;
-$has-boxshadow:                  false;
+$has-boxshadow:                  true;
 $has-button-borders:             false;
 
 // Text colors
@@ -27,7 +27,9 @@ $text-warning:                   #c09853;
 $text-success:                   #468847;
 
 // Button
-$btn-text:                       $text;
+$btn-text:                       $dark-gray-500; // from variables.scss
+$btn-text-inverse:               $white; // from variables.scss
+$btn-text-hover:                 $blue-medium; // from variables.scss
 $btn-text-shadow:                none;
 $btn-border-top:                 transparent;
 $btn-border-right:               transparent;
@@ -35,16 +37,16 @@ $btn-border-bottom:              transparent;
 $btn-border-left:                transparent;
 $btn-caret-border:               $btn-text;
 $btn-text-disabled:              $text-disabled;
-$btn-box-shadow:                 inset 0 1px 0 rgba(255, 255, 255, .2), 0 1px 2px rgba(0, 0, 0, .05);
-$btn-box-shadow-active:          inset 0 2px 4px rgba(0, 0, 0, .15), 0 1px 2px rgba(0, 0, 0, .05);
+$btn-box-shadow:                 none;
+$btn-box-shadow-active:          none;
 $btn-box-disabled-opacity:       0.4;
-$btn-bg:                         white;
-$btn-bg-hlight:                  #D9D9D9;
-$btn-bg-hover:                   darken($btn-bg, 5%);
-$btn-bg-hlight-hover:            darken($btn-bg-hlight, 5%);
-$btn-border-hover:               darken($btn-bg, 20%);
-$btn-border-active:              darken($btn-bg, 20%);
-$btn-padding:                    8px 10px;
+$btn-bg:                         $white; // from variables.scss
+$btn-bg-hlight:                  $white; // from variables.scss
+$btn-bg-hover:                   $dark-gray-500; // from variables.scss
+$btn-bg-hlight-hover:            $dark-gray-500; // from variables.scss
+$btn-border-hover:               $dark-gray-500; // from variables.scss
+$btn-border-active:              $dark-gray-500; // from variables.scss
+$btn-padding:                    7px 9px;
 
 $btn-primary-bg:                 #2980b9;
 $btn-primary-bg-hlight:          #3498db;
@@ -63,27 +65,27 @@ $btn-primary-border-hover:       transparent;
 $btn-group-border-width:         1px;
 
 // Panel
-$panel-border:                   rgba(0,0,0,.2);
-$panel-bg:                       #FDFDFD;
-$panel-bg-hlight:                #DDD;
+$panel-border:                   $light-gray-500; // from variables.scss
+$panel-bg:                       $white; // from variables.scss
+$panel-bg-hlight:                $white; // from variables.scss
 
 // Menu
-$menuitem-text:                  $text;
+$menuitem-text:                  $dark-gray-500; // from variables.scss
 $menu-bg:                        #fff;
 $menu-margin:                    -1px 0 0;
 $menu-border:                    rgba(0, 0, 0, 0.2);
 $menubar-border:                 mix($panel-border, $panel-bg, 60%);
 $menuitem-text-inverse:          $text-inverse;
 $menubar-bg-active:              darken($btn-bg, 10%);
-$menuitem-bg-hover:              #0081C2;
-$menuitem-bg-selected:           #2980b9;
-$menuitem-bg-selected-hlight:    #3498db;
+$menuitem-bg-hover:              $blue-wordpress; // from variables.scss
+$menuitem-bg-selected:           $blue-wordpress; // from variables.scss
+$menuitem-bg-selected-hlight:    $blue-wordpress; // from variables.scss
 $menuitem-bg-disabled:           #CCC;
 $menuitem-caret:                 $menuitem-text;
 $menuitem-caret-selected:        $menuitem-text-inverse;
 $menuitem-separator-top:         transparent;
 $menuitem-separator-bottom:      rgba(0,0,0,0.1);
-$menuitem-bg-active:             #3498db;
+$menuitem-bg-active:             $blue-wordpress; // from variables.scss
 $menuitem-text-active:           $text-inverse;
 $menuitem-preview-border-active: #aaa;
 $menubar-menubtn-text:           #333;
@@ -157,7 +159,7 @@ $popover-arrow-outer-width:      $popover-arrow-width + 1;
 $popover-arrow-outer:            rgba(0, 0, 0, 0.25);
 
 // Floatpanel
-$floatpanel-box-shadow:          0 5px 10px rgba(0, 0, 0, .2);
+$floatpanel-box-shadow:          0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
 
 // Checkbox
 $checkbox-bg:                    $btn-bg;
@@ -219,4 +221,4 @@ $progress-bar-bg-hlight:         #cccccc;
 $progress-text:                  $text;
 
 // Flow layout
-$flow-layout-spacing:            2px;
+$flow-layout-spacing:            0px;

@@ -4,6 +4,10 @@
 	position: absolute;
 	@include box-shadow($floatpanel-box-shadow);
 }
+.#{$prefix}-floatpanel.#{$prefix}-tinymce-inline {
+	@include box-shadow($floatpanel-box-shadow);
+}
+
 
 .#{$prefix}-floatpanel.#{$prefix}-fixed {
 	position: fixed;
