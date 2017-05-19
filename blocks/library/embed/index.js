@@ -123,7 +123,7 @@ registerBlock( 'core/embed', {
 			const figureClass = this.videoEmbeds.includes( domain ) ? 'blocks-embed__video' : 'blocks-embed';
 
 			return (
-				<figure className={ figureClass }>
+				<div>
 					{ ( cannotPreview ) ? (
 						<Placeholder icon="cloud" label={ wp.i18n.__( 'Embed URL' ) } className="blocks-embed">
 							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
@@ -132,19 +132,7 @@ registerBlock( 'core/embed', {
 					) : (
 						<Sandbox html={ oEmbedHtml } />
 					) }
-					{ ( caption && caption.length > 0 ) || !! focus ? (
-						<Editable
-							tagName="figcaption"
-							placeholder={ wp.i18n.__( 'Write caption…' ) }
-							value={ caption }
-							focus={ focus }
-							onFocus={ setFocus }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							inline
-							inlineToolbar
-						/>
-					) : null }
-				</figure>
+				</div>
 			);
 		}
 	},
