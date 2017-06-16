@@ -144,6 +144,8 @@ export default class FreeformBlock extends wp.element.Component {
 		return {
 			...baseSettings,
 			plugins: ( baseSettings.plugins || [] ).concat( 'lists' ),
+			theme: 'modern',
+			menubar: false,
 		};
 	}
 
