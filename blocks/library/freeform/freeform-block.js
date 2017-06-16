@@ -71,6 +71,11 @@ const FREEFORM_CONTROLS = [
 			icon: 'editor-strikethrough',
 			title: __( 'Strikethrough' ),
 		},
+		{
+			id: 'link',
+			icon: 'admin-links',
+			title: __( 'Link' ),
+		},
 	],
 ];
 const MORE_CONTROLS = [
@@ -143,9 +148,13 @@ export default class FreeformBlock extends wp.element.Component {
 	getSettings( baseSettings ) {
 		return {
 			...baseSettings,
-			plugins: ( baseSettings.plugins || [] ).concat( 'lists' ),
 			theme: 'modern',
 			menubar: false,
+			plugins: [
+				...( baseSettings.plugins || [] ),
+				'link',
+				'lists',
+			],
 		};
 	}
 
