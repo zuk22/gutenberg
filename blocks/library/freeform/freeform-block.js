@@ -89,6 +89,27 @@ const MORE_CONTROLS = [
 		icon: 'editor-outdent',
 		title: __( 'Outdent' ),
 	},
+	{
+		id: 'forecolor',
+		icon: 'editor-textcolor',
+		title: __( 'Text color' ),
+		isDisabled: true,
+	},
+	{
+		id: 'pastetext',
+		icon: 'editor-paste-text',
+		title: __( 'Paste as text' ),
+	},
+	{
+		id: 'charmap',
+		icon: 'editor-customchar',
+		title: __( 'Insert symbol' ),
+	},
+	{
+		id: 'removeformat',
+		icon: 'editor-removeformatting',
+		title: __( 'Clear formatting' ),
+	},
 ];
 
 const MORE_DRAWER_HEIGHT = 40;
@@ -152,8 +173,12 @@ export default class FreeformBlock extends wp.element.Component {
 			menubar: false,
 			plugins: [
 				...( baseSettings.plugins || [] ),
+				'charmap',
+				'contextmenu',
 				'link',
 				'lists',
+				'paste',
+				'textcolor',
 			],
 		};
 	}
@@ -343,6 +368,10 @@ export default class FreeformBlock extends wp.element.Component {
 	}
 
 	mapControls( controls ) {
+		const { activeButtons, disabledButtons } = this.state;
+		const buttonClick = ( id ) => (
+			() => id && this.editor && this.editor.buttons[ id ].onclick()
+		);
 		return controls.map( ( control ) => {
 			if ( Array.isArray( control ) ) {
 				return this.mapControls( control );
@@ -350,9 +379,9 @@ export default class FreeformBlock extends wp.element.Component {
 
 			return {
 				...control,
-				onClick: () => this.editor && this.editor.buttons[ control.id ].onclick(),
-				isActive: this.state.activeButtons[ control.id ],
-				isDisabled: this.state.disabledButtons[ control.id ],
+				onClick: control.onClick || buttonClick( control.id ),
+				isActive: control.isActive || activeButtons[ control.id ],
+				isDisabled: control.isDisabled || disabledButtons[ control.id ],
 			};
 		} );
 	}
