@@ -328,6 +328,10 @@ export default class FreeformBlock extends wp.element.Component {
 		const { focus } = this.props;
 		const isActive = this.isActive();
 
+		if ( this.editor.windowManager.windows.length > 0 ) {
+			return; // popup window open, let it manage the focus
+		}
+
 		if ( focus ) {
 			if ( ! isActive ) {
 				this.editor.focus();
