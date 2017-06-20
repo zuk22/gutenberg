@@ -172,13 +172,6 @@ class VisualEditorBlockList extends wp.element.Component {
 
 		return (
 			<div>
-				{ ! blocks.length && (
-					<input
-						className="editor-visual-editor__placeholder"
-						value={ __( 'Write your story' ) }
-						onFocus={ this.appendDefaultBlock }
-					/>
-				) }
 				{ !! blocks.length && blocksWithInsertionPoint.map( ( uid ) => {
 					if ( uid === INSERTION_POINT_PLACEHOLDER ) {
 						return (
@@ -199,6 +192,14 @@ class VisualEditorBlockList extends wp.element.Component {
 						/>
 					);
 				} ) }
+
+				<input
+					type="text"
+					readOnly
+					className="editor-visual-editor__placeholder"
+					value={ ! blocks.length ? __( 'Write your story' ) : __( 'Write' ) }
+					onFocus={ this.appendDefaultBlock }
+				/>
 			</div>
 		);
 	}

@@ -151,7 +151,8 @@ class VisualEditorBlock extends wp.element.Component {
 		this.props.onStopTyping();
 	}
 
-	removeOrDeselect( { keyCode, target } ) {
+	removeOrDeselect( event ) {
+		const { keyCode, target } = event;
 		const {
 			uid,
 			multiSelectedBlockUids,
@@ -164,6 +165,7 @@ class VisualEditorBlock extends wp.element.Component {
 		// Remove block on backspace.
 		if ( BACKSPACE === keyCode ) {
 			if ( target === this.node ) {
+				event.preventDefault();
 				onRemove( [ uid ] );
 
 				if ( previousBlock ) {
@@ -172,6 +174,7 @@ class VisualEditorBlock extends wp.element.Component {
 			}
 
 			if ( multiSelectedBlockUids.length ) {
+				event.preventDefault();
 				onRemove( multiSelectedBlockUids );
 			}
 		}
