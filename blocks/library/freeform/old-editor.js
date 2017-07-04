@@ -136,6 +136,8 @@ export default class OldEditor extends Component {
 				editor.nodeChanged();
 			}
 		} ) );
+		const toolbarCount = reduce( [ 1, 2, 3, 4 ], ( sum, i ) => sum + ( editor.settings[ 'toolbar' + i ] ? 1 : 0 ), 0 );
+		ref.classList.add( 'toolbar-count-' + toolbarCount );
 
 		/* eslint-enable */
 	}

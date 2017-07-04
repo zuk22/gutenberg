@@ -90,16 +90,7 @@
 }
 
 .freeform-toolbar .mce-tinymce-inline {
-	margin: 0;
 	background: transparent;
-	position: sticky;
-	top: $header-height - 1px;
-	z-index: z-index( '.editor-visual-editor__block-controls' );
-	margin-top: -$block-controls-height - $item-spacing;
-
-	@include break-medium() {
-		top: $header-height + $admin-bar-height + $item-spacing;
-	}
 }
 
 // Overwrite inline styles.
@@ -143,7 +134,7 @@ div.mce-toolbar-grp > div {
 }
 
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar {
-	display: block;
+	display: flex;
 }
 
 .freeform-toolbar .mce-toolbar .mce-btn {
@@ -230,4 +221,50 @@ div.mce-toolbar-grp > div {
 
 .components-toolbar__control .dashicon {
 	display: block;
+}
+
+@mixin freeform-toolbar-positioning($toolbar-count: 1) {
+	$extra: $toolbar-count - 1;
+	$primary-toolbar: $block-controls-height + $item-spacing;
+	$extra-toolbar: $block-controls-height + 6px;
+	top: $header-height + $primary-toolbar + ( $extra-toolbar * $extra );
+	@include break-medium() {
+		top: $header-height + $admin-bar-height + $primary-toolbar + ( $extra-toolbar * $extra );
+	}
+	&> div {
+		margin-top: - ( $primary-toolbar + ( $extra-toolbar * $extra ) );
+	}
+}
+
+.freeform-toolbar {
+	position: sticky;
+	z-index: z-index( '.editor-visual-editor__block-controls' );
+
+	@include freeform-toolbar-positioning(1);
+
+	&> div {
+		position: absolute;
+	}
+}
+
+.freeform-toolbar.has-advanced-toolbar {
+	&.toolbar-count-2 {
+		@include freeform-toolbar-positioning(2);
+	}
+	&.toolbar-count-3 {
+		@include freeform-toolbar-positioning(3);
+	}
+	&.toolbar-count-4 {
+		@include freeform-toolbar-positioning(4);
+	}
+}
+
+.freeform-toolbar .mce-toolbar-grp > .mce-stack-layout {
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: flex-start;
+
+	&> .mce-toolbar.mce-stack-layout-item {
+		margin-top: 6px;
+	}
 }
