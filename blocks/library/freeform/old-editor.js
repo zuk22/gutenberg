@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { reduce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from 'element';
