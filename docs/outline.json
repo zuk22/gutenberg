@@ -1,0 +1,29 @@
+[
+  {
+    "path": "",
+    "file": "readme.md",
+    "title": "Introduction"
+  },
+  {
+    "path": "blocks",
+    "file": "blocks.md",
+    "title": "Blocks",
+    "children": [
+      {
+        "path": "blocks/writing-your-first-block",
+        "file": "blocks-basic.md",
+        "title": "Writing your first block"
+      },
+      {
+        "path": "blocks/adding-a-stylesheet",
+        "file": "blocks-stylesheet.md",
+        "title": "Adding a stylesheet"
+      }
+    ]
+  },
+  {
+    "path": "faq",
+    "file": "faq.md",
+    "title": "Frequently Asked Questions"
+  }
+]

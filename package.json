@@ -63,6 +63,7 @@
     "eslint-plugin-react": "^6.10.3",
     "expose-loader": "^0.7.3",
     "extract-text-webpack-plugin": "^2.1.0",
+    "fs-extra": "^3.0.1",
     "gettext-parser": "^1.2.2",
     "glob": "^7.1.1",
     "jsdom": "^10.1.0",

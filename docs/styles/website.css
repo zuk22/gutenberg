@@ -1,0 +1,8 @@
+code {
+	tab-size: 4;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background-color: #f7f7f7 !important;
+}
