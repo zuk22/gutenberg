@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
 import { partial } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
+import Swipe from 'react-easy-swipe';
 
 /**
  * WordPress dependencies
@@ -50,6 +51,10 @@ function FirstChild( { children } ) {
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
+		this.state = {
+			'swipedLeft': false,
+			'swipedRight': false,
+		};
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
@@ -63,6 +68,7 @@ class VisualEditorBlock extends Component {
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.previousOffset = null;
+		this.onSwipeMove = this.onSwipeMove.bind( this );
 	}
 
 	componentDidMount() {
@@ -294,6 +300,34 @@ class VisualEditorBlock extends Component {
 		delete this.lastRange;
 	}
 
+	onSwipeMove( position, event ) {
+		if ( position.x < -100 ) {
+			if ( this.state.swipedRight ) {
+				this.setState( {
+					'swipedRight': false,
+				} );
+				event.stopPropagation();
+			} else {
+				this.setState( {
+					'swipedLeft': true,
+				} );
+			}
+		}
+
+		if ( position.x > 100 ) {
+			if ( this.state.swipedLeft ) {
+				this.setState( {
+					'swipedLeft': false,
+				} );
+				event.stopPropagation();
+			} else {
+				this.setState( {
+					'swipedRight': true,
+				} );
+			}
+		}
+	}
+
 	render() {
 		const { block, multiSelectedBlockUids } = this.props;
 		const blockType = getBlockType( block.name );
@@ -323,6 +357,8 @@ class VisualEditorBlock extends Component {
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
+			'is-swiped-left': this.state.swipedLeft,
+			'is-swiped-right': this.state.swipedRight,
 		} );
 
 		const { onMouseLeave, onFocus, onInsertBlocksAfter } = this.props;
@@ -336,6 +372,9 @@ class VisualEditorBlock extends Component {
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
+			<Swipe
+				onSwipeMove={ this.onSwipeMove }
+			>
 			<div
 				ref={ this.bindBlockNode }
 				onKeyDown={ this.onKeyDown }
@@ -350,8 +389,8 @@ class VisualEditorBlock extends Component {
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+				{ ( showUI || isHovered || this.state.swipedRight  ) && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered || this.state.swipedLeft ) && <BlockRightMenu uid={ block.uid } /> }
 				{ showUI &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
@@ -388,6 +427,7 @@ class VisualEditorBlock extends Component {
 					/>
 				</div>
 			</div>
+			</Swipe>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}

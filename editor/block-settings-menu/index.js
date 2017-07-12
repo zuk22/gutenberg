@@ -27,13 +27,13 @@ function BlockSettingsMenu( { onDelete, selectBlock, isSidebarOpened, toggleSide
 	return (
 		<div className="editor-block-settings-menu">
 			<IconButton
-				className="editor-block-settings-menu__control"
+				className="editor-block-settings-menu__control is-settings"
 				onClick={ toggleInspector }
 				icon="admin-generic"
 				label={ __( 'Show inspector' ) }
 			/>
 			<IconButton
-				className="editor-block-settings-menu__control"
+				className="editor-block-settings-menu__control is-delete"
 				onClick={ onDelete }
 				icon="trash"
 				label={ __( 'Delete the block' ) }

@@ -11,6 +11,7 @@
 
 	@include break-small() {
 		padding: 50px 0;
+		overflow: hidden;
 	}
 
 	@include break-large() {
@@ -29,8 +30,8 @@
 	margin-bottom: 5px;
 	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
 	position: relative;
-
 	padding: $block-padding;
+	transition: 0.2s transform ease-out;
 
 	@include break-small {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
@@ -63,6 +64,40 @@
 	&.is-selected:before {
 		outline: 2px solid $light-gray-500;
 		transition: 0.2s outline;
+	}
+
+	&.is-swiped-left {
+		transform: translateX( -200px );
+
+		.editor-block-settings-menu {
+			display: block;
+			transform: translateX( 200px );
+
+			.editor-block-settings-menu__control {
+				width: 200px;
+				height: 50px;
+				border-radius: 0;
+
+				&.is-settings {
+					background: $light-gray-500;
+				}
+
+				&.is-delete {
+					background: #CF2E06;
+					.dashicon {
+						fill: white;
+					}
+				}
+
+				.dashicon {
+					margin: 0 auto;
+				}
+			}
+		}
+	}
+
+	&.is-swiped-right {
+		transform: translateX( 200px );
 	}
 
 	&.is-multi-selected *::selection {
