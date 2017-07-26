@@ -1,0 +1,39 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/text",
+        "attributes": {
+            "content": [
+                []
+            ]
+        },
+        "isValid": true
+    },
+    {
+        "uid": "_uid_1",
+        "name": "core/text",
+        "attributes": {
+            "content": []
+        },
+        "isValid": false,
+        "originalContent": ""
+    },
+    {
+        "uid": "_uid_2",
+        "name": "core/text",
+        "attributes": {
+            "content": []
+        },
+        "isValid": false,
+        "originalContent": ""
+    },
+    {
+        "uid": "_uid_3",
+        "name": "core/text",
+        "attributes": {
+            "content": []
+        },
+        "isValid": false,
+        "originalContent": ""
+    }
+]
