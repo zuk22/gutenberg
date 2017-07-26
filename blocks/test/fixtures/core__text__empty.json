@@ -15,8 +15,7 @@
         "attributes": {
             "content": []
         },
-        "isValid": false,
-        "originalContent": ""
+        "isValid": true
     },
     {
         "uid": "_uid_2",
@@ -24,8 +23,7 @@
         "attributes": {
             "content": []
         },
-        "isValid": false,
-        "originalContent": ""
+        "isValid": true
     },
     {
         "uid": "_uid_3",
@@ -33,7 +31,6 @@
         "attributes": {
             "content": []
         },
-        "isValid": false,
-        "originalContent": ""
+        "isValid": true
     }
 ]
