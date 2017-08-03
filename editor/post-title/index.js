@@ -20,6 +20,7 @@ import './style.scss';
 import { getEditedPostTitle } from '../selectors';
 import { editPost, clearSelectedBlock } from '../actions';
 import PostPermalink from '../post-permalink';
+import FeaturedImage from '../featured-image';
 
 /**
  * Constants
@@ -106,6 +107,7 @@ class PostTitle extends Component {
 						onKeyPress={ this.onUnselect }
 					/>
 				</h1>
+				<FeaturedImage />
 			</div>
 		);
 	}

@@ -282,6 +282,16 @@ export function getEditedPostExcerpt( state ) {
 }
 
 /**
+ * Returns the featured image for the saved post if it has been set.
+ *
+ * @param  {Object} state Global application state
+ * @return {String}       Raw post excerpt
+ */
+export function getFeaturedImageLink( state ) {
+	return state.editor.edits.featured_media_link;
+}
+
+/**
  * Returns a URL to preview the post being edited.
  *
  * @param  {Object} state Global application state

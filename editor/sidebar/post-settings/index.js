@@ -10,7 +10,7 @@ import './style.scss';
 import PostStatus from '../post-status';
 import PostExcerpt from '../post-excerpt';
 import PostTaxonomies from '../post-taxonomies';
-import FeaturedImage from '../featured-image';
+import FeaturedImagePanel from '../featured-image-panel';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import TableOfContents from '../table-of-contents';
@@ -21,7 +21,7 @@ const panel = (
 		<PostStatus />
 		<LastRevision />
 		<PostTaxonomies />
-		<FeaturedImage />
+		<FeaturedImagePanel />
 		<PostExcerpt />
 		<DiscussionPanel />
 		<PageAttributes />

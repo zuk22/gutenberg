@@ -1,5 +1,7 @@
 .editor-visual-editor > .editor-post-title:not( [ data-align="wide" ] ),
 .editor-post-title {
+	display: flex;
+	justify-content: space-between;
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
@@ -12,6 +14,7 @@
 
 	h1 {
 		outline: 1px solid transparent;
+		flex-grow: 1;
 		font-size: $editor-font-size;
 		transition: 0.2s outline;
 		margin-top: 0;
@@ -46,6 +49,23 @@
 		@include break-large() {
 			margin: 0 auto;
 			padding: 0;
+		}
+	}
+
+	.editor-featured-image__howto,
+	.editor-featured-image__toggle {
+		display: none;
+	}
+
+	.editor-featured-image {
+		margin-left: 22px;
+		width: 82px;
+		height: 82px;
+
+		img {
+			object-fit: cover;
+			width: 100%;
+			height: 100%;
 		}
 	}
 }

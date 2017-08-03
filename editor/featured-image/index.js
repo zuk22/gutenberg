@@ -8,15 +8,15 @@ import { connect } from 'react-redux';
  */
 import { Component } from 'element';
 import { __ } from 'i18n';
-import { Button, PanelBody, Spinner, ResponsiveWrapper } from 'components';
+import { Button, Spinner, ResponsiveWrapper } from 'components';
 import { MediaUploadButton } from 'blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import { getEditedPostAttribute } from '../selectors';
+import { editPost } from '../actions';
 
 class FeaturedImage extends Component {
 	constructor() {
@@ -75,46 +75,44 @@ class FeaturedImage extends Component {
 		const { media, loading } = this.state;
 
 		return (
-			<PanelBody title={ __( 'Featured image' ) } initialOpen={ false }>
-				<div className="editor-featured-image__content">
-					{ !! featuredImageId &&
-						<MediaUploadButton
-							buttonProps={ { className: 'button-link editor-featured-image__preview' } }
-							onSelect={ onUpdateImage }
-							type="image"
-						>
-							{ media &&
-								<ResponsiveWrapper
-									naturalWidth={ media.media_details.width }
-									naturalHeight={ media.media_details.height }
-								>
-									<img src={ media.source_url } alt={ __( 'Featured image' ) } />
-								</ResponsiveWrapper>
-							}
-							{ loading && <Spinner /> }
-						</MediaUploadButton>
-					}
-					{ !! featuredImageId && media &&
-						<p className="editor-featured-image__howto">
-							{ __( 'Click the image to edit or update' ) }
-						</p>
-					}
-					{ ! featuredImageId &&
-						<MediaUploadButton
-							buttonProps={ { className: 'editor-featured-image__toggle button-link' } }
-							onSelect={ onUpdateImage }
-							type="image"
-						>
-							{ __( 'Set featured image' ) }
-						</MediaUploadButton>
-					}
-					{ !! featuredImageId &&
-						<Button className="editor-featured-image__toggle button-link" onClick={ onRemoveImage }>
-							{ __( 'Remove featured image' ) }
-						</Button>
-					}
-				</div>
-			</PanelBody>
+			<div className="editor-featured-image">
+				{ !! featuredImageId &&
+					<MediaUploadButton
+						buttonProps={ { className: 'button-link editor-featured-image__preview' } }
+						onSelect={ onUpdateImage }
+						type="image"
+					>
+						{ media &&
+							<ResponsiveWrapper
+								naturalWidth={ media.media_details.width }
+								naturalHeight={ media.media_details.height }
+							>
+								<img src={ media.source_url } alt={ __( 'Featured image' ) } />
+							</ResponsiveWrapper>
+						}
+						{ loading && <Spinner /> }
+					</MediaUploadButton>
+				}
+				{ !! featuredImageId && media &&
+					<p className="editor-featured-image__howto">
+						{ __( 'Click the image to edit or update' ) }
+					</p>
+				}
+				{ ! featuredImageId &&
+					<MediaUploadButton
+						buttonProps={ { className: 'editor-featured-image__toggle button-link' } }
+						onSelect={ onUpdateImage }
+						type="image"
+					>
+						{ __( 'Set featured image' ) }
+					</MediaUploadButton>
+				}
+				{ !! featuredImageId &&
+					<Button className="editor-featured-image__toggle button-link" onClick={ onRemoveImage }>
+						{ __( 'Remove featured image' ) }
+					</Button>
+				}
+			</div>
 		);
 	}
 }

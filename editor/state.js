@@ -476,6 +476,15 @@ export function panel( state = 'document', action ) {
 	return state;
 }
 
+export function featuredImage( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_FEATURED_IMAGE':
+			return action.imageUrl;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning current network request state (whether a request to the WP
  * REST API is in progress, successful, or failed).
@@ -546,6 +555,7 @@ export function createReduxStore() {
 		mode,
 		isSidebarOpened,
 		panel,
+		featuredImage,
 		saving,
 		notices,
 		userData,
