@@ -117,11 +117,11 @@
 	}
 
 	&.is-multi-selected *::selection {
-		background: transparent;
+		// background: transparent;
 	}
 
 	&.is-multi-selected:before {
-		background: $blue-medium-100;
+		// background: $blue-medium-100;
 		outline: 2px solid $blue-medium-200;
 		transition: 0.2s outline;
 	}

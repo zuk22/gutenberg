@@ -529,6 +529,7 @@ export default class Editable extends Component {
 			formattingControls,
 			placeholder,
 			multiline: MultilineTag,
+			isMultiSelected,
 		} = this.props;
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -568,6 +569,7 @@ export default class Editable extends Component {
 					isPlaceholderVisible={ isPlaceholderVisible }
 					label={ placeholder }
 					key={ key }
+					isMultiSelected={ isMultiSelected }
 				/>
 				{ isPlaceholderVisible &&
 					<Tagname

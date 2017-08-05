@@ -57,7 +57,7 @@ registerBlockType( 'core/paragraph', {
 		};
 	},
 
-	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace } ) {
+	edit( { attributes, setAttributes, insertBlocksAfter, focus, setFocus, mergeBlocks, onReplace, isMultiSelected } ) {
 		const { align, content, dropCap, placeholder } = attributes;
 		const toggleDropCap = () => setAttributes( { dropCap: ! dropCap } );
 		return [
@@ -107,6 +107,7 @@ registerBlockType( 'core/paragraph', {
 				style={ { textAlign: align } }
 				className={ dropCap && 'has-drop-cap' }
 				placeholder={ placeholder || __( 'New Paragraph' ) }
+				isMultiSelected={ isMultiSelected }
 			/>,
 		];
 	},

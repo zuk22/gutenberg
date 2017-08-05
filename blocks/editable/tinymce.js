@@ -31,6 +31,10 @@ export default class TinyMCE extends Component {
 			this.editorNode.setAttribute( name, isPlaceholderVisible );
 		}
 
+		if ( this.props.isMultiSelected !== nextProps.isMultiSelected ) {
+			this.editorNode.setAttribute( 'contentEditable', ! nextProps.isMultiSelected );
+		}
+
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
 			Object.assign( this.editorNode.style, nextProps.style );
 		}

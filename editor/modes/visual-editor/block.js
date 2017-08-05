@@ -417,6 +417,7 @@ class VisualEditorBlock extends Component {
 							mergeBlocks={ this.mergeBlocks }
 							className={ className }
 							id={ block.uid }
+							isMultiSelected={ isMultiSelected }
 						/>
 					) }
 					{ ! isValid && (
