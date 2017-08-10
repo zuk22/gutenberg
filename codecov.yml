@@ -1,3 +1,7 @@
+# dummy update to make codecov rebuild
+codecov:
+  allow_coverage_offsets: false
+
 coverage:
   status:
     project:
