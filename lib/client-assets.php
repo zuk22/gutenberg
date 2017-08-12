@@ -35,6 +35,18 @@ function gutenberg_url( $path ) {
 }
 
 /**
+ * Returns a version handle for a specified file path.
+ *
+ * @param  string $path File path
+ * @return string       Version handle
+ */
+function gutenberg_file_version( $path ) {
+	if ( file_exists( $path ) ) {
+		return filemtime( $path );
+	}
+}
+
+/**
  * Returns contents of an inline script used in appending polyfill scripts for
  * browsers which fail the provided tests. The provided array is a mapping from
  * a condition to verify feature support to its polyfill script handle.
@@ -80,13 +92,13 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-utils',
 		gutenberg_url( 'utils/build/index.js' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
+		gutenberg_file_version( gutenberg_dir_path() . 'utils/build/index.js' )
 	);
 	wp_register_script(
 		'wp-date',
 		gutenberg_url( 'date/build/index.js' ),
 		array( 'moment' ),
-		filemtime( gutenberg_dir_path() . 'date/build/index.js' )
+		gutenberg_file_version( gutenberg_dir_path() . 'date/build/index.js' )
 	);
 	global $wp_locale;
 	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
@@ -118,25 +130,25 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-i18n',
 		gutenberg_url( 'i18n/build/index.js' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'i18n/build/index.js' )
+		gutenberg_file_version( gutenberg_dir_path() . 'i18n/build/index.js' )
 	);
 	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'element/build/index.js' ),
 		array( 'react', 'react-dom', 'react-dom-server' ),
-		filemtime( gutenberg_dir_path() . 'element/build/index.js' )
+		gutenberg_file_version( gutenberg_dir_path() . 'element/build/index.js' )
 	);
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
 		array( 'wp-element', 'wp-a11y', 'wp-i18n', 'wp-utils' ),
-		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
+		gutenberg_file_version( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
 		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-nightly', 'tinymce-nightly-lists', 'tinymce-nightly-paste', 'tinymce-nightly-table', 'media-views', 'media-models' ),
-		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
+		gutenberg_file_version( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
 		'wp-blocks',
@@ -152,19 +164,19 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-components',
 		gutenberg_url( 'components/build/style.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'components/build/style.css' )
+		gutenberg_file_version( gutenberg_dir_path() . 'components/build/style.css' )
 	);
 	wp_register_style(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/style.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'blocks/build/style.css' )
+		gutenberg_file_version( gutenberg_dir_path() . 'blocks/build/style.css' )
 	);
 	wp_register_style(
 		'wp-edit-blocks',
 		gutenberg_url( 'blocks/build/edit-blocks.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' )
+		gutenberg_file_version( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' )
 	);
 }
 add_action( 'init', 'gutenberg_register_scripts_and_styles' );
@@ -532,7 +544,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'wp-editor',
 		gutenberg_url( 'editor/build/index.js' ),
 		array( 'wp-api', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'editor' ),
-		filemtime( gutenberg_dir_path() . 'editor/build/index.js' ),
+		gutenberg_file_version( gutenberg_dir_path() . 'editor/build/index.js' ),
 		true // enqueue in the footer.
 	);
 
@@ -708,7 +720,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'wp-editor',
 		gutenberg_url( 'editor/build/style.css' ),
 		array( 'wp-components', 'wp-blocks', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
+		gutenberg_file_version( gutenberg_dir_path() . 'editor/build/style.css' )
 	);
 
 	/**
