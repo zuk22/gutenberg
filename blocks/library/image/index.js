@@ -8,7 +8,7 @@ import ResizableBox from 'react-resizable-box';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { mediaUpload } from '@wordpress/utils';
+import { mediaUpload, createMediaFromFile } from '@wordpress/utils';
 import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordpress/components';
 
 /**
@@ -16,7 +16,7 @@ import { Placeholder, Dashicon, Toolbar, DropZone, FormFileUpload } from '@wordp
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, source } from '../../api';
+import { registerBlockType, source, createBlock } from '../../api';
 import withEditorSettings from '../../with-editor-settings';
 import Editable from '../../editable';
 import MediaUploadButton from '../../media-upload-button';
@@ -78,6 +78,19 @@ registerBlockType( 'core/image', {
 					node.nodeName === 'IMG' ||
 					( ! node.textContent && node.querySelector( 'img' ) )
 				),
+			},
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
+				},
+				transform( files ) {
+					return createMediaFromFile( files[ 0 ] )
+						.then( ( media ) => createBlock( 'core/image', {
+							id: media.id,
+							url: media.source_url,
+						} ) );
+				},
 			},
 		],
 	},
