@@ -4,16 +4,16 @@
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Slot } from 'react-slot-fill';
-import { partial } from 'lodash';
+import { partial, reduce, get, find } from 'lodash';
 import CSSTransitionGroup from 'react-transition-group/CSSTransitionGroup';
 
 /**
  * WordPress dependencies
  */
 import { Children, Component } from '@wordpress/element';
-import { IconButton, Toolbar } from '@wordpress/components';
+import { IconButton, Toolbar, DropZone } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
+import { getBlockType, getBlockDefaultClassname, createBlock, getBlockTypes } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -76,6 +76,7 @@ class VisualEditorBlock extends Component {
 		this.handleArrowKey = this.handleArrowKey.bind( this );
 		this.toggleMobileControls = this.toggleMobileControls.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
+		this.dropFiles = this.dropFiles.bind( this );
 
 		this.previousOffset = null;
 
@@ -262,9 +263,9 @@ class VisualEditorBlock extends Component {
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
-			this.props.onInsertBlocksAfter( [
+			this.props.onInsertBlocks( [
 				createBlock( 'core/paragraph' ),
-			] );
+			], this.props.order );
 		}
 	}
 
@@ -325,8 +326,27 @@ class VisualEditorBlock extends Component {
 		this.setState( { error } );
 	}
 
+	dropFiles( files, position ) {
+		const { order } = this.props;
+		const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
+			if ( ret ) {
+				return ret;
+			}
+
+			return find( get( blockType, 'transforms.from', [] ), ( transform ) => (
+				transform.type === 'files' && transform.isMatch( files )
+			) );
+		}, false );
+
+		if ( transformation ) {
+			transformation.transform( files ).then( ( blocks ) => {
+				this.props.onInsertBlocks( blocks, position.y === 'top' ? order : order + 1 );
+			} );
+		}
+	}
+
 	render() {
-		const { block, multiSelectedBlockUids } = this.props;
+		const { block, multiSelectedBlockUids, order } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -359,7 +379,7 @@ class VisualEditorBlock extends Component {
 			'is-showing-mobile-controls': showMobileControls,
 		} );
 
-		const { onMouseLeave, onFocus, onInsertBlocksAfter, onReplace } = this.props;
+		const { onMouseLeave, onFocus, onInsertBlocks, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -388,6 +408,9 @@ class VisualEditorBlock extends Component {
 				aria-label={ blockLabel }
 				{ ...wrapperProps }
 			>
+				<DropZone
+					onFilesDrop={ this.dropFiles }
+				/>
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
 				{ showUI && isValid &&
@@ -434,7 +457,7 @@ class VisualEditorBlock extends Component {
 								focus={ focus }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ onInsertBlocksAfter }
+								insertBlocksAfter={ ( blocks ) => onInsertBlocks( blocks, order + 1 ) }
 								onReplace={ onReplace }
 								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ this.mergeBlocks }
@@ -509,8 +532,8 @@ export default connect(
 			} );
 		},
 
-		onInsertBlocksAfter( blocks ) {
-			dispatch( insertBlocks( blocks, ownProps.uid ) );
+		onInsertBlocks( blocks, position ) {
+			dispatch( insertBlocks( blocks, position ) );
 		},
 
 		onFocus( ...args ) {
