@@ -13,7 +13,7 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source } from '../../api';
+import { registerBlockType, createBlock, source, toElement } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -209,9 +209,7 @@ registerBlockType( 'core/quote', {
 				className={ `blocks-quote-style-${ style }` }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph.props.children }</p>
-				) ) }
+				{ toElement( value ) }
 				{ citation && citation.length > 0 && (
 					<footer>{ citation }</footer>
 				) }

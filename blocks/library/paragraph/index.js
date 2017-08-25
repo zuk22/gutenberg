@@ -8,7 +8,7 @@ import { concatChildren } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, createBlock, source, setDefaultBlock } from '../../api';
+import { registerBlockType, createBlock, source, setDefaultBlock, toElement } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import Editable from '../../editable';
@@ -124,10 +124,10 @@ registerBlockType( 'core/paragraph', {
 		const className = dropCap ? 'has-drop-cap' : null;
 
 		if ( ! align ) {
-			return <p className={ className }>{ content }</p>;
+			return <p className={ className }>{ toElement( content ) }</p>;
 		}
 
-		return <p style={ { textAlign: align } } className={ className }>{ content }</p>;
+		return <p style={ { textAlign: align } } className={ className }>{ toElement( content ) }</p>;
 	},
 } );
 

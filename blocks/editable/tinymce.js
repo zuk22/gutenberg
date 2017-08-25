@@ -8,7 +8,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, Children, createElement } from '@wordpress/element';
+import { Component, createElement } from '@wordpress/element';
+import { toElement } from '@wordpress/blocks';
 
 export default class TinyMCE extends Component {
 	componentDidMount() {
@@ -85,7 +86,7 @@ export default class TinyMCE extends Component {
 		// us to show and focus the content before it's truly ready to edit.
 		let children;
 		if ( defaultValue ) {
-			children = Children.toArray( defaultValue );
+			children = toElement( defaultValue );
 		}
 
 		return createElement( tagName, {
