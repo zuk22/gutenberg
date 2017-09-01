@@ -8,7 +8,7 @@ import { get, reduce, keyBy, first, last, omit, without, mapValues } from 'lodas
 /**
  * WordPress dependencies
  */
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -156,7 +156,13 @@ export const editor = combineUndoableReducers( {
 				}, omit( state, action.uids ) );
 
 			case 'REMOVE_BLOCKS':
-				return omit( state, action.uids );
+				console.log( action.uids );
+				const uids = action.uids.filter( ( uid ) => {
+					const block = getBlockType( state[ uid ].name );
+					return ! block.locked;
+				} );
+				console.log( uids );
+				return omit( state, uids );
 		}
 
 		return state;
@@ -232,7 +238,7 @@ export const editor = combineUndoableReducers( {
 				}, [] );
 
 			case 'REMOVE_BLOCKS':
-				return without( state, ...action.uids );
+				return without( state, ...uids );
 		}
 
 		return state;

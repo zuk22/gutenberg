@@ -50,6 +50,7 @@ import {
 	isFirstMultiSelectedBlock,
 	isTyping,
 	getMultiSelectedBlockUids,
+	isBlockLocked,
 } from '../../selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
@@ -196,6 +197,10 @@ class VisualEditorBlock extends Component {
 			onDeselect,
 		} = this.props;
 
+		if ( this.props.isLocked ) {
+			return;
+		}
+
 		// Remove block on backspace.
 		if (
 			target === this.node &&
@@ -276,7 +281,7 @@ class VisualEditorBlock extends Component {
 	}
 
 	render() {
-		const { block, multiSelectedBlockUids, order } = this.props;
+		const { block, multiSelectedBlockUids, order, isLocked } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -307,6 +312,7 @@ class VisualEditorBlock extends Component {
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-showing-mobile-controls': showMobileControls,
+			'is-locked': isLocked,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;
@@ -338,8 +344,8 @@ class VisualEditorBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+				{ ( showUI || isHovered ) && ! isLocked && <BlockMover uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } isLocked={ isLocked } /> }
 				{ showUI && isValid &&
 					<CSSTransitionGroup
 						transitionName={ { appear: 'is-appearing', appearActive: 'is-appearing-active' } }
@@ -422,6 +428,7 @@ export default connect(
 			isTyping: isTyping( state ),
 			order: getBlockIndex( state, ownProps.uid ),
 			multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+			isLocked: isBlockLocked( state, ownProps.uid ),
 		};
 	},
 	( dispatch, ownProps ) => ( {

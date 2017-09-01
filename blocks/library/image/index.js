@@ -23,6 +23,8 @@ registerBlockType( 'core/image', {
 
 	keywords: [ __( 'photo' ) ],
 
+	locked: true,
+
 	attributes: {
 		url: {
 			type: 'string',

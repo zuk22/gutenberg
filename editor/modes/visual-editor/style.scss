@@ -126,6 +126,11 @@
 		transition: 0.2s outline;
 	}
 
+	&.is-multi-selected.is-locked:before {
+		background: $light-gray-300;
+		outline: 2px solid $light-gray-500;
+	}
+
 	.iframe-overlay {
 		position: relative;
 	}

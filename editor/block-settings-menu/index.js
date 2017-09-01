@@ -16,7 +16,7 @@ import './style.scss';
 import { isEditorSidebarOpened } from '../selectors';
 import { selectBlock } from '../actions';
 
-function BlockSettingsMenu( { onDelete, onSelect, isSidebarOpened, toggleSidebar, setActivePanel } ) {
+function BlockSettingsMenu( { onDelete, onSelect, isSidebarOpened, toggleSidebar, setActivePanel, isLocked } ) {
 	const toggleInspector = () => {
 		onSelect();
 		setActivePanel();
@@ -33,12 +33,19 @@ function BlockSettingsMenu( { onDelete, onSelect, isSidebarOpened, toggleSidebar
 				icon="admin-generic"
 				label={ __( 'Show inspector' ) }
 			/>
-			<IconButton
-				className="editor-block-settings-menu__control"
-				onClick={ onDelete }
-				icon="trash"
-				label={ __( 'Delete the block' ) }
-			/>
+			{ isLocked
+				? <IconButton
+					className="editor-block-settings-menu__control"
+					icon="lock"
+					label={ __( 'This block cannot be removed' ) }
+				/>
+				: <IconButton
+					className="editor-block-settings-menu__control"
+					onClick={ onDelete }
+					icon="trash"
+					label={ __( 'Delete the block' ) }
+				/>
+			}
 		</div>
 	);
 }

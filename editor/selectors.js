@@ -656,6 +656,24 @@ export function getBlockFocus( state, uid ) {
 }
 
 /**
+ * Returns whether the block is locked or not.
+ *
+ * @param  {Object} state Global application state
+ * @param  {String} uid   Block unique ID
+ * @return {Bool}         Block locked status
+ */
+export function isBlockLocked( state, uid ) {
+	const block = getBlock( state, uid );
+	const blockType = getBlockType( block.name );
+
+	if ( blockType ) {
+		return blockType.locked;
+	}
+
+	return false;
+}
+
+/**
  * Returns true if the user is typing, or false otherwise.
  *
  * @param  {Object}  state Global application state
