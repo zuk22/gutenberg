@@ -36,7 +36,6 @@ registerBlockType( 'core/contact-stripe', {
 	attributes: {
 		address: {
 			type: 'string',
-			default: 'Write address...'
 		},
 		align: {
 			type: 'string'
@@ -58,17 +57,15 @@ registerBlockType( 'core/contact-stripe', {
 			<div className="contact-info-area  contact-info-footer-no-display">
 				<div className="contact-info-wrapper">
 					<span className="contact-info-address">
-						<a href="http://maps.google.com/maps?q=4600+international+gateway,+columbus,+oh+43219,+usa" target="_blank" className="customize-unpreviewable">
-							<Editable
-								tagName="span"
-								className="contact-info-label"
-								placeholder={ __( 'Write address...' ) }
-								value={ address }
-								focus={ focus }
-								onFocus={ setFocus }
-								onChange={ ( value ) => setAttributes( { address: value } ) }
-							/>
-						</a>
+						<Editable
+							tagName="span"
+							className="contact-info-label"
+							placeholder={ __( 'Write address...' ) }
+							value={ address }
+							focus={ focus }
+							onFocus={ setFocus }
+							onChange={ ( value ) => setAttributes( { address: value } ) }
+						/>
 					</span>
 
 					<span className="contact-info-phone">
@@ -91,7 +88,35 @@ registerBlockType( 'core/contact-stripe', {
 		);
 	},
 
-	save() {
-		return null;
+	save( { attributes } ) {
+		const { address } = attributes;
+
+		return (
+			<div className="contact-info-area  contact-info-footer-no-display">
+				<div className="contact-info-wrapper">
+					<span className="contact-info-address">
+						<a href={ "http://maps.google.com/maps?q=" + encodeURIComponent( address ) } target="_blank" className="customize-unpreviewable">
+							{ address }
+						</a>
+					</span>
+
+					<span className="contact-info-phone">
+						<a href="tel:+1 555-555-555">
+							<span className="contact-info-label">+1 555-555-555</span>
+						</a>
+					</span>
+
+					<span className="contact-info-email">
+						<a href="mailto:contact@mydomain.com">
+							<span className="contact-info-label">contact@mydomain.com</span>
+						</a>
+					</span>
+
+					<span className="contact-info-hours">
+						<span className="contact-info-hours-text">Mon - Fri: 8am - 6pm</span>
+					</span>
+				</div>
+			</div>
+		);
 	},
 } );
