@@ -38,13 +38,17 @@ registerBlockType( 'core/contact-stripe', {
 	},
 
 	edit() {
+		const svgIconLocation = '<use href="#icon-location" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-location"></use>';
+		const svgIconPhone = '<use href="#icon-phone" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-phone"></use>';
+		const svgIconMail = '<use href="#icon-mail" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-mail"></use>';
+		const svgIconTime = '<use href="#icon-time" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-time"></use>';
+
 		return (
 			<div className="contact-info-area  contact-info-footer-no-display">
 				<div className="contact-info-wrapper">
 					<span className="contact-info-address">
 						<a href="http://maps.google.com/maps?q=4600+international+gateway,+columbus,+oh+43219,+usa" target="_blank" className="customize-unpreviewable">
-							<svg className="icon icon-location" aria-hidden="true" role="img">
-								{/*<use href="#icon-location" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-location"></use>*/}
+							<svg className="icon icon-location" aria-hidden="true" role="img" dangerouslySetInnerHTML={ {__html: svgIconLocation } }>
 							</svg>
 							<span className="contact-info-label">4600 International Gateway, Columbus, OH 43219, USA</span>
 						</a>
@@ -52,8 +56,7 @@ registerBlockType( 'core/contact-stripe', {
 
 					<span className="contact-info-phone">
 						<a href="tel:+1 555-555-555">
-							<svg className="icon icon-phone" aria-hidden="true" role="img">
-								{/*<use href="#icon-phone" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-phone"></use>*/}
+							<svg className="icon icon-phone" aria-hidden="true" role="img" dangerouslySetInnerHTML={ {__html: svgIconPhone } }>
 							</svg>
 						<span className="contact-info-label">+1 555-555-555</span>
 						</a>
@@ -61,16 +64,14 @@ registerBlockType( 'core/contact-stripe', {
 
 					<span className="contact-info-email">
 						<a href="mailto:contact@mydomain.com">
-							<svg className="icon icon-mail" aria-hidden="true" role="img">
-								{/*<use href="#icon-mail" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-mail"></use>*/}
+							<svg className="icon icon-mail" aria-hidden="true" role="img" dangerouslySetInnerHTML={ {__html: svgIconMail } }>
 							</svg>
 							<span className="contact-info-label">contact@mydomain.com</span>
 						</a>
 					</span>
 
 					<span className="contact-info-hours">
-						<svg className="icon icon-time" aria-hidden="true" role="img">
-							{/*<use href="#icon-time" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-time"></use>*/}
+						<svg className="icon icon-time" aria-hidden="true" role="img" dangerouslySetInnerHTML={ {__html: svgIconTime  } }>
 						</svg>
 						<span className="contact-info-hours-text">Mon - Fri: 8am - 6pm</span>
 					</span>
