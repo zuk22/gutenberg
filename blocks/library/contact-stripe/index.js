@@ -54,8 +54,8 @@ registerBlockType( 'core/contact-stripe', {
 		const { address } = attributes;
 
 		return (
-			<div className="contact-info-area  contact-info-footer-no-display">
-				<div className="contact-info-wrapper">
+			<div className="wp-block-contact-info">
+				<div className="wp-block-contact-info__wrapper">
 					<span className="contact-info-address">
 						<Editable
 							tagName="span"
@@ -92,8 +92,8 @@ registerBlockType( 'core/contact-stripe', {
 		const { address } = attributes;
 
 		return (
-			<div className="contact-info-area  contact-info-footer-no-display">
-				<div className="contact-info-wrapper">
+			<div className="wp-block-contact-info">
+				<div className="wp-block-contact-info__wrapper">
 					<span className="contact-info-address">
 						<a href={ "http://maps.google.com/maps?q=" + encodeURIComponent( address ) } target="_blank" className="customize-unpreviewable">
 							{ address }

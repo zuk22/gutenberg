@@ -1,4 +1,58 @@
+.wp-block-contact-info {
+
+}
+
+.wp-block-contact-info__wrapper {
+	padding: $block-padding;
+	text-align: center;
+}
+
+.wp-block-contact-info span {
+	display: inline-block;
+}
+
+.wp-block-contact-info span a,
+.wp-block-contact-info span.contact-info-hours {
+	display: inline-block;
+	padding: 0 ( $block-padding / 2 );
+}
+
+.wp-block-contact-info span:first-child {
+	margin-left: 0;
+}
+
+.wp-block-contact-info span.contact-info-label {
+	position: absolute;
+	left: -999999em;
+}
+
+.wp-block-contact-info .icon {
+	height: 1.5em;
+	width: 1.5em;
+}
+
+@include break-medium() {
+
+	.wp-block-contact-info .icon {
+		height: 1em;
+		width: 1em;
+	}
+
+	.wp-block-contact-info span.contact-info-label {
+		display: inline;
+		left: auto;
+		margin: 0;
+		position: static;
+	}
+}
+
+@media screen and (min-width: $break-medium) {
+
+}
+
+/*
 .wp-block-latest-posts {
+
 	&.alignleft {
 		margin-right: 2em;
 	}
@@ -41,4 +95,5 @@
 	color: $dark-gray-100;
 	font-size: $default-font-size;
 }
+*/
 
