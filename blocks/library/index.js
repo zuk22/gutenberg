@@ -15,6 +15,7 @@ import './code';
 import './html';
 import './freeform';
 import './latest-posts';
+import './contact-stripe';
 import './categories';
 import './cover-image';
 import './shortcode';
