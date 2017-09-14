@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { Placeholder, Toolbar, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/utils';
-import moment from 'moment';
-import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -14,13 +9,6 @@ import classnames from 'classnames';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
-import BlockDescription from '../../block-description';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const { text } = source;
 
@@ -36,22 +24,24 @@ registerBlockType( 'core/contact-stripe', {
 	attributes: {
 		address: {
 			type: 'string',
+			source: text( '.wp-block-contact-info__address' ),
 		},
-		align: {
-			type: 'string'
-		}
-	},
-
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+		phone: {
+			type: 'string',
+			source: text( '.wp-block-contact-info__phone' ),
+		},
+		email: {
+			type: 'string',
+			source: text( '.wp-block-contact-info__email' ),
+		},
+		hours: {
+			type: 'string',
+			source: text( '.wp-block-contact-info__hours' ),
+		},
 	},
 
 	edit( { attributes, setAttributes, focus, setFocus } ) {
-
-		const { address } = attributes;
+		const { address, phone, email, hours } = attributes;
 
 		return (
 			<div className="wp-block-contact-info">
@@ -62,26 +52,38 @@ registerBlockType( 'core/contact-stripe', {
 							className="contact-info-label"
 							placeholder={ __( 'Write address...' ) }
 							value={ address }
-							focus={ focus }
-							onFocus={ setFocus }
 							onChange={ ( value ) => setAttributes( { address: value } ) }
 						/>
 					</span>
 
 					<span className="contact-info-phone">
-						<a href="tel:+1 555-555-555">
-							<span className="contact-info-label">+1 555-555-555</span>
-						</a>
+						<Editable
+							tagName="span"
+							className="contact-info-label"
+							placeholder={ __( 'Write phone number...' ) }
+							value={ phone }
+							onChange={ ( value ) => setAttributes( { phone: value } ) }
+						/>
 					</span>
 
 					<span className="contact-info-email">
-						<a href="mailto:contact@mydomain.com">
-							<span className="contact-info-label">contact@mydomain.com</span>
-						</a>
+						<Editable
+							tagName="span"
+							className="contact-info-label"
+							placeholder={ __( 'Write email...' ) }
+							value={ email }
+							onChange={ ( value ) => setAttributes( { email: value } ) }
+						/>
 					</span>
 
 					<span className="contact-info-hours">
-						<span className="contact-info-hours-text">Mon - Fri: 8am - 6pm</span>
+						<Editable
+							tagName="span"
+							className="contact-info-label"
+							placeholder={ __( 'Write opening hours...' ) }
+							value={ hours }
+							onChange={ ( value ) => setAttributes( { hours: value } ) }
+						/>
 					</span>
 				</div>
 			</div>
@@ -89,31 +91,41 @@ registerBlockType( 'core/contact-stripe', {
 	},
 
 	save( { attributes } ) {
-		const { address } = attributes;
+		const { address, phone, email, hours } = attributes;
 
 		return (
 			<div className="wp-block-contact-info">
 				<div className="wp-block-contact-info__wrapper">
-					<span className="contact-info-address">
-						<a href={ "http://maps.google.com/maps?q=" + encodeURIComponent( address ) } target="_blank" className="customize-unpreviewable">
+					<span>
+						<a
+							href={ "http://maps.google.com/maps?q=" + encodeURIComponent( address ) }
+							target="_blank"
+							className="wp-block-contact-info__address"
+						>
 							{ address }
 						</a>
 					</span>
 
-					<span className="contact-info-phone">
+					<span>
 						<a href="tel:+1 555-555-555">
-							<span className="contact-info-label">+1 555-555-555</span>
+							<span className="contact-info-label wp-block-contact-info__phone">
+								{ phone }
+							</span>
 						</a>
 					</span>
 
-					<span className="contact-info-email">
-						<a href="mailto:contact@mydomain.com">
-							<span className="contact-info-label">contact@mydomain.com</span>
+					<span>
+						<a href={ "mailto:" + email }>
+							<span className="contact-info-label wp-block-contact-info__email">
+								{ email }
+							</span>
 						</a>
 					</span>
 
-					<span className="contact-info-hours">
-						<span className="contact-info-hours-text">Mon - Fri: 8am - 6pm</span>
+					<span>
+						<span className="contact-info-hours-text wp-block-contact-info__hours">
+							{ hours }
+						</span>
 					</span>
 				</div>
 			</div>
