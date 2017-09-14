@@ -1,29 +1,20 @@
-.wp-block-contact-info {
-
-}
-
 .wp-block-contact-info__wrapper {
 	padding: $block-padding;
 	text-align: center;
 }
 
-.wp-block-contact-info > span {
+.wp-block-contact-info__wrapper > span {
 	display: inline-block;
 }
 
-.wp-block-contact-info span a,
-.wp-block-contact-info span.contact-info-hours {
+.wp-block-contact-info__wrapper > span a,
+.wp-block-contact-info__wrapper > span.contact-info-hours {
 	display: inline-block;
 	padding: 0 ( $block-padding / 2 );
 }
 
-.wp-block-contact-info span:first-child {
-	margin-left: 0;
-}
-
-.wp-block-contact-info span.contact-info-label {
-	position: absolute;
-	left: -999999em;
+.wp-block-contact-info__wrapper > span:first-child {
+	left: 0;
 }
 
 .wp-block-contact-info .icon {
@@ -36,12 +27,5 @@
 	.wp-block-contact-info .icon {
 		height: 1em;
 		width: 1em;
-	}
-
-	.wp-block-contact-info span.contact-info-label {
-		display: inline;
-		left: auto;
-		margin: 0;
-		position: static;
 	}
 }

@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
 import { registerBlockType, source } from '../../api';
 import Editable from '../../editable';
@@ -44,8 +45,8 @@ registerBlockType( 'core/contact-stripe', {
 		const { address, phone, email, hours } = attributes;
 
 		return (
-			<div className="wp-block-contact-info">
-				<div className="wp-block-contact-info__wrapper">
+			<div className="editor-contact-info">
+				<div className="editor-contact-info__wrapper">
 					<span className="contact-info-address">
 						<Editable
 							tagName="span"
