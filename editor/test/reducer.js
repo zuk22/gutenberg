@@ -23,7 +23,7 @@ import {
 	saving,
 	notices,
 	showInsertionPoint,
-	userData,
+	userSessionData,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -919,7 +919,7 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'userData()', () => {
+	describe( 'userSessionData()', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/test-block', {
 				save: noop,
@@ -934,8 +934,8 @@ describe( 'state', () => {
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const original = userData( undefined, {} );
-			const state = userData( original, {
+			const original = userSessionData( undefined, {} );
+			const state = userSessionData( original, {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -945,7 +945,7 @@ describe( 'state', () => {
 
 			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
 
-			const twoRecentBlocks = userData( state, {
+			const twoRecentBlocks = userSessionData( state, {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'eggs',
@@ -958,7 +958,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should populate recently used blocks with blocks from the common category', () => {
-			const initial = userData( undefined, {
+			const initial = userSessionData( undefined, {
 				type: 'SETUP_EDITOR',
 			} );
 

@@ -802,5 +802,5 @@ export function getNotices( state ) {
  */
 export function getRecentlyUsedBlocks( state ) {
 	// resolves the block names in the state to the block type settings
-	return state.userData.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
+	return state.userSessionData.recentlyUsedBlocks.map( blockType => getBlockType( blockType ) );
 }

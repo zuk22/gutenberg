@@ -240,14 +240,13 @@ export const editor = combineUndoableReducers( {
 }, { resetTypes: [ 'RESET_POST' ] } );
 
 /**
- * Reducer loading and saving user specific data, such as preferences and
- * block usage.
+ * Reducer loading and saving data for this editing session.
  *
  * @param  {Object} state  Current state
  * @param  {Object} action Dispatched action
  * @return {Object}        Updated state
  */
-export const userData = combineReducers( {
+export const userSessionData = combineReducers( {
 	recentlyUsedBlocks( state = [], action ) {
 		const maxRecent = 8;
 		switch ( action.type ) {
@@ -540,5 +539,5 @@ export default optimist( combineReducers( {
 	panel,
 	saving,
 	notices,
-	userData,
+	userSessionData,
 } ) );
