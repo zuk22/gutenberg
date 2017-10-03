@@ -58,6 +58,8 @@ function isLinkBoundary( fragment ) {
 		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
 }
 
+let caretPos;
+
 export default class Editable extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -88,6 +90,8 @@ export default class Editable extends Component {
 		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
 		this.onBeforePastePreProcess = this.onBeforePastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.getScrollContainer = this.getScrollContainer.bind( this );
+		this.getCaretPosition = this.getCaretPosition.bind( this );
 
 		this.state = {
 			formats: {},
@@ -333,6 +337,8 @@ export default class Editable extends Component {
 	}
 
 	onKeyDown( event ) {
+		caretPos = this.getCaretPosition();
+
 		if (
 			this.props.onMerge && (
 				( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
@@ -394,6 +400,53 @@ export default class Editable extends Component {
 		if ( keyCode === BACKSPACE ) {
 			this.onSelectionChange();
 		}
+
+		const newRect = this.getCaretPosition();
+
+		if ( ! newRect || ! caretPos ) {
+			caretPos = null;
+			return;
+		}
+
+		const diff = newRect.top - caretPos.top;
+		const container = this.getScrollContainer();
+
+		container.scrollTop += diff;
+		caretPos = null;
+	}
+
+	getScrollContainer() {
+		if ( this.getScrollContainer.node ) {
+			return this.getScrollContainer.node;
+		}
+
+		const rootNode = this.editor.getBody();
+
+		let node = rootNode.parentNode;
+
+		while ( node ) {
+			const style = window.getComputedStyle( node );
+
+			if ( [ 'auto', 'scroll' ].indexOf( style.overflowY ) !== -1 ) {
+				this.getScrollContainer.node = node;
+				return node;
+			}
+
+			node = node.parentNode;
+		}
+	}
+
+	getCaretPosition() {
+		const range = this.editor.selection.getRng();
+		const rects = range.getClientRects();
+
+		if ( rects && rects.length ) {
+			return rects[ 0 ];
+		}
+
+		const node = this.editor.selection.getStart();
+
+		return node.getBoundingClientRect();
 	}
 
 	splitContent( blocks = [] ) {
@@ -516,6 +569,21 @@ export default class Editable extends Component {
 		if ( focus ) {
 			if ( ! isActive ) {
 				this.editor.focus();
+
+				// We have an old caret position after keydown.
+				if ( caretPos ) {
+					const newRect = this.getCaretPosition();
+
+					if ( ! newRect ) {
+						return;
+					}
+
+					const diff = newRect.top - caretPos.top;
+					const container = this.getScrollContainer();
+
+					container.scrollTop += diff;
+					caretPos = null;
+				}
 			}
 
 			// Offset = -1 means we should focus the end of the editable
