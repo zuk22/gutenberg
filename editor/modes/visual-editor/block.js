@@ -3,13 +3,13 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { has, partial, reduce, size } from 'lodash';
+import { has, partial, reduce, size, defer } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { focus as focusTools, keycodes } from '@wordpress/utils';
 import { getBlockType, getBlockDefaultClassname, createBlock } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -55,6 +55,14 @@ import {
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
 
+function isMac() {
+	return window.navigator.platform.toLowerCase().indexOf( 'mac' ) !== -1;
+}
+
+function metaKeyPressed( event ) {
+	return isMac() ? event.metaKey : ( event.ctrlKey && ! event.altKey );
+}
+
 class VisualEditorBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -69,10 +77,13 @@ class VisualEditorBlock extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
+		this.bindControlWrapper = this.bindControlWrapper.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 
 		this.previousOffset = null;
+		this.metaCount = 0;
 
 		this.state = {
 			error: null,
@@ -267,6 +278,7 @@ class VisualEditorBlock extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
+
 		if ( ENTER === keyCode && target === this.node ) {
 			event.preventDefault();
 
@@ -274,7 +286,34 @@ class VisualEditorBlock extends Component {
 				createBlock( 'core/paragraph' ),
 			], this.props.order + 1 );
 		}
+
+		if ( metaKeyPressed( event ) ) {
+			this.metaCount++;
+		} else {
+			this.metaCount = 0;
+		}
+
 		this.removeOrDeselect( event );
+	}
+
+	bindControlWrapper( ref ) {
+		this.controlWrapper = ref;
+	}
+
+	onKeyUp() {
+		if ( this.metaCount === 1 ) {
+			this.props.onStopTyping();
+
+			defer( () => {
+				const tabbables = focusTools.tabbable.find( this.controlWrapper );
+
+				if ( tabbables.length ) {
+					tabbables[ 0 ].focus();
+				}
+			} );
+		}
+
+		this.metaCount = 0;
 	}
 
 	onBlockError( error ) {
@@ -332,6 +371,7 @@ class VisualEditorBlock extends Component {
 			<div
 				ref={ this.bindBlockNode }
 				onKeyDown={ this.onKeyDown }
+				onKeyUp={ this.onKeyUp }
 				onFocus={ this.onFocus }
 				onMouseMove={ this.maybeHover }
 				onMouseEnter={ this.maybeHover }
@@ -343,13 +383,19 @@ class VisualEditorBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
-				{ showUI && isValid && mode === 'visual' && <BlockToolbar uid={ block.uid } /> }
+				<div
+					tabIndex="-1"
+					ref={ this.bindControlWrapper }
+					className="editor-visual-editor__block-control-wrapper"
+				>
+					{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
+					{ ( showUI || isHovered ) && <BlockRightMenu uid={ block.uid } /> }
+					{ showUI && isValid && mode === 'visual' && <BlockToolbar uid={ block.uid } /> }
 
-				{ isFirstMultiSelected && (
-					<BlockMover uids={ multiSelectedBlockUids } />
-				) }
+					{ isFirstMultiSelected && (
+						<BlockMover uids={ multiSelectedBlockUids } />
+					) }
+				</div>
 				<div
 					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ ( event ) => event.preventDefault() }
