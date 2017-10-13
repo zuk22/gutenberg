@@ -81,9 +81,10 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name ) => {
+					const onInsert = ( name, attributes ) => {
 						onInsertBlock(
 							name,
+							attributes,
 							insertionPoint
 						);
 
@@ -105,10 +106,10 @@ export default connect(
 		};
 	},
 	( dispatch ) => ( {
-		onInsertBlock( name, position ) {
+		onInsertBlock( name, attributes, position ) {
 			dispatch( hideInsertionPoint() );
 			dispatch( insertBlock(
-				createBlock( name ),
+				createBlock( name, attributes ),
 				position
 			) );
 		},

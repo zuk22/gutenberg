@@ -325,11 +325,13 @@ class VisualEditorBlock extends Component {
 		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
 		const isProperlyHovered = isHovered && ! this.props.isSelecting;
 		const { error } = this.state;
+		const isReusableBlock = blockType.name === 'core/reusable-block';
 		const wrapperClassName = classnames( 'editor-visual-editor__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isProperlyHovered,
+			'is-reusable': isReusableBlock,
 		} );
 
 		const { onMouseLeave, onFocus, onReplace } = this.props;

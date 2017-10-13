@@ -17,8 +17,8 @@ import { getCategories, getBlockTypes, BlockIcon } from '@wordpress/blocks';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlocks, getRecentlyUsedBlocks } from '../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../actions';
+import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../selectors';
+import { showInsertionPoint, hideInsertionPoint, fetchReusableBlocks } from '../actions';
 
 const { TAB, LEFT, UP, RIGHT, DOWN } = keycodes;
 
@@ -52,6 +52,8 @@ export class InserterMenu extends Component {
 
 	componentDidMount() {
 		document.addEventListener( 'keydown', this.onKeyDown, true );
+
+		this.props.fetchReusableBlocks();
 	}
 
 	componentWillUnmount() {
@@ -90,9 +92,9 @@ export class InserterMenu extends Component {
 		} );
 	}
 
-	selectBlock( name ) {
+	selectBlock( name, attributes ) {
 		return () => {
-			this.props.onSelect( name );
+			this.props.onSelect( name, attributes );
 			this.setState( {
 				filterValue: '',
 				currentFocus: null,
@@ -102,7 +104,23 @@ export class InserterMenu extends Component {
 
 	getBlockTypes() {
 		// Block types that are marked as private should not appear in the inserter
-		return getBlockTypes().filter( ( block ) => ! block.isPrivate );
+		const staticBlockTypes = getBlockTypes().filter( ( block ) => ! block.isPrivate );
+
+		// Display reusable blocks that we've fetched in the inserter
+		const reusableBlockTypes = this.props.reusableBlocks.map( ( reusableBlock ) => ( {
+			name: 'core/reusable-block',
+			attributes: {
+				ref: reusableBlock.id,
+			},
+			title: reusableBlock.name,
+			icon: 'layout',
+			category: 'reusable-blocks',
+		} ) );
+
+		return [
+			...staticBlockTypes,
+			...reusableBlockTypes,
+		];
 	}
 
 	searchBlocks( blockTypes ) {
@@ -292,7 +310,7 @@ export class InserterMenu extends Component {
 				role="menuitem"
 				key={ block.name }
 				className="editor-inserter__block"
-				onClick={ this.selectBlock( block.name ) }
+				onClick={ this.selectBlock( block.name, block.attributes ) }
 				ref={ this.bindReferenceNode( block.name ) }
 				tabIndex="-1"
 				onMouseEnter={ ! disabled ? this.props.showInsertionPoint : null }
@@ -406,9 +424,10 @@ const connectComponent = connect(
 		return {
 			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
 			blocks: getBlocks( state ),
+			reusableBlocks: getReusableBlocks( state ),
 		};
 	},
-	{ showInsertionPoint, hideInsertionPoint }
+	{ showInsertionPoint, hideInsertionPoint, fetchReusableBlocks }
 );
 
 export default flow(
