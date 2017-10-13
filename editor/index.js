@@ -38,10 +38,13 @@ if ( dateSettings.timezone.string ) {
  */
 window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
 	if ( response[ 'rest-nonce' ] ) {
+
+		// Previous to WordPress 4.9, the wp-api client used a global nonce.
 		window.wpApiSettings.nonce = response[ 'rest-nonce' ];
-		if ( 'undefined' !== typeof wp.api.endpoints.at( 0 ) ) {
-			wp.api.endpoints.at( 0 ).set( 'nonce', response[ 'rest-nonce' ] );
-		}
+
+		// Since WordPress 4.9, the wp-api client tracks nonces per-endpoint.
+		// The core nonce is always set up first, set the noonce there.
+		wp.api.endpoints.at( 0 ).set( 'nonce', response[ 'rest-nonce' ] );
 	}
 } );
 
