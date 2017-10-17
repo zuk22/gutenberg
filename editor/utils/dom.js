@@ -5,7 +5,7 @@
  * @param  {Boolean} start     Reverse means check if it touches the start of the container
  * @return {Boolean}           Is Edge or not
  */
-export function isEdge( container, start = false, collapseRanges = true ) {
+export function isEdge( container, start = false, collapseRanges = false ) {
 	if ( [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1 ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
