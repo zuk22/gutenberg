@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
  * WordPress dependencies
  */
 import { Component } from 'element';
@@ -7,7 +12,17 @@ import { keycodes, focus } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { isEdge, placeCaretAtEdge } from '../utils/dom';
+import { isEdge, placeCaretAtEdge, closest } from '../utils/dom';
+import {
+	getBlockUids,
+	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
+	getMultiSelectedBlocks,
+	getMultiSelectedBlockUids,
+	getSelectedBlock,
+} from '../selectors';
+
+import { multiSelect } from '../actions';
 
 /**
  * Module Constants
@@ -20,10 +35,42 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.isLastEditable = this.isLastEditable.bind( this );
+		this.isFirstEditable = this.isFirstEditable.bind( this );
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
+	}
+
+	getEditables( target ) {
+		console.log( 'getEditables' );
+		const outer = closest( target, '.editor-visual-editor__block-edit' );
+		if ( ! outer ) {
+			return [ target ];
+		}
+
+		if ( target === outer ) {
+			return [ target ];
+		}
+
+		const elements = outer.querySelectorAll( '[contenteditable="true"]' );
+		return [ ...elements ];
+	}
+
+	isLastEditable( target ) {
+		const editables = this.getEditables( target );
+		
+		const index = editables.indexOf( target );
+		console.log('last check', editables, index);
+		return editables.length > 0 && index === editables.length - 1;
+	}
+
+	isFirstEditable( target ) {
+		const editables = this.getEditables( target );
+		const index = editables.indexOf( target );
+		console.log('first check', editables, index);
+		return editables.length > 0 && index === 0;
 	}
 
 	getVisibleTabbables() {
@@ -54,12 +101,42 @@ class WritingFlow extends Component {
 		}
 	}
 
+	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
+		const lastIndex = blocks.indexOf( currentEndUid );
+		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
+		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
+	}
+
+	isEditableEdge( moveUp, target ) {
+		if ( moveUp ) {
+			return this.isFirstEditable( target );
+		}
+
+		return this.isLastEditable( target );
+	}
+
 	onKeyDown( event ) {
+		console.log( 'event', event );
+		const { multiSelectedBlocks, selectedBlock, selectionStart, selectionEnd, blocks } = this.props;
+
 		const { keyCode, target } = event;
 		const moveUp = ( keyCode === UP || keyCode === LEFT );
 		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
 
-		if ( ( moveUp || moveDown ) && isEdge( target, moveUp ) ) {
+		const isMoving = moveUp || moveDown;
+
+		const isShift = event.shiftKey;
+		const hasMultiSelection = multiSelectedBlocks.length > 1;
+
+		if ( isMoving && isShift && hasMultiSelection ) {
+			// Shift key is down and existing block selection
+			event.preventDefault();
+			this.expandSelection( blocks, selectionStart, selectionEnd, moveUp ? -1 : +1 );
+		} else if ( isMoving && isShift && this.isEditableEdge( moveUp, target ) && isEdge( target, moveUp ) ) {
+			// Shift key is down, but no existing block selection
+			event.preventDefault();
+			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, moveUp ? -1 : +1 );
+		} else if ( isMoving && isEdge( target, moveUp ) ) {
 			event.preventDefault();
 			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
 		}
@@ -78,4 +155,18 @@ class WritingFlow extends Component {
 	}
 }
 
-export default WritingFlow;
+export default connect(
+	( state, ownProps ) => ( {
+		blocks: getBlockUids( state ),
+		selectionStart: getMultiSelectedBlocksStartUid( state ),
+		selectionEnd: getMultiSelectedBlocksEndUid( state ),
+		multiSelectedBlocks: getMultiSelectedBlocks( state ),
+		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
+		selectedBlock: getSelectedBlock( state ),
+	} ),
+	( dispatch, ownProps ) => ( {
+		onMultiSelect( start, end ) {
+			dispatch( multiSelect( start, end ) );
+		},
+	} )
+)( WritingFlow );

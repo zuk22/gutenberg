@@ -5,7 +5,7 @@
  * @param  {Boolean} start     Reverse means check if it touches the start of the container
  * @return {Boolean}           Is Edge or not
  */
-export function isEdge( container, start = false ) {
+export function isEdge( container, start = false, collapseRanges = true ) {
 	if ( [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1 ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
@@ -23,7 +23,9 @@ export function isEdge( container, start = false ) {
 	}
 
 	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const liveRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const range = liveRange.cloneRange();
+	if ( collapseRanges ) range.collapse( start );
 	const position = start ? 'start' : 'end';
 	const order = start ? 'first' : 'last';
 	const offset = range[ `${ position }Offset` ];
@@ -38,7 +40,9 @@ export function isEdge( container, start = false ) {
 		return false;
 	}
 
-	if ( ! start && offset !== node.textContent.length ) {
+	const len = node.nodeType === 3 ? node.textContent.length : node.childNodes.length;
+
+	if ( ! start && offset !== len ) {
 		return false;
 	}
 
@@ -53,6 +57,18 @@ export function isEdge( container, start = false ) {
 	}
 
 	return true;
+}
+
+export function closest( node, selector ) {
+	if ( node.matches( selector ) ) {
+		return node;
+	}
+
+	if ( node.parentNode ) {
+		return closest( node.parentNode, selector );
+	}
+
+	return null;
 }
 
 /**
