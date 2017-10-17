@@ -44,9 +44,7 @@ export function isEdge( container, start = false, collapseRanges = false ) {
 		return false;
 	}
 
-	const len = node.nodeType === 3 ? node.textContent.length : node.childNodes.length;
-
-	if ( ! start && offset !== len ) {
+	if ( ! start && offset !== node.textContent.length ) {
 		return false;
 	}
 
