@@ -153,7 +153,7 @@ class WritingFlow extends Component {
 }
 
 export default connect(
-	( state, ownProps ) => ( {
+	( state ) => ( {
 		blocks: getBlockUids( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
@@ -161,7 +161,7 @@ export default connect(
 		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		selectedBlock: getSelectedBlock( state ),
 	} ),
-	( dispatch, ownProps ) => ( {
+	( dispatch ) => ( {
 		onMultiSelect( start, end ) {
 			dispatch( multiSelect( start, end ) );
 		},

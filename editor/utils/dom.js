@@ -1,9 +1,10 @@
 /**
  * Check whether the selection touches an edge of the container
  *
- * @param  {Element} container DOM Element
- * @param  {Boolean} start     Reverse means check if it touches the start of the container
- * @return {Boolean}           Is Edge or not
+ * @param  {Element} container       DOM Element
+ * @param  {Boolean} start           Reverse means check if it touches the start of the container
+ * @param  {Boolean} collapseRanges  Whether or not to collapse the selection range before the check
+ * @return {Boolean}                 Is Edge or not
  */
 export function isEdge( container, start = false, collapseRanges = false ) {
 	if ( [ 'INPUT', 'TEXTAREA' ].indexOf( container.tagName ) !== -1 ) {
@@ -25,7 +26,10 @@ export function isEdge( container, start = false, collapseRanges = false ) {
 	const selection = window.getSelection();
 	const liveRange = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	const range = liveRange.cloneRange();
-	if ( collapseRanges ) range.collapse( start );
+	if ( collapseRanges ) {
+		range.collapse( start );
+	}
+
 	const position = start ? 'start' : 'end';
 	const order = start ? 'first' : 'last';
 	const offset = range[ `${ position }Offset` ];
@@ -59,6 +63,13 @@ export function isEdge( container, start = false, collapseRanges = false ) {
 	return true;
 }
 
+/**
+ * Check whether there is a node above node (or node itself) that matches selector
+ *
+ * @param  {Element} node DOM Element
+ * @param  {Boolean} selector  The selector to match
+ * @return {Element}           A node if one is found matching the selector, otherwise null
+ */
 export function closest( node, selector ) {
 	if ( node.matches( selector ) ) {
 		return node;
