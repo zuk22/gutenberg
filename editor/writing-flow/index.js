@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -12,7 +13,7 @@ import { keycodes, focus } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { isEdge, placeCaretAtEdge, closest } from '../utils/dom';
+import { isEdge, placeCaretAtEdge } from '../utils/dom';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -44,7 +45,7 @@ class WritingFlow extends Component {
 	}
 
 	getEditables( target ) {
-		const outer = closest( target, '.editor-visual-editor__block-edit' );
+		const outer = target.closest( '.editor-visual-editor__block-edit' );
 		if ( ! outer ) {
 			return [ target ];
 		}

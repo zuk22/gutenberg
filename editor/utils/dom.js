@@ -62,25 +62,6 @@ export function isEdge( container, start = false, collapseRanges = false ) {
 }
 
 /**
- * Check whether there is a node above node (or node itself) that matches selector
- *
- * @param  {Element} node DOM Element
- * @param  {Boolean} selector  The selector to match
- * @return {Element}           A node if one is found matching the selector, otherwise null
- */
-export function closest( node, selector ) {
-	if ( node.matches( selector ) ) {
-		return node;
-	}
-
-	if ( node.parentNode ) {
-		return closest( node.parentNode, selector );
-	}
-
-	return null;
-}
-
-/**
  * Places the caret at start or end of a given element
  *
  * @param  {Element} container DOM Element
