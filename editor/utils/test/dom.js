@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isEdge, placeCaretAtEdge, closest } from '../dom';
+import { isEdge, placeCaretAtEdge } from '../dom';
 
 describe( 'DOM', () => {
 	let parent;
