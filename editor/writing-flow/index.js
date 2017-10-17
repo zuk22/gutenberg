@@ -35,8 +35,6 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-		this.isLastEditable = this.isLastEditable.bind( this );
-		this.isFirstEditable = this.isFirstEditable.bind( this );
 	}
 
 	bindContainer( ref ) {
@@ -45,28 +43,12 @@ class WritingFlow extends Component {
 
 	getEditables( target ) {
 		const outer = target.closest( '.editor-visual-editor__block-edit' );
-		if ( ! outer ) {
-			return [ target ];
-		}
-
-		if ( target === outer ) {
+		if ( ! outer || target === outer ) {
 			return [ target ];
 		}
 
 		const elements = outer.querySelectorAll( '[contenteditable="true"]' );
 		return [ ...elements ];
-	}
-
-	isLastEditable( target ) {
-		const editables = this.getEditables( target );
-		const index = editables.indexOf( target );
-		return editables.length > 0 && index === editables.length - 1;
-	}
-
-	isFirstEditable( target ) {
-		const editables = this.getEditables( target );
-		const index = editables.indexOf( target );
-		return editables.length > 0 && index === 0;
 	}
 
 	getVisibleTabbables() {
@@ -105,11 +87,10 @@ class WritingFlow extends Component {
 	}
 
 	isEditableEdge( moveUp, target ) {
-		if ( moveUp ) {
-			return this.isFirstEditable( target );
-		}
-
-		return this.isLastEditable( target );
+		const editables = this.getEditables( target );
+		const index = editables.indexOf( target );
+		const edgeIndex = moveUp ? 0 : editables.length - 1;
+		return editables.length > 0 && index === edgeIndex;
 	}
 
 	onKeyDown( event ) {
