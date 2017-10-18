@@ -192,7 +192,7 @@ class VisualEditorBlockList extends Component {
 	}
 
 	render() {
-		const { blocks } = this.props;
+		const { blocks, onBlockKeyDown } = this.props;
 
 		return (
 			<div>
@@ -201,6 +201,7 @@ class VisualEditorBlockList extends Component {
 					<VisualEditorBlock
 						key={ 'block-' + uid }
 						uid={ uid }
+						onBlockKeyDown={ onBlockKeyDown }
 						blockRef={ ( ref ) => this.setBlockRef( ref, uid ) }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }

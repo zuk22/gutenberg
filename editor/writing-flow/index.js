@@ -2,12 +2,11 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component, cloneElement, Children } from 'element';
 import { keycodes, focus } from '@wordpress/utils';
 
 /**
@@ -34,6 +33,7 @@ class WritingFlow extends Component {
 		super( ...arguments );
 
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onBlockKeyDown = this.onBlockKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 	}
 
@@ -41,14 +41,10 @@ class WritingFlow extends Component {
 		this.container = ref;
 	}
 
-	getEditables( target ) {
-		const outer = target.closest( '.editor-visual-editor__block-edit' );
-		if ( ! outer || target === outer ) {
-			return [ target ];
-		}
-
-		const elements = outer.querySelectorAll( '[contenteditable="true"]' );
-		return [ ...elements ];
+	getEditables( blockNode ) {
+		// Should we care about INPUT, TEXTAREA etc inside a block?
+		const elements = blockNode.querySelectorAll( '[contenteditable="true"]' );
+		return elements.length > 0 ? [ ...elements ] : [ blockNode ];
 	}
 
 	getVisibleTabbables() {
@@ -83,18 +79,19 @@ class WritingFlow extends Component {
 		const delta = moveUp ? -1 : +1;
 		const lastIndex = blocks.indexOf( currentEndUid );
 		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
+		console.log('lastIndex', lastIndex, nextIndex);
 		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
 	}
 
-	isEditableEdge( moveUp, target ) {
-		const editables = this.getEditables( target );
-		const index = editables.indexOf( target );
+	isEditableEdge( moveUp, blockNode, target ) {
+		const editables = this.getEditables( blockNode );
+		const index = editables.length > 1 ? editables.indexOf( target ) : 0;
 		const edgeIndex = moveUp ? 0 : editables.length - 1;
 		return editables.length > 0 && index === edgeIndex;
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
+		const { selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const moveUp = ( keyCode === UP || keyCode === LEFT );
@@ -107,14 +104,32 @@ class WritingFlow extends Component {
 			// Shift key is down and existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectionStart, selectionEnd, moveUp );
-		} else if ( isMoving && isShift && this.isEditableEdge( moveUp, target ) && isEdge( target, moveUp, true ) ) {
-			// Shift key is down, but no existing block selection
-			event.preventDefault();
-			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, moveUp );
 		} else if ( isMoving && isEdge( target, moveUp, isShift ) ) {
 			// Shift key may be down, but we aren't at the edge of our overall block
 			event.preventDefault();
 			this.moveFocusInContainer( target, moveUp ? 'UP' : 'DOWN' );
+		}
+	}
+
+	onBlockKeyDown( uid, event, blockNode ) {
+		// Only if there isn't already multi-selection, do we care about this. Otherwise, we can let it bubble and be handled by the general keydown listener
+		const { hasMultiSelection, blocks } = this.props;
+		if ( hasMultiSelection ) {
+			return;
+		}
+
+		const { keyCode, target } = event;
+		const moveUp = ( keyCode === UP || keyCode === LEFT );
+		const moveDown = ( keyCode === DOWN || keyCode === RIGHT );
+		const isShift = event.shiftKey;
+
+		const isMoving = moveUp || moveDown;
+		if ( isMoving && isShift && this.isEditableEdge( moveUp, blockNode, target ) && isEdge( target, moveUp, true ) ) {
+			console.log('expanding', uid );
+			// Shift key is down, but no existing block selection
+			event.preventDefault();
+			event.stopPropagation();
+			this.expandSelection( blocks, uid, uid, moveUp );
 		}
 	}
 
@@ -125,7 +140,9 @@ class WritingFlow extends Component {
 			<div
 				ref={ this.bindContainer }
 				onKeyDown={ this.onKeyDown }>
-				{ children }
+				{ Children.map( children, ( child ) => {
+					return cloneElement( child, { onBlockKeyDown: this.onBlockKeyDown } );
+				} ) }
 			</div>
 		);
 	}

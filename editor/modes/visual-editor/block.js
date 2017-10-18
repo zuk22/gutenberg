@@ -206,6 +206,7 @@ class VisualEditorBlock extends Component {
 			onRemove,
 			onFocus,
 			onDeselect,
+			onBlockKeyDown,
 		} = this.props;
 
 		// Remove block on backspace.
@@ -224,6 +225,9 @@ class VisualEditorBlock extends Component {
 		// Deselect on escape.
 		if ( ESCAPE === keyCode ) {
 			onDeselect();
+		} else {
+			console.log('this.node', this.node);
+			onBlockKeyDown( uid, event, this.node );
 		}
 	}
 
