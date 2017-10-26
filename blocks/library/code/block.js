@@ -38,7 +38,14 @@ class CodeBlock extends Component {
 		}
 		const textarea = findDOMNode( this.textareaRef );
 		if ( focus && ! textarea.contains( document.activeElement ) ) {
-			setTimeout( () => textarea.focus(), 0 );
+			if ( focus.offset === -1 ) {
+				setTimeout( () => {
+					textarea.focus();
+					textarea.setSelectionRange( textarea.value.length, textarea.value.length );
+				}, 0 );
+			} else {
+				setTimeout( () => textarea.focus(), 0 );
+			}
 		}
 	}
 
