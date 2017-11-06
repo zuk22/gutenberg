@@ -135,7 +135,20 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'blocks/build/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
+		array(
+			'wp-element',
+			'wp-components',
+			'wp-utils',
+			'wp-i18n',
+			'tinymce-latest',
+			'tinymce-latest-lists',
+			'tinymce-latest-paste',
+			'tinymce-latest-table',
+			'media-views',
+			'media-models',
+			'shortcode',
+			'vue',
+		),
 		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
 	);
 	wp_add_inline_script(
@@ -221,6 +234,10 @@ function gutenberg_register_vendor_scripts() {
 	// Vendor Scripts.
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
 
+	gutenberg_register_vendor_script(
+		'vue',
+		'https://vuejs.org/js/vue' . $suffix . '.js'
+	);
 	gutenberg_register_vendor_script(
 		'react',
 		'https://unpkg.com/react@16.0.0/umd/react' . $react_suffix . '.js'

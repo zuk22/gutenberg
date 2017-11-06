@@ -18,6 +18,7 @@ import './latest-posts';
 import './categories';
 import './cover-image';
 import './shortcode';
+import './stars';
 import './text-columns';
 import './verse';
 import './video';
