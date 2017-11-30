@@ -32,10 +32,11 @@ import { getBlockType, getBlockTypes } from './registration';
  *
  * @param {string} name            Block name.
  * @param {Object} blockAttributes Block attributes.
+ * @param {?Array} innerBlocks     Nested blocks.
  *
  * @returns {Object} Block object.
  */
-export function createBlock( name, blockAttributes = {} ) {
+export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
@@ -59,6 +60,29 @@ export function createBlock( name, blockAttributes = {} ) {
 		name,
 		isValid: true,
 		attributes,
+		innerBlocks,
+	};
+}
+
+/**
+ * Given a block object, returns a copy of the block object, optionally merging
+ * new attributes and/or replacing its inner blocks.
+ *
+ * @param {Object} block           Block object.
+ * @param {Object} mergeAttributes Block attributes.
+ * @param {?Array} innerBlocks     Nested blocks.
+ *
+ * @returns {Object} A cloned block.
+ */
+export function cloneBlock( block, mergeAttributes = {}, innerBlocks = block.innerBlocks ) {
+	return {
+		...block,
+		uid: uuid(),
+		attributes: {
+			...block.attributes,
+			...mergeAttributes,
+		},
+		innerBlocks,
 	};
 }
 

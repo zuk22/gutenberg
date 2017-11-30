@@ -10,7 +10,6 @@ import {
 	BlockList,
 	PostTitle,
 	WritingFlow,
-	DefaultBlockAppender,
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 	InserterWithShortcuts,
@@ -33,7 +32,6 @@ function VisualEditor( props ) {
 					showContextualToolbar={ ! props.hasFixedToolbar }
 					renderBlockMenu={ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
 				/>
-				<DefaultBlockAppender />
 			</WritingFlow>
 			<InserterWithShortcuts />
 		</BlockSelectionClearer>

@@ -14,6 +14,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import BlockContentProvider from '../block-content-provider';
 
 /**
  * Returns the block's default classname from its name.
@@ -31,20 +32,21 @@ export function getBlockDefaultClassname( blockName ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
- * @returns {Object|string} Save content.
+ * @returns {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockType, attributes ) {
+export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 	const { save } = blockType;
 
 	let saveElement;
 
 	if ( save.prototype instanceof Component ) {
-		saveElement = createElement( save, { attributes } );
+		saveElement = createElement( save, { attributes, innerBlocks } );
 	} else {
-		saveElement = save( { attributes } );
+		saveElement = save( { attributes, innerBlocks } );
 
 		// Special-case function render implementation to allow raw HTML return
 		if ( 'string' === typeof saveElement ) {
@@ -63,20 +65,25 @@ export function getSaveElement( blockType, attributes ) {
 		return cloneElement( element, props );
 	};
 
-	return Children.map( saveElement, addExtraContainerProps );
+	return (
+		<BlockContentProvider innerBlocks={ innerBlocks }>
+			{ Children.map( saveElement, addExtraContainerProps ) }
+		</BlockContentProvider>
+	);
 }
 
 /**
  * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
  * @returns {string} Save content.
  */
-export function getSaveContent( blockType, attributes ) {
-	const saveElement = getSaveElement( blockType, attributes );
+export function getSaveContent( blockType, attributes, innerBlocks ) {
+	const saveElement = getSaveElement( blockType, attributes, innerBlocks );
 
 	// Special-case function render implementation to allow raw HTML return
 	if ( 'string' === typeof saveElement ) {
@@ -84,7 +91,12 @@ export function getSaveContent( blockType, attributes ) {
 	}
 
 	// Otherwise, infer as element
-	return renderToString( saveElement );
+	let content = renderToString( saveElement );
+
+	// Drop raw HTML wrappers (support dangerous inner HTML without wrapper)
+	content = content.replace( /<\/?wp-raw-html>/g, '' );
+
+	return content;
 }
 
 /**
@@ -165,11 +177,14 @@ export function getBlockContent( block ) {
 	const blockType = getBlockType( block.name );
 
 	// If block was parsed as invalid or encounters an error while generating
-	// save content, use original content instead to avoid content loss.
+	// save content, use original content instead to avoid content loss. If a
+	// block contains nested content, exempt it from this condition because we
+	// otherwise have no access to its original content and content loss would
+	// still occur.
 	let saveContent = block.originalContent;
-	if ( block.isValid ) {
+	if ( block.isValid || block.innerBlocks.length ) {
 		try {
-			saveContent = getSaveContent( blockType, block.attributes );
+			saveContent = getSaveContent( blockType, block.attributes, block.innerBlocks );
 		} catch ( error ) {}
 	}
 
