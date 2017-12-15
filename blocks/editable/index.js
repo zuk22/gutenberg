@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	map,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -108,6 +109,8 @@ export default class Editable extends Component {
 			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
+
+		this.complexFormatters = {};
 	}
 
 	/**
@@ -205,9 +208,17 @@ export default class Editable extends Component {
 		}
 	}
 
+	canRegisterFormatter( formatter ) {
+		return [ 'inline-style' ].indexOf( formatter.type ) > -1;
+	}
+
 	registerCustomFormatters() {
 		forEach( this.props.formatters, ( formatter ) => {
-			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
+			if ( this.canRegisterFormatter( formatter ) ) {
+				this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
+			} else {
+				this.complexFormatters[ formatter.format ] = formatter;
+			}
 		} );
 	}
 
@@ -660,9 +671,9 @@ export default class Editable extends Component {
 		);
 	}
 
-	onNodeChange( { parents } ) {
+	onNodeChange( { element, parents } ) {
 		const formatNames = this.props.formattingControls;
-		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
+		const editorFormats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
 			accFormats[ activeFormat ] = {
 				isActive: true,
 				...getFormatProperties( activeFormat, parents ),
@@ -670,6 +681,19 @@ export default class Editable extends Component {
 
 			return accFormats;
 		}, {} );
+
+		// This is a little too similar to above...
+		const formats = _.reduce( this.complexFormatters, ( accFormats, formatter ) => {
+			const formatProperties = formatter.formatProperties( element, parents );
+			if ( formatProperties ) {
+				accFormats[ formatter.format ] = {
+					isActive: true,
+					...formatProperties,
+				};
+			}
+
+			return accFormats;
+		}, editorFormats );
 
 		const focusPosition = this.getFocusPosition();
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );

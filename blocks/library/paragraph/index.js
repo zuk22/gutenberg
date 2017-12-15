@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -187,6 +187,23 @@ class ParagraphBlock extends Component {
 							aria-expanded={ isExpanded }
 							aria-owns={ listBoxId }
 							aria-activedescendant={ activeId }
+							formattingControls={ [ 'bold', 'italic', 'strikethrough', 'link', 'color-picker' ] }
+							formatters={ [ {
+								type: 'complex',
+								format: 'color-picker',
+								title: 'Color Picker',
+								icon: 'hammer',
+								formatProperties: ( element, parents ) => {
+									const colorNode = parents && find( parents, p => p.nodeName === 'SPAN' && p.getAttribute( 'data-color-picker-format' ) );
+									return colorNode ? { color: colorNode.getAttribute( 'data-color-picker-format' ) } : false;
+								},
+								applyFormat: ( { editor } ) => {
+
+								},
+								removeFormat: () => {},
+								inlineUi: ( ) => <div />,
+							} ]
+							}
 						/>
 					) }
 				</Autocomplete>
