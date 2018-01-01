@@ -258,6 +258,14 @@ export function toggleAutosave( isAutosaving ) {
 		isAutosaving,
 	};
 }
+
+export function showAutosaveAlert( autosave ) {
+	return {
+		type: 'REQUEST_AUTOSAVE_EXISTS',
+		autosave,
+	};
+}
+
 /**
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
