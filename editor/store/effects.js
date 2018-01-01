@@ -57,6 +57,7 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
 
@@ -172,6 +173,22 @@ export default {
 			messages[ edits.status ] :
 			__( 'Updating failed' );
 		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
+	},
+	REQUEST_AUTOSAVE_EXISTS( action, store ) {
+		const { autosave } = action;
+		const { dispatch } = store;
+		if ( autosave ) {
+			dispatch( createWarningNotice(
+				<p>
+					<span>{ __( 'There is an autosave of this post that is more recent than the version below.' ) }</span>
+					{ ' ' }
+					{ <a href={ autosave.edit_link }>{ __( 'View the autosave' ) }</a> }
+				</p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+				}
+			) );
+		}
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
