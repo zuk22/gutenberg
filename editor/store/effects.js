@@ -30,6 +30,7 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	createWarningNotice,
 	removeNotice,
 	savePost,
 	editPost,
@@ -175,14 +176,14 @@ export default {
 		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
 	},
 	REQUEST_AUTOSAVE_EXISTS( action, store ) {
-		const { autosave } = action;
+		const { autosaveStatus } = action;
 		const { dispatch } = store;
-		if ( autosave ) {
+		if ( autosaveStatus ) {
 			dispatch( createWarningNotice(
 				<p>
 					<span>{ __( 'There is an autosave of this post that is more recent than the version below.' ) }</span>
 					{ ' ' }
-					{ <a href={ autosave.edit_link }>{ __( 'View the autosave' ) }</a> }
+					{ <a href={ autosaveStatus.edit_link }>{ __( 'View the autosave' ) }</a> }
 				</p>,
 				{
 					id: AUTOSAVE_POST_NOTICE_ID,

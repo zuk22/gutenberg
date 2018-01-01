@@ -70,6 +70,7 @@ export function recreateEditorInstance( target, settings ) {
  * @param  {String}  id       Unique identifier for editor instance
  * @param  {Object}  post     API entity for post to edit
  * @param  {?Object} settings Editor settings object
+ * @param  {?Object} autosave Autosave post object
  * @return {Object}           Editor interface
  */
 export function createEditorInstance( id, post, settings, autosave ) {

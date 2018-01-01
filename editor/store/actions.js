@@ -259,10 +259,10 @@ export function toggleAutosave( isAutosaving ) {
 	};
 }
 
-export function showAutosaveAlert( autosave ) {
+export function showAutosaveAlert( autosaveStatus ) {
 	return {
 		type: 'REQUEST_AUTOSAVE_EXISTS',
-		autosave,
+		autosaveStatus,
 	};
 }
 
