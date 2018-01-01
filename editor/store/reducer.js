@@ -474,6 +474,23 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
+ * Reducer returning the currently autosaving status.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function currentlyAutosaving( state = false, action ) {
+	switch ( action.type ) {
+		case 'DOING_AUTOSAVE':
+			const { isAutosaving } = action;
+			return isAutosaving;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the block insertion point
  *
  * @param  {Object} state  Current state
@@ -793,4 +810,5 @@ export default optimist( combineReducers( {
 	metaBoxes,
 	mobile,
 	reusableBlocks,
+	currentlyAutosaving,
 } ) );
