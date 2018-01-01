@@ -114,7 +114,7 @@ export function setupHeartbeat() {
 	$document.off( 'heartbeat-connection-restored.autosave' );
 	$document.off( 'heartbeat-send.autosave' );
 	$document.on( 'heartbeat-send.autosave', function( event, data ) {
-		var autosaveData = save();
+		const autosaveData = save();
 
 		if ( autosaveData ) {
 			data.wp_autosave = autosaveData;
