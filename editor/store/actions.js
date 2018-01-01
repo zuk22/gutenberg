@@ -252,6 +252,12 @@ export function autosave() {
 	};
 }
 
+export function toggleAutosave( isAutosaving ) {
+	return {
+		type: 'DOING_AUTOSAVE',
+		isAutosaving,
+	};
+}
 /**
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
