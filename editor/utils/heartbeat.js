@@ -65,7 +65,7 @@ export function setupHearthbeat() {
 	const initialCompareString = compareString;
 
 	// Overwrite the core autosave 'save' function with one that pulls content from Gutenberg state.
-	wp.autosave.local.save = function() {
+	const save = function() {
 		if ( wp.autosave.isSuspended || wp.autosave._blockSave ) {
 			return false;
 		}
@@ -88,7 +88,7 @@ export function setupHearthbeat() {
 		}
 
 		wp.autosave.previousCompareString = compareString;
-		wp.autosave.tempBlockSave();
+		wp.autosave.server.tempBlockSave();
 		wp.autosave.disableButtons();
 
 		$document.trigger( 'wpcountwords', [ postData.content ] )
@@ -104,7 +104,7 @@ export function setupHearthbeat() {
 	// Initialize autosaves on document ready.
 	$document.ready( function() {
 		// Save every 15 sec.
-		window.setInterval( wp.autosave.local.save, 15000 );
+		window.setInterval( save, 15000 );
 	} );
 
 	/**
@@ -112,7 +112,14 @@ export function setupHearthbeat() {
 	 */
 	$document.off( 'heartbeat-connection-lost.autosave' );
 	$document.off( 'heartbeat-connection-restored.autosave' );
+	$document.off( 'heartbeat-send.autosave' );
+	$document.on( 'heartbeat-send.autosave', function( event, data ) {
+		var autosaveData = save();
 
+		if ( autosaveData ) {
+			data.wp_autosave = autosaveData;
+		}
+	} );
 	/**
 	 * @summary Disables buttons and throws a notice when the connection is lost.
 	 *
