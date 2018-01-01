@@ -101,6 +101,12 @@ export function setupHearthbeat() {
 		return postData;
 	};
 
+	// Initialize autosaves on document ready.
+	$document.ready( function() {
+		// Save every 15 sec.
+		window.setInterval( wp.autosave.local.save, 15000 );
+	} );
+
 	/**
 	 * Disable the default autosave connection event handlers.
 	 */
