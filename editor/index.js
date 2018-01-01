@@ -17,7 +17,7 @@ import './assets/stylesheets/main.scss';
 import Layout from './edit-post/layout';
 import { EditorProvider, ErrorBoundary } from './components';
 import { initializeMetaBoxState } from './store/actions';
-import { setupHearthbeat } from './utils/heartbeat';
+import { setupHeartbeat } from './utils/heartbeat';
 
 export * from './components';
 import store from './store'; // Registers the state tree
@@ -75,7 +75,7 @@ export function recreateEditorInstance( target, settings ) {
 export function createEditorInstance( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = recreateEditorInstance.bind( null, target, settings );
-	setupHearthbeat();
+	setupHeartbeat();
 
 	render(
 		<EditorProvider settings={ settings } post={ post }>

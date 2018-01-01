@@ -3,7 +3,7 @@ import {
 	getCurrentPost,
 } from '../store/selectors';
 
-export function setupHearthbeat() {
+export function setupHeartbeat() {
 	const $document = jQuery( document );
 	/**
 	 * Configure heartbeat to refresh the wp-api nonce, keeping the editor authorization intact.
