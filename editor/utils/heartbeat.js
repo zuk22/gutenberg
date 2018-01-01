@@ -227,7 +227,6 @@ export function setupHearthbeat() {
 	 */
 	$document.on( 'heartbeat-send.autosave', function( event, data ) {
 		const autosaveData = save();
-		console.log( 'heartbeat-send.autosave', state, autosaveData );
 
 		if ( autosaveData ) {
 			data.wp_autosave = autosaveData;
