@@ -24,6 +24,7 @@ import {
 	isEditedPostSaveable,
 	isEditedPostPublishable,
 	getCurrentPostType,
+	isAutosavingPost,
 } from '../../store/selectors';
 
 export function PostPublishButton( {
@@ -36,6 +37,7 @@ export function PostPublishButton( {
 	isSaveable,
 	user,
 	onSubmit = noop,
+	isAutosaving,
 } ) {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
 	const isContributor = ! get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
@@ -52,7 +54,7 @@ export function PostPublishButton( {
 	}
 
 	const className = classnames( 'editor-post-publish-button', {
-		'is-saving': isSaving,
+		'is-saving': isSaving || isAutosaving,
 	} );
 
 	const onClick = () => {
@@ -82,6 +84,7 @@ const applyConnect = connect(
 		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
 		postType: getCurrentPostType( state ),
+		isAutosaving: isAutosavingPost( state ),
 	} ),
 	{
 		onStatusChange: ( status ) => editPost( { status } ),
