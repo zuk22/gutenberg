@@ -2,6 +2,9 @@ import store from '../store';
 import {
 	getCurrentPost,
 } from '../store/selectors';
+import {
+	toggleAutosave,
+} from '../store/actions'
 
 export function setupHeartbeat() {
 	const $document = jQuery( document );
@@ -56,7 +59,8 @@ export function setupHeartbeat() {
 	/**
 	 * Autosaves.
 	 */
-	let state = store.getState();
+	const { dispatch, getState } = store;
+	let state = getState();
 	const postDataFromState = getCurrentPost( state );
 	let compareString = wp.autosave.getCompareString( postDataFromState );
 	let lastCompareString;
@@ -89,7 +93,9 @@ export function setupHeartbeat() {
 
 		wp.autosave.previousCompareString = compareString;
 		wp.autosave.server.tempBlockSave();
-		wp.autosave.disableButtons();
+
+		// Show progress and disable update buttons.
+		dispatch( toggleAutosave( true ) );
 
 		$document.trigger( 'wpcountwords', [ postData.content ] )
 			.trigger( 'before-autosave', [ postData ] );
@@ -105,6 +111,12 @@ export function setupHeartbeat() {
 	$document.ready( function() {
 		// Save every 15 sec.
 		window.setInterval( save, 15000 );
+	} );
+
+
+	// Tie autosave button state triggers to Gutenberg autosave state.
+	$document.on( 'autosave-enable-buttons', function() {
+		dispatch( toggleAutosave( false ) );
 	} );
 
 	/**
