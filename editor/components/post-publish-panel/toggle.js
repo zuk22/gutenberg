@@ -17,9 +17,10 @@ import {
 	isEditedPostSaveable,
 	isEditedPostPublishable,
 	isCurrentPostPublished,
+	isAutosavingPost,
 } from '../../store/selectors';
 
-function PostPublishPanelToggle( { isSaving, isPublishable, isSaveable, isPublished, onToggle, isOpen } ) {
+function PostPublishPanelToggle( { isSaving, isPublishable, isSaveable, isPublished, onToggle, isOpen, isAutosaving } ) {
 	const isButtonEnabled = (
 		! isSaving && isPublishable && isSaveable
 	) || isPublished;
@@ -31,7 +32,7 @@ function PostPublishPanelToggle( { isSaving, isPublishable, isSaveable, isPublis
 			onClick={ onToggle }
 			aria-expanded={ isOpen }
 			disabled={ ! isButtonEnabled }
-			isBusy={ isSaving && isPublished }
+			isBusy={ ( isSaving && isPublished ) || isAutosaving }
 		>
 			<PostPublishButtonLabel />
 			<Dashicon icon="arrow-down" />
@@ -45,5 +46,6 @@ export default connect(
 		isSaveable: isEditedPostSaveable( state ),
 		isPublishable: isEditedPostPublishable( state ),
 		isPublished: isCurrentPostPublished( state ),
+		isAutosaving: isAutosavingPost( state ),
 	} ),
 )( PostPublishPanelToggle );
