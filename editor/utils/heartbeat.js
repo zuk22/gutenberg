@@ -1,6 +1,9 @@
 import store from '../store';
 import {
 	getCurrentPost,
+	getEditedPostTitle,
+	getEditedPostExcerpt,
+	getEditedPostContent,
 } from '../store/selectors';
 import {
 	toggleAutosave,
@@ -57,12 +60,27 @@ export function setupHeartbeat() {
 	} );
 
 	/**
+	 * @summary Concatenates the title, content and excerpt.
+	 *
+	 * This is used to track changes when auto-saving.
+	 *
+	 * @since 3.9.0
+	 *
+	 * @param {Object} state The current state.
+	 *
+	 * @returns {string} A concatenated string with title, content and excerpt.
+	 */
+	const getCompareString = function ( state ) {
+		return ( getEditedPostTitle( state ) || '' ) + '::' + ( getEditedPostContent( state ) || '' ) + '::' + ( getEditedPostExcerpt( state ) || '' );
+	}
+
+	/**
 	 * Autosaves.
 	 */
 	const { dispatch, getState } = store;
 	let state = getState();
-	const postDataFromState = getCurrentPost( state );
-	let compareString = wp.autosave.getCompareString( postDataFromState );
+	const postData = getCurrentPost( state );
+	let compareString = ( postData.title || '' ) + '::' + ( postData.content || '' ) + '::' + ( postData.excerpt || '' );
 	let lastCompareString;
 
 	// Set initial content.
@@ -78,8 +96,7 @@ export function setupHeartbeat() {
 			return false;
 		}
 		state = store.getState();
-		const postData = getCurrentPost( state );
-		compareString = wp.autosave.getCompareString( postData );
+		compareString = getCompareString( state );
 
 		// First check
 		if ( typeof lastCompareString === 'undefined' ) {
@@ -90,12 +107,14 @@ export function setupHeartbeat() {
 		if ( compareString === lastCompareString ) {
 			return false;
 		}
+		lastCompareString = compareString;
 
 		wp.autosave.previousCompareString = compareString;
 		wp.autosave.server.tempBlockSave();
 
 		// Show progress and disable update buttons.
 		dispatch( toggleAutosave( true ) );
+
 
 		$document.trigger( 'wpcountwords', [ postData.content ] )
 			.trigger( 'before-autosave', [ postData ] );
@@ -106,6 +125,8 @@ export function setupHeartbeat() {
 
 		return postData;
 	};
+
+
 
 	// Initialize autosaves on document ready.
 	$document.ready( function() {
