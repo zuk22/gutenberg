@@ -174,5 +174,4 @@ describe( 'PostPublishButton', () => {
 
 		expect( wrapper.hasClass( 'is-saving' ) ).toBe( true );
 	} );
-
 } );
