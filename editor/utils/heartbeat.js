@@ -78,13 +78,9 @@ export function setupHeartbeat() {
 	 * Autosaves.
 	 */
 	const { dispatch, getState } = store;
-	let state = getState();
-	const postData = getCurrentPost( state );
-	let compareString = ( postData.title || '' ) + '::' + ( postData.content || '' ) + '::' + ( postData.excerpt || '' );
-	let lastCompareString;
 
-	// Set initial content.
-	const initialCompareString = compareString;
+	let compareString;
+	let lastCompareString;
 
 	// Overwrite the core autosave 'save' function with one that pulls content from Gutenberg state.
 	const save = function() {
@@ -95,12 +91,12 @@ export function setupHeartbeat() {
 		if ( ( new Date() ).getTime() < wp.autosave.nextRun ) {
 			return false;
 		}
-		state = store.getState();
+		const state = getState();
 		compareString = getCompareString( state );
 
 		// First check
 		if ( typeof lastCompareString === 'undefined' ) {
-			lastCompareString = initialCompareString;
+			lastCompareString = getCompareString( state );
 		}
 
 		// No change
@@ -112,27 +108,21 @@ export function setupHeartbeat() {
 		wp.autosave.previousCompareString = compareString;
 		wp.autosave.server.tempBlockSave();
 
+		const postData = getCurrentPost( state );
+
 		// Show progress and disable update buttons.
 		dispatch( toggleAutosave( true ) );
-
 
 		$document.trigger( 'wpcountwords', [ postData.content ] )
 			.trigger( 'before-autosave', [ postData ] );
 
 		postData._wpnonce = jQuery( '#_wpnonce' ).val() || '';
 
-		postData.post_id = postData.id;
+		postData.post_id   = postData.id;
+		postData.post_type = postData.type;
 
 		return postData;
 	};
-
-
-
-	// Initialize autosaves on document ready.
-	$document.ready( function() {
-		// Save every 15 sec.
-		window.setInterval( save, 15000 );
-	} );
 
 
 	// Tie autosave button state triggers to Gutenberg autosave state.
