@@ -7,7 +7,7 @@ import {
 } from '../store/selectors';
 import {
 	toggleAutosave,
-} from '../store/actions'
+} from '../store/actions';
 
 export function setupHeartbeat() {
 	const $document = jQuery( document );
@@ -70,9 +70,9 @@ export function setupHeartbeat() {
 	 *
 	 * @returns {string} A concatenated string with title, content and excerpt.
 	 */
-	const getCompareString = function ( state ) {
+	const getCompareString = function( state ) {
 		return ( getEditedPostTitle( state ) || '' ) + '::' + ( getEditedPostContent( state ) || '' ) + '::' + ( getEditedPostExcerpt( state ) || '' );
-	}
+	};
 
 	/**
 	 * Autosaves.
@@ -117,13 +117,11 @@ export function setupHeartbeat() {
 			.trigger( 'before-autosave', [ postData ] );
 
 		postData._wpnonce = jQuery( '#_wpnonce' ).val() || '';
-
-		postData.post_id   = postData.id;
+		postData.post_id = postData.id;
 		postData.post_type = postData.type;
 
 		return postData;
 	};
-
 
 	// Tie autosave button state triggers to Gutenberg autosave state.
 	$document.on( 'autosave-enable-buttons', function() {
