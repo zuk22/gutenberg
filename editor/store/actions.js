@@ -252,6 +252,12 @@ export function autosave() {
 	};
 }
 
+/**
+ * Returns an action object used to toggle the autosave action status.
+ *
+ * @param  {bool} isAutosaving Is the editor autosaving?
+ * @return {Object}            Action object
+ */
 export function toggleAutosave( isAutosaving ) {
 	return {
 		type: 'DOING_AUTOSAVE',
