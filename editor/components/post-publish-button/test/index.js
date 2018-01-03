@@ -158,4 +158,21 @@ describe( 'PostPublishButton', () => {
 
 		expect( wrapper.hasClass( 'is-saving' ) ).toBe( true );
 	} );
+
+	it( 'should have save modifier class when autosaving', () => {
+		const wrapper = shallow(
+			<PostPublishButton user={ user } isAutosaving />
+		);
+
+		expect( wrapper.hasClass( 'is-saving' ) ).toBe( true );
+	} );
+
+	it( 'should have save modifier class when autosaving and is published', () => {
+		const wrapper = shallow(
+			<PostPublishButton user={ user } isAutosaving />
+		);
+
+		expect( wrapper.hasClass( 'is-saving' ) ).toBe( true );
+	} );
+
 } );
