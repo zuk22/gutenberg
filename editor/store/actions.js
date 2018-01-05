@@ -354,15 +354,15 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user toggled the sidebar
  *
- * @param  {String} sidebar  Name of the sidebar to toggle (desktop, mobile or publish)
- * @param  {Boolean?} force  Force a sidebar state
- * @return {Object}          Action object
+ * @param  {String}   sidebar      Name of the sidebar to toggle (desktop, mobile or publish)
+ * @param  {Boolean?} forcedValue  Force a sidebar state
+ * @return {Object}                Action object
  */
-export function toggleSidebar( sidebar, force ) {
+export function toggleSidebar( sidebar, forcedValue ) {
 	return {
 		type: 'TOGGLE_SIDEBAR',
 		sidebar,
-		force,
+		forcedValue,
 	};
 }
 
@@ -407,6 +407,7 @@ export function createNotice( status, content, options = {} ) {
 	const {
 		id = uuid(),
 		isDismissible = true,
+		spokenMessage,
 	} = options;
 	return {
 		type: 'CREATE_NOTICE',
@@ -415,6 +416,7 @@ export function createNotice( status, content, options = {} ) {
 			status,
 			content,
 			isDismissible,
+			spokenMessage,
 		},
 	};
 }
@@ -570,6 +572,19 @@ export function updateReusableBlock( id, reusableBlock ) {
 export function saveReusableBlock( id ) {
 	return {
 		type: 'SAVE_REUSABLE_BLOCK',
+		id,
+	};
+}
+
+/**
+ * Returns an action object used to delete a reusable block via the REST API.
+ * 
+ * @param {number} id  The ID of the reusable block to delete.
+ * @return {Object}    Action object.
+ */
+export function deleteReusableBlock( id ) {
+	return {
+		type: 'DELETE_REUSABLE_BLOCK',
 		id,
 	};
 }

@@ -217,6 +217,9 @@ export const editor = flow( [
 					return block;
 				} );
 			}
+
+			case 'REMOVE_REUSABLE_BLOCK':
+				return omit( state, action.associatedBlockUids );
 		}
 
 		return state;
@@ -293,6 +296,9 @@ export const editor = flow( [
 
 			case 'REMOVE_BLOCKS':
 				return without( state, ...action.uids );
+
+			case 'REMOVE_REUSABLE_BLOCK':
+				return without( state, ...action.associatedBlockUids );
 		}
 
 		return state;
@@ -526,7 +532,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				...state,
 				sidebars: {
 					...state.sidebars,
-					[ action.sidebar ]: action.force !== undefined ? action.force : ! state.sidebars[ action.sidebar ],
+					[ action.sidebar ]: action.forcedValue !== undefined ? action.forcedValue : ! state.sidebars[ action.sidebar ],
 				},
 			};
 		case 'TOGGLE_SIDEBAR_PANEL':
@@ -770,6 +776,35 @@ export const reusableBlocks = combineReducers( {
 						id: updatedId,
 					},
 				};
+			}
+
+			case 'REMOVE_REUSABLE_BLOCK': {
+				const { id } = action;
+				return omit( state, id );
+			}
+		}
+
+		return state;
+	},
+
+	isFetching( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_REUSABLE_BLOCKS': {
+				const { id } = action;
+				if ( ! id ) {
+					return state;
+				}
+
+				return {
+					...state,
+					[ id ]: true,
+				};
+			}
+
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
+			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
+				const { id } = action;
+				return omit( state, id );
 			}
 		}
 
