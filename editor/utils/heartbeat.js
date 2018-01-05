@@ -13,6 +13,8 @@ export function setupHeartbeat() {
 	const $document = jQuery( document );
 	/**
 	 * Configure heartbeat to refresh the wp-api nonce, keeping the editor authorization intact.
+	 *
+	 * @todo update the _wpnonce used by autosaves.
 	 */
 	$document.on( 'heartbeat-tick', ( event, response ) => {
 		if ( response[ 'rest-nonce' ] ) {
@@ -25,7 +27,7 @@ export function setupHeartbeat() {
 	 *
 	 * This is used to track changes when auto-saving.
 	 *
-	 * @since 3.9.0
+	 * @since 1.9.0
 	 *
 	 * @param {Object} state The current state.
 	 *
@@ -36,50 +38,68 @@ export function setupHeartbeat() {
 	};
 
 	/**
-	 * Autosaves.
+	 * Configure Heartbeat autosaves.
 	 */
 	const { dispatch, getState } = store;
 
 	let compareString;
 	let lastCompareString;
 
-	// Overwrite the core autosave 'save' function with one that pulls content from Gutenberg state.
+	/**
+	 * Autosave 'save' function that pulls content from Gutenberg state. Based on `wp.autosave.save`.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @returns {Object|bool} postData The autosaved post data to send, or false if no autosave is needed.
+	 */
 	const save = function() {
+
+		// Bail early if autosaving is suspended or saving is blocked.
 		if ( wp.autosave.isSuspended || wp.autosave._blockSave ) {
 			return false;
 		}
 
+		// Check if its time for another autosave.
 		if ( ( new Date() ).getTime() < wp.autosave.nextRun ) {
 			return false;
 		}
+
+		// Get the current editor state and compute the compare string (title::excerpt::content).
 		const state = getState();
 		compareString = getCompareString( state );
 
-		// First check
+		// Initialize lastCompareString if this is the first run and it is undefined.
 		if ( typeof lastCompareString === 'undefined' ) {
-			lastCompareString = getCompareString( state );
+			lastCompareString = compareString;
 		}
 
-		// No change
+		// Bail if no changes to the compare string (title::excerpt::content).
 		if ( compareString === lastCompareString ) {
 			return false;
 		}
+
+		// Store the latest compare string.
 		lastCompareString = compareString;
 
-		wp.autosave.previousCompareString = compareString;
+		// Block autosaving for 10 seconds.
 		wp.autosave.server.tempBlockSave();
 
 		const postData = getCurrentPost( state );
 
-		// Show progress and disable update buttons.
+		// Dispath an event to set the state isAutosaving to true..
 		dispatch( toggleAutosave( true ) );
 
+		// Add some additional data point copies expected on the back end.
+		postData.post_id   = postData.id;
+		postData.post_type = postData.type;
+
+		// Trigger some legacy events.
 		$document.trigger( 'wpcountwords', [ postData.content ] )
 			.trigger( 'before-autosave', [ postData ] );
 
+
+		// Add the nonce to validate the request.
 		postData._wpnonce = jQuery( '#_wpnonce' ).val() || '';
-		postData.post_id = postData.id;
-		postData.post_type = postData.type;
 
 		return postData;
 	};
@@ -90,11 +110,15 @@ export function setupHeartbeat() {
 	} );
 
 	/**
-	 * Disable the default autosave connection event handlers.
+	 * Disable the default (classic editor) autosave connection event handlers.
 	 */
 	$document.off( 'heartbeat-connection-lost.autosave' );
 	$document.off( 'heartbeat-connection-restored.autosave' );
 	$document.off( 'heartbeat-send.autosave' );
+
+	/**
+	 * Handle the heartbeat-send event, attaching autosave data if available.
+	 */
 	$document.on( 'heartbeat-send.autosave', function( event, data ) {
 		const autosaveData = save();
 
@@ -102,10 +126,11 @@ export function setupHeartbeat() {
 			data.wp_autosave = autosaveData;
 		}
 	} );
+
 	/**
-	 * @summary Disables buttons and throws a notice when the connection is lost.
+	 * Disable buttons and throw a notice when the connection is lost.
 	 *
-	 * @since 3.9.0
+	 * @since 1.9.0
 	 *
 	 * @returns {void}
 	 */
@@ -121,9 +146,9 @@ export function setupHeartbeat() {
 	} );
 
 	/**
-	 * @summary Enables buttons when the connection is restored.
+	 * Enable buttons when the connection is restored.
 	 *
-	 * @since 3.9.0
+	 * @since 1.9.0
 	 *
 	 * @returns {void}
 	 */
