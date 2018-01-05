@@ -9,6 +9,12 @@ import {
 	toggleAutosave,
 } from '../store/actions';
 
+/**
+ * WordPress dependencies
+ */
+import { doAction } from '@wordpress/hooks';
+
+
 export function setupHeartbeat() {
 	const $document = jQuery( document );
 	/**
@@ -97,6 +103,8 @@ export function setupHeartbeat() {
 		$document.trigger( 'wpcountwords', [ postData.content ] )
 			.trigger( 'before-autosave', [ postData ] );
 
+		// Trigger a hook action.
+		doAction( 'editor.beforeAutosave', postData );
 
 		// Add the nonce to validate the request.
 		postData._wpnonce = jQuery( '#_wpnonce' ).val() || '';
