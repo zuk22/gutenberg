@@ -7,6 +7,9 @@ import {
 } from '../store/selectors';
 import {
 	toggleAutosave,
+	removeNotice,
+	toggleNetworkIsConnected,
+	showDisconnectAlert,
 } from '../store/actions';
 
 import { compact } from 'lodash';
@@ -16,6 +19,7 @@ import { compact } from 'lodash';
  */
 import { doAction } from '@wordpress/hooks';
 
+const DISCONNECTION_NOTICE_ID = 'DISCONNECTION_NOTICE_ID';
 
 export function setupHeartbeat() {
 	const $document = jQuery( document );
@@ -65,7 +69,6 @@ export function setupHeartbeat() {
 	 * @returns {Object|bool} postData The autosaved post data to send, or false if no autosave is needed.
 	 */
 	const save = function() {
-
 		// Bail early if autosaving is suspended or saving is blocked.
 		if ( wp.autosave.isSuspended || wp.autosave._blockSave ) {
 			return false;
@@ -102,7 +105,7 @@ export function setupHeartbeat() {
 		dispatch( toggleAutosave( true ) );
 
 		// Add some additional data point copies expected on the back end.
-		postData.post_id   = postData.id;
+		postData.post_id = postData.id;
 		postData.post_type = postData.type;
 
 		// Trigger some legacy events.
@@ -154,8 +157,8 @@ export function setupHeartbeat() {
 			if ( wp.autosave.local.hasStorage ) {
 				// @todo use sessionstorage for autosaves
 			}
-			// @todo show the disconnections notice
-			// @todo disable publish/update buttons.
+			dispatch( showDisconnectAlert() );
+			dispatch( toggleNetworkIsConnected( false ) );
 		}
 	} );
 
@@ -167,7 +170,7 @@ export function setupHeartbeat() {
 	 * @returns {void}
 	 */
 	$document.on( 'heartbeat-connection-restored.autosave', function() {
-		// @todo hide connection notice
-	// @todo enable publish/update buttons
+		dispatch( removeNotice( DISCONNECTION_NOTICE_ID ) );
+		dispatch( toggleNetworkIsConnected( true ) );
 	} );
 }
