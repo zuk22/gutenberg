@@ -9,6 +9,8 @@ import {
 	toggleAutosave,
 } from '../store/actions';
 
+import { compact } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -29,7 +31,7 @@ export function setupHeartbeat() {
 	} );
 
 	/**
-	 * @summary Concatenates the title, content and excerpt.
+	 * Concatenate the title, content and excerpt.
 	 *
 	 * This is used to track changes when auto-saving.
 	 *
@@ -40,7 +42,11 @@ export function setupHeartbeat() {
 	 * @returns {string} A concatenated string with title, content and excerpt.
 	 */
 	const getCompareString = function( state ) {
-		return ( getEditedPostTitle( state ) || '' ) + '::' + ( getEditedPostContent( state ) || '' ) + '::' + ( getEditedPostExcerpt( state ) || '' );
+		return compact( [
+			getEditedPostTitle( state ),
+			getEditedPostContent( state ),
+			getEditedPostExcerpt( state ),
+		] ).join( '::' );
 	};
 
 	/**
