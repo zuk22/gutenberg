@@ -62,6 +62,7 @@ import {
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
+const DISCONNECTION_NOTICE_ID = 'DISCONNECTION_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
 
@@ -191,6 +192,20 @@ export default {
 				</p>,
 				{
 					id: AUTOSAVE_POST_NOTICE_ID,
+				}
+			) );
+		}
+	},
+	REQUEST_CONNECTION_LOST( action, store ) {
+		const { autosaveStatus } = action;
+		const { dispatch } = store;
+		if ( autosaveStatus ) {
+			dispatch( createWarningNotice(
+				<p>
+					<span>{ __( 'You have lost your connection with the server, and saving has been disabled. This message will vanish once you\'ve reconnected.' ) }</span>
+				</p>,
+				{
+					id: DISCONNECTION_NOTICE_ID,
 				}
 			) );
 		}
