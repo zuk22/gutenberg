@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo, showAutosaveAlert } from '../../store/actions';
+import { setupEditor, undo, showAutosaveNotice } from '../../store/actions';
 import store from '../../store';
 
 /**
@@ -56,7 +56,7 @@ class EditorProvider extends Component {
 
 		// Display a notice if an autosave exists.
 		if ( props.autosave ) {
-			this.store.dispatch( showAutosaveAlert( props.autosave ) );
+			this.store.dispatch( showAutosaveNotice( props.autosave ) );
 		}
 	}
 
