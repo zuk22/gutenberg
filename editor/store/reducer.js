@@ -497,6 +497,23 @@ export function currentlyAutosaving( state = false, action ) {
 }
 
 /**
+ * Reducer returning the currently network connection status.
+ *
+ * @param  {Object} state  Current state
+ * @param  {Object} action Dispatched action
+ * @return {Object}        Updated state
+ */
+export function networkIsConnected( state = false, action ) {
+	switch ( action.type ) {
+		case 'IS_CONNECTED':
+			const { status } = action;
+			return status;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the block insertion point
  *
  * @param  {Object} state  Current state
@@ -846,4 +863,5 @@ export default optimist( combineReducers( {
 	mobile,
 	reusableBlocks,
 	currentlyAutosaving,
+	networkIsConnected,
 } ) );
