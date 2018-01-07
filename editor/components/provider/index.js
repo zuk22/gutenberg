@@ -52,9 +52,11 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
-			if ( props.autosave ) {
-				this.store.dispatch( showAutosaveAlert( props.autosave ) );
-			}
+		}
+
+		// Display a notice if an autosave exists.
+		if ( props.autosave ) {
+			this.store.dispatch( showAutosaveAlert( props.autosave ) );
 		}
 	}
 
