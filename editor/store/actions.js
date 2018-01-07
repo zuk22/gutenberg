@@ -265,10 +265,40 @@ export function toggleAutosave( isAutosaving ) {
 	};
 }
 
-export function showAutosaveAlert( autosaveStatus ) {
+/**
+ * Returns an action to show the autosave notice.
+ *
+ * @param  {bool} autosaveStatus Autosave status and data including a link to the autosave.
+ * @return {Object}              Action object
+ */
+export function showAutosaveNotice( autosaveStatus ) {
 	return {
 		type: 'REQUEST_AUTOSAVE_EXISTS',
 		autosaveStatus,
+	};
+}
+
+/**
+ * Returns an action object used to toggle the connection status.
+ *
+ * @param  {bool} status Is the network connection up?
+ * @return {Object}      Action object
+ */
+export function toggleNetworkIsConnected( status ) {
+	return {
+		type: 'IS_CONNECTED',
+		status,
+	};
+}
+
+/**
+ * Returns an action to show the disconnection notice.
+ *
+ * @return {Object}              Action object
+ */
+export function showDisconnectionNotice() {
+	return {
+		type: 'REQUEST_CONNECTION_LOST',
 	};
 }
 
