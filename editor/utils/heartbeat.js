@@ -10,6 +10,7 @@ import {
 	removeNotice,
 	toggleNetworkIsConnected,
 	showDisconnectAlert,
+	showLocalSaveNotice,
 } from '../store/actions';
 
 import { compact } from 'lodash';
@@ -108,6 +109,9 @@ export function setupHeartbeat() {
 		postData.post_id = postData.id;
 		postData.post_type = postData.type;
 
+		// Save the data in local storage.
+		storeLocal( postData );
+
 		// Trigger some legacy events.
 		$document.trigger( 'wpcountwords', [ postData.content ] )
 			.trigger( 'before-autosave', [ postData ] );
@@ -173,4 +177,151 @@ export function setupHeartbeat() {
 		dispatch( removeNotice( DISCONNECTION_NOTICE_ID ) );
 		dispatch( toggleNetworkIsConnected( true ) );
 	} );
+
+	/**
+	 * Sets (save or delete) post data in the storage.
+	 *
+	 * If stored_data evaluates to 'false' the storage key for the current post will be removed.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param {Object|boolean|null} postData The post data to store or null/false/empty to delete the key.
+	 *
+	 * @returns {boolean} True if data is stored, false if data was removed.
+	 */
+	function setData( postData ) {
+		const stored = getStorage();
+		const postId = postData.id;
+
+		if ( ! stored || ! postId ) {
+			return false;
+		}
+
+		if ( postData ) {
+			stored[ 'post_' + postId ] = postData;
+		} else if ( stored.hasOwnProperty( 'post_' + postId ) ) {
+			delete stored[ 'post_' + postId ];
+		} else {
+			return false;
+		}
+
+		return setStorage( stored );
+	}
+
+	const blogId = typeof window.autosaveL10n !== 'undefined' && window.autosaveL10n.blog_id;
+
+	/**
+	 * Initializes post local storage.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @returns {boolean|Object} False if no sessionStorage in the browser or an Object
+	 *                           containing all postData for this blog.
+	 */
+	function getStorage() {
+		let storedObject = false;
+
+		// Separate local storage containers for each blog_id
+		if ( wp.autosave.local.hasStorage && blogId ) {
+			storedObject = window.sessionStorage.getItem( 'wp-autosave-' + blogId );
+
+			if ( storedObject ) {
+				storedObject = JSON.parse( storedObject );
+			} else {
+				storedObject = {};
+			}
+		}
+
+		return storedObject;
+	}
+
+	/**
+	 * Sets the storage for this blog. Confirms that the data was saved
+	 * successfully.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param {Object} postData The post data to store.
+	 *
+	 * @returns {boolean} True if the data was saved successfully, false if it wasn't saved.
+	 */
+	function setStorage( postData ) {
+		if ( wp.autosave.local.hasStorage && blogId ) {
+			const key = 'wp-autosave-' + blogId;
+			window.sessionStorage.setItem( key, JSON.stringify( postData ) );
+			return window.sessionStorage.getItem( key ) !== null;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Store the editor contents in local storage, in case the user disconnects.
+	 *
+	 * @param {Object} postData The post data to store.
+	 *
+	 * @returns {boolean} True if the data was saved successfully, false if it wasn't saved.
+	 */
+	function storeLocal( postData ) {
+		const secure = ( 'https:' === window.location.protocol );
+
+		if ( ! wp.autosave.local.hasStorage ) {
+			return false;
+		}
+
+		postData.save_time = ( new Date() ).getTime();
+		window.wpCookies.set( 'wp-saving-post', postData.id + '-check', 24 * 60 * 60, false, false, secure );
+		return setData( postData );
+	}
+
+	/**
+	 * Gets the saved post data for the current post.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param {int} postId The post id.
+	 *
+	 * @returns {boolean|Object} False if no storage or no data or the postData as an Object.
+	 */
+	function getSavedPostData( postId ) {
+		const stored = getStorage();
+
+		if ( ! stored || ! postId ) {
+			return false;
+		}
+
+		return stored[ 'post_' + postId ] || false;
+	}
+
+	/**
+	 * Checks if the saved data for the current post (if any) is different than the
+	 * loaded post data on the screen.
+	 *
+	 * Shows a standard message letting the user restore the post data if different.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @returns {void}
+	 */
+	function checkPostLocalSaveisDifferent() {
+		const cookie = window.wpCookies.get( 'wp-saving-post' ),
+			postData = getSavedPostData();
+
+		if ( cookie === postData.id + '-saved' ) {
+			window.wpCookies.remove( 'wp-saving-post' );
+
+			// The post was saved properly, remove old local storage data and bail.
+			setData( false, postData.id );
+			return;
+		}
+
+		if ( ! postData ) {
+			return;
+		}
+
+		dispatch( showLocalSaveNotice( postData ) );
+	}
+
+	// Check  local storage for post content.
+	checkPostLocalSaveisDifferent();
 }
