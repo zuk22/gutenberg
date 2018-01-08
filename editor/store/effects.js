@@ -183,32 +183,33 @@ export default {
 	REQUEST_AUTOSAVE_EXISTS( action, store ) {
 		const { autosaveStatus } = action;
 		const { dispatch } = store;
+		const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
 		if ( autosaveStatus ) {
 			dispatch( createWarningNotice(
 				<p>
-					<span>{ __( 'There is an autosave of this post that is more recent than the version below.' ) }</span>
+					<span>{ noticeMessage }</span>
 					{ ' ' }
 					{ <a href={ autosaveStatus.edit_link }>{ __( 'View the autosave' ) }</a> }
 				</p>,
 				{
 					id: AUTOSAVE_POST_NOTICE_ID,
+					spokenMessage: noticeMessage,
 				}
 			) );
 		}
 	},
 	REQUEST_CONNECTION_LOST( action, store ) {
-		const { autosaveStatus } = action;
 		const { dispatch } = store;
-		if ( autosaveStatus ) {
-			dispatch( createWarningNotice(
-				<p>
-					<span>{ __( 'You have lost your connection with the server, and saving has been disabled. This message will vanish once you\'ve reconnected.' ) }</span>
-				</p>,
-				{
-					id: DISCONNECTION_NOTICE_ID,
-				}
-			) );
-		}
+		const noticeMessage = __( 'You have lost your connection with the server, and saving has been disabled. This message will vanish once you\'ve reconnected.' );
+		dispatch( createWarningNotice(
+			<p>
+				<span>{ noticeMessage }</span>
+			</p>,
+			{
+				id: DISCONNECTION_NOTICE_ID,
+				spokenMessage: noticeMessage,
+			}
+		) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
