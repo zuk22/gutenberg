@@ -26,8 +26,8 @@ import {
 	isNetworkConnected,
 } from '../../store/selectors';
 
-function PostPublishPanelToggle( { user, isSaving, isPublishable, isSaveable, isPublished, isBeingScheduled, onToggle, isOpen, isAutosaving, isNetworkConnected } ) {
-	const isButtonEnabled = isNetworkConnected &&
+function PostPublishPanelToggle( { user, isSaving, isPublishable, isSaveable, isPublished, isBeingScheduled, onToggle, isOpen, isAutosaving, isConnected } ) {
+	const isButtonEnabled = isConnected &&
 		(
 			(
 				! isSaving && isPublishable && isSaveable
