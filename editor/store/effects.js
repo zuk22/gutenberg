@@ -199,20 +199,17 @@ export default {
 		}
 	},
 	REQUEST_CONNECTION_LOST( action, store ) {
-		const { autosaveStatus } = action;
 		const { dispatch } = store;
 		const noticeMessage = __( 'You have lost your connection with the server, and saving has been disabled. This message will vanish once you\'ve reconnected.' );
-		if ( autosaveStatus ) {
-			dispatch( createWarningNotice(
-				<p>
-					<span>{ noticeMessage }</span>
-				</p>,
-				{
-					id: DISCONNECTION_NOTICE_ID,
-					spokenMessage: noticeMessage,
-				}
-			) );
-		}
+		dispatch( createWarningNotice(
+			<p>
+				<span>{ noticeMessage }</span>
+			</p>,
+			{
+				id: DISCONNECTION_NOTICE_ID,
+				spokenMessage: noticeMessage,
+			}
+		) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
