@@ -9,7 +9,7 @@ import {
 	toggleAutosave,
 	removeNotice,
 	toggleNetworkIsConnected,
-	showDisconnectAlert,
+	showDisconnectionNotice,
 } from '../store/actions';
 
 import { compact } from 'lodash';
@@ -153,11 +153,8 @@ export function setupHeartbeat() {
 	 */
 	$document.on( 'heartbeat-connection-lost.autosave', function( event, error, status ) {
 		// When connection is lost, keep user from submitting changes.
-		if ( 'timeout' === error || 603 === status ) {
-			if ( wp.autosave.local.hasStorage ) {
-				// @todo use sessionstorage for autosaves
-			}
-			dispatch( showDisconnectAlert() );
+		if ( 'timeout' === error || 'error' === error || 603 === status ) {
+			dispatch( showDisconnectionNotice() );
 			dispatch( toggleNetworkIsConnected( false ) );
 		}
 	} );
