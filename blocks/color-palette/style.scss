@@ -84,6 +84,11 @@ $color-palette-circle-spacing: 14px;
 	}
 }
 
+.blocks-color-palette__custom-color div {
+	width: 100%;
+	height: 100%;
+}
+
 .blocks-color-palette__custom-color .blocks-color-palette__item {
 	position: relative;
 	box-shadow: none;
