@@ -190,15 +190,17 @@ function gutenberg_templates( $templates, $theme, $post, $post_type ) {
 	return $templates;
 }
 
-/*
- * TODO: This needs to be dynamically generated for all post types, either
- * queried here or a new filter made available for generic templates filter.
- *
- * - add_filter( 'theme_{$post_type}_templates', 'gutenberg_templates' );
+/**
+ * Adds filters to override available templates for all post types.
  */
-
-add_filter( 'theme_post_templates', 'gutenberg_templates', 10, 4 );
-add_filter( 'theme_page_templates', 'gutenberg_templates', 10, 4 );
+function gutenberg_filter_post_type_templates() {
+	$post_types = get_post_types();
+	foreach ( $post_types as $post_type ) {
+		$filter_tag = sprintf( 'theme_%s_templates', $post_type );
+		add_filter( $filter_tag, 'gutenberg_templates', 10, 4 );
+	}
+}
+add_action( 'init', 'gutenberg_filter_post_type_templates', 20 );
 
 /**
  * Registers post tyes and taxonomies for dynamic templates.
