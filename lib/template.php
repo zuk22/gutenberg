@@ -76,8 +76,8 @@ function gutenberg_override_template( $template, $type, $templates ) {
 				return $template_name;
 			}
 
-			// `$template` filter value is a absolute path, so check that template
-			// file exists at end of path.
+			// `$template` filter value is an absolute path, so check that
+			// template file exists at end of path.
 			$is_template = ( 0 === substr_compare(
 				$template,
 				'/' . $template_name,
@@ -91,7 +91,7 @@ function gutenberg_override_template( $template, $type, $templates ) {
 		}
 	}
 
-	// Remove file extension from template paths before slug lookup.
+	// Prepare template paths for slug lookup.
 	$override_templates = array_map( 'gutenberg_get_template_slug', $templates );
 
 	$candidate_template_posts_query = new WP_Query( array(
