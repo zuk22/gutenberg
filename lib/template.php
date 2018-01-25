@@ -47,7 +47,7 @@ add_filter( 'template_include', 'gutenberg_template_include' );
  *
  * @return string The name of the template with path extension removed.
  */
-function gutenberg_map_template_slug( $template_name ) {
+function gutenberg_get_template_slug( $template_name ) {
 	return preg_replace( '/\.php$/', '', $template_name );
 }
 
@@ -92,7 +92,7 @@ function gutenberg_override_template( $template, $type, $templates ) {
 	}
 
 	// Remove file extension from template paths before slug lookup.
-	$override_templates = array_map( 'gutenberg_map_template_slug', $templates );
+	$override_templates = array_map( 'gutenberg_get_template_slug', $templates );
 
 	$candidate_template_posts_query = new WP_Query( array(
 		'post_name__in' => $override_templates,
