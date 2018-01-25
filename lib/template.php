@@ -6,6 +6,19 @@
  */
 
 /**
+ * Returns true if the passed template name is for a dynamic template, or false
+ * otherwise. A template is considered dynamic if it is not a file path, and
+ * rather the slug of a template post.
+ *
+ * @param string $template The path or slug of the template to test.
+ *
+ * @return bool Whether the template is dynamic.
+ */
+function gutenberg_is_dynamic_template( $template ) {
+	return 1 !== preg_match( '/\.php$/', $template );
+}
+
+/**
  * Replaces the output content of the template with the post content of a
  * dynamic template, if it is the result of a dynamic template override.
  *
@@ -16,7 +29,7 @@
 function gutenberg_template_include( $template ) {
 	// Assume if template override resulted in no dynamic template result, that
 	// original should be used.
-	if ( preg_match( '/\.php$/', $template ) ) {
+	if ( ! gutenberg_is_dynamic_template( $template ) ) {
 		return $template;
 	}
 
@@ -72,7 +85,7 @@ function gutenberg_override_template( $template, $type, $templates ) {
 			$template_name = $templates[ $i ];
 
 			// If post is explicitly assigned a dynamic template, return immediately.
-			if ( ! preg_match( '/\.php$/', $template_name ) ) {
+			if ( gutenberg_is_dynamic_template( $template_name ) ) {
 				return $template_name;
 			}
 
