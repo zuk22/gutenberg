@@ -17,6 +17,16 @@ import { diffAriaProps, pickAriaProps } from './aria';
 
 export default class TinyMCE extends Component {
 	componentDidMount() {
+		this.editorNode.addEventListener( 'blur', () => {
+			console.log( 'blurred', document.activeElement );
+		} );
+
+		if ( this.props.autoFocus ) {
+			console.log( 'prefocus', document.activeElement );
+			this.editorNode.focus();
+			console.log( 'postfocus', document.activeElement );
+		}
+
 		this.initialize();
 	}
 

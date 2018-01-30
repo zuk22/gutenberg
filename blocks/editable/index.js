@@ -740,6 +740,7 @@ export default class Editable extends Component {
 
 		if ( focus ) {
 			if ( ! isActive ) {
+				console.log( 'mce focus' );
 				this.editor.focus();
 			}
 
@@ -749,7 +750,15 @@ export default class Editable extends Component {
 				this.editor.selection.collapse( false );
 			}
 		} else if ( isActive ) {
-			this.editor.getBody().blur();
+			// Give other instances the chance to catch focus.
+			// This will move focus to the body element.
+			setTimeout( () => {
+				if ( this.isActive() ) {
+					console.log( 'preblur', document.activeElement );
+					this.editor.getBody().blur();
+					console.log( 'postblur', document.activeElement );
+				}
+			} );
 		}
 	}
 
@@ -884,6 +893,7 @@ export default class Editable extends Component {
 					{ ...ariaProps }
 					className={ className }
 					key={ key }
+					autoFocus={ focus }
 				/>
 				{ isPlaceholderVisible &&
 					<Tagname
