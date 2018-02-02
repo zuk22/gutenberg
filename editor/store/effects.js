@@ -19,7 +19,7 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-
+import { doAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
@@ -86,6 +86,13 @@ export default {
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
+
+			/**
+			 * Fires when a post is successfully updated.
+			 *
+			 * @param {Object} The updated post object as returned from the REST API.
+			 */
+			doAction( 'editor.effects.postUpdated', newPost );
 			dispatch( {
 				type: 'RESET_POST',
 				post: newPost,
