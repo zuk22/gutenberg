@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, renderToString } from '@wordpress/element';
+import { Component, renderToString, RawHTML } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -181,14 +181,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
-				let typeClassName = 'wp-block-embed';
-				if ( 'video' === type ) {
-					typeClassName += ' is-video';
-				}
 
 				return [
 					controls,
-					<figure key="embed" className={ typeClassName }>
+					<figure key="embed" className={ `wp-block-embed is-${ type }` }>
 						{ ( cannotPreview ) ? (
 							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
@@ -196,12 +192,12 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							</Placeholder>
 						) : (
 							<div className="wp-block-embed__wrapper">
-								<SandBox
+								{ type === 'opengraph' ? <RawHTML>{ html }</RawHTML> : <SandBox
 									html={ html }
 									title={ iframeTitle }
 									type={ type }
 									onFocus={ () => setFocus() }
-								/>
+								/> }
 							</div>
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (

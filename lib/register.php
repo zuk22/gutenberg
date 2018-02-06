@@ -517,3 +517,54 @@ function gutenberg_revisions_restore( $revisions_data ) {
 	return $revisions_data;
 }
 add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );
+
+function gutenberg_oembed_fallback_response( $url ) {
+	$get = wp_safe_remote_get( $url, array( 'limit_response_size' => 153600 ) );
+	$body = wp_remote_retrieve_body( $get );
+	preg_match( '/<title>([^<]+)<\/title>/i', $body, $title_match );
+	$title = empty( $title_match ) ? $url : $title_match[ 1 ];
+	preg_match( '/<meta[^>]+property="og:image"[^>]*>/i', $body, $image_match );
+	$image = empty( $image_match ) ? '' : $image_match[ 0 ];
+	preg_match( '/content="([^"]+)"/i', $image, $image_match );
+	$image = empty( $image_match ) ? '' : $image_match[ 1 ];
+	preg_match( '/<meta[^>]+property="og:description"[^>]*>/i', $body, $desc_match );
+	$desc = empty( $desc_match ) ? '' : $desc_match[ 0 ];
+	preg_match( '/content="([^"]+)"/i', $desc, $desc_match );
+	$desc = empty( $desc_match ) ? '' : $desc_match[ 1 ];
+
+	return  (
+		'<blockquote>' .
+			"<h1><a href=\"$url\">$title</a></h1>" .
+			"<figure><img src=\"$image\"></figure>" .
+			"<p>$desc</p>" .
+		'</blockquote>'
+	);
+}
+
+function gutenberg_oembed_fallback( $response, $handler, $request ) {
+	if ( is_wp_error( $response ) && $response->get_error_code() === 'oembed_invalid_url' ) {
+		$url = $request->get_param( 'url' );
+
+		return array(
+			'url' => $url,
+			'html' => gutenberg_oembed_fallback_response( $url ),
+			'type' => 'opengraph',
+		);
+	}
+
+	return $response;
+}
+
+function gutenberg_pre_oembed_result( $html, $url, $args ) {
+	$wp_oembed = _wp_oembed_get_object();
+
+	if ( $wp_oembed->get_provider( $url, $args ) ) {
+		return $html;
+	}
+
+	return gutenberg_oembed_fallback_response( $url );
+}
+
+add_filter( 'rest_request_after_callbacks', 'gutenberg_oembed_fallback', 10, 3 );
+// add_filter( 'embed_maybe_make_link', 'gutenberg_oembed_fallback_response', 10, 2 );
+add_filter( 'pre_oembed_result', 'gutenberg_pre_oembed_result', 10, 3 );
