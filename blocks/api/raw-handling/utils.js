@@ -49,6 +49,7 @@ const inlineWrapperWhiteList = {
 	pre: {},
 	td: {},
 	th: {},
+	cite: {},
 };
 
 const whitelist = {

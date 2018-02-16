@@ -22,6 +22,7 @@ const types = [
 	'iframe-embed',
 	'one-image',
 	'two-images',
+	'quote',
 ];
 
 describe( 'raw handling: integration', () => {

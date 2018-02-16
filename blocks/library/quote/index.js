@@ -15,7 +15,7 @@ import { Toolbar, withState } from '@wordpress/components';
  */
 import './style.scss';
 import './editor.scss';
-import { createBlock } from '../../api';
+import { createBlock, getBlockType, getBlockAttributes } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
@@ -99,6 +99,25 @@ export const settings = {
 			{
 				type: 'raw',
 				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
+				transform( node ) {
+					Array.from( node.children ).forEach( ( child ) => {
+						if ( child.nodeName === 'CITE' || child.nodeName === 'P' ) {
+							return;
+						}
+
+						const p = document.createElement( 'p' );
+
+						while ( child.firstChild ) {
+							p.appendChild( child.firstChild );
+						}
+
+						node.replaceChild( p, child );
+					} );
+
+					const blockType = getBlockType( 'core/quote' );
+					const attributes = getBlockAttributes( blockType, node.outerHTML );
+					return createBlock( 'core/quote', attributes );
+				},
 			},
 		],
 		to: [
