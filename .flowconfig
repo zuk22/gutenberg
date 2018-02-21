@@ -1,0 +1,16 @@
+[ignore]
+./*/build/.*
+.*/node_modules/cypress/.*
+.*/node_modules/findup/.*
+.*/node_modules/config-chain/.*
+
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+module.name_mapper='^@wordpress\/\(.*\)$' -> '<PROJECT_ROOT>/\1'
+
+[strict]
