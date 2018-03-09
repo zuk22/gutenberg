@@ -78,7 +78,7 @@ class PostTitle extends Component {
 				<Textarea
 					className="editor-post-title__input"
 					value={ title }
-					onChange={ this.onChange }
+					onInput={ this.onChange }
 					placeholder={ placeholder || __( 'Add title' ) }
 					aria-label={ placeholder || __( 'Add title' ) }
 					onFocus={ this.onSelect }
