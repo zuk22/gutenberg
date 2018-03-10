@@ -39,7 +39,7 @@ class ObserveTyping extends Component {
 
 		this.stopTypingOnSelectionUncollapse = this.stopTypingOnSelectionUncollapse.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
-		this.startTypingInTextField = this.startTypingInTextField.bind( this );
+		this.startTypingInBlockTextField = this.startTypingInBlockTextField.bind( this );
 
 		this.lastMouseMove = null;
 	}
@@ -108,17 +108,18 @@ class ObserveTyping extends Component {
 	}
 
 	/**
-	 * Handles a keypress or keydown event to infer intention to start typing.
+	 * Handles a keypress or keydown event to infer intention to start typing
+	 * when within a block's text field.
 	 *
 	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
 	 */
-	startTypingInTextField( event ) {
-		const { isTyping, onStartTyping } = this.props;
+	startTypingInBlockTextField( event ) {
+		const { isTyping, hasSelectedBlock, onStartTyping } = this.props;
 		const { type, target } = event;
 
 		// Abort early if already typing, or key press is incurred outside a
 		// text field (e.g. arrow-ing through toolbar buttons).
-		if ( isTyping || ! isTextField( target ) ) {
+		if ( isTyping || ! hasSelectedBlock || ! isTextField( target ) ) {
 			return;
 		}
 
@@ -141,8 +142,8 @@ class ObserveTyping extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				onKeyPress={ this.startTypingInTextField }
-				onKeyDown={ this.startTypingInTextField }
+				onKeyPress={ this.startTypingInBlockTextField }
+				onKeyDown={ this.startTypingInBlockTextField }
 			>
 				{ children }
 			</div>
@@ -153,14 +154,19 @@ class ObserveTyping extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { isTyping, getSelectedBlockCount } = select( 'core/editor' );
+
 		return {
-			isTyping: select( 'core/editor' ).isTyping(),
+			isTyping: isTyping(),
+			hasSelectedBlock: getSelectedBlockCount() > 0,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		const { startTyping, stopTyping } = dispatch( 'core/editor' );
+
 		return {
-			onStartTyping: dispatch( 'core/editor' ).startTyping,
-			onStopTyping: dispatch( 'core/editor' ).stopTyping,
+			onStartTyping: startTyping,
+			onStopTyping: stopTyping,
 		};
 	} ),
 ] )( ObserveTyping );
