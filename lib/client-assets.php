@@ -518,24 +518,17 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 		}
 		fclose( $f );
 		$response = wp_remote_get( $src );
-		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			// The request failed. If the file is already cached we should
-			// continue to use this file. 
-			// If not, then we need to unlink the 
-			// 0 byte file that's been created, 
-			// and enqueue the script directly from the URL.
-			// The browser may also fail to load the file...
-			// leading to a very poor user experience. 
-			// That's development mode for you!
-			if ( ! filesize( $full_path ) ) {
-				wp_register_script( $handle, $src, $deps, null );
-				unlink( $full_path );
-				return;
-			}
-		} else {
+		if ( wp_remote_retrieve_response_code( $response ) === 200 ) {
 			$f = fopen( $full_path, 'w' );
 			fwrite( $f, wp_remote_retrieve_body( $response ) );
 			fclose( $f );
+		} else if ( ! filesize( $full_path ) ) {
+			// The request failed. If the file is already cached, continue to
+			// use this file. If not, then unlink the 0 byte file, and enqueue
+			// the script directly from the URL.
+			wp_register_script( $handle, $src, $deps, null );
+			unlink( $full_path );
+			return;
 		}
 	}
 	wp_register_script(
