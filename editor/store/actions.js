@@ -640,6 +640,14 @@ export function insertDefaultBlock( attributes, rootUID, index ) {
 	};
 }
 
+export function updateBlockListSettings( id, settings ) {
+	return {
+		type: 'UPDATED_BLOCK_LIST_SETTINGS',
+		id,
+		settings,
+	};
+}
+
 /**
  * Returns an action object used to set the keyboard mode
  *
