@@ -32,7 +32,12 @@ import {
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 } from '../../store/selectors';
-import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
+import {
+	startMultiSelect,
+	stopMultiSelect,
+	multiSelect,
+	selectBlock,
+} from '../../store/actions';
 
 class BlockListLayout extends Component {
 	constructor( props ) {

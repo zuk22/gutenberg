@@ -73,6 +73,8 @@ class ButtonBlock extends Component {
 			clear,
 		} = attributes;
 
+		/* The disabling of autofocus, the input is being focused when you tab to the button block. */
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return [
 			isSelected && (
 				<BlockControls key="controls">
@@ -129,6 +131,7 @@ class ButtonBlock extends Component {
 					onSubmit={ ( event ) => event.preventDefault() }>
 					<Dashicon icon="admin-links" />
 					<UrlInput
+						autoFocus={ false }
 						value={ url }
 						onChange={ ( value ) => setAttributes( { url: value } ) }
 					/>
@@ -136,6 +139,7 @@ class ButtonBlock extends Component {
 				</form>
 			),
 		];
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 

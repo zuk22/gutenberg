@@ -29,10 +29,13 @@ import {
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
+	getKeyboardMode,
 } from '../../store/selectors';
 import {
 	multiSelect,
 	selectBlock,
+	setKeyboardMode,
+	clearSelectedBlock,
 } from '../../store/actions';
 import {
 	isBlockFocusStop,
@@ -48,7 +51,7 @@ const { DOMRect } = window;
 /**
  * Module Constants
  */
-const { UP, DOWN, LEFT, RIGHT } = keycodes;
+const { UP, DOWN, LEFT, RIGHT, TAB } = keycodes;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -69,14 +72,44 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.bindAppender = this.bindAppender.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
+		this.swithToEditMode = this.swithToEditMode.bind( this );
 
+		this.lastClientY = null;
+		this.lastClientX = null;
 		this.verticalRect = null;
+	}
+
+	componentDidMount() {
+		window.addEventListener( 'mousemove', this.swithToEditMode );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'mousemove', this.swithToEditMode );
+	}
+
+	swithToEditMode( { clientY, clientX } ) {
+		// Safari triggers mousemove even if we didn't really move the mouse
+		// On shift press for instance.
+		// To ensure we really moved the mouse, we compare the mouse position
+		if ( this.props.keyboardMode !== 'edit' &&
+			( this.lastClientX !== null && this.lastClientY !== null ) &&
+			( clientY !== this.lastClientY || clientX !== this.lastClientX )
+		) {
+			this.props.setKeyboardMode( 'edit' );
+		}
+		this.lastClientY = clientY;
+		this.lastClientX = clientX;
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
+	}
+
+	bindAppender( ref ) {
+		this.appender = ref;
 	}
 
 	clearVerticalRect() {
@@ -161,7 +194,10 @@ class WritingFlow extends Component {
 		const focusedBlockUid = isReverse ? previousBlockUid : nextBlockUid;
 		if ( focusedBlockUid ) {
 			this.props.onSelectBlock( focusedBlockUid );
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
@@ -181,9 +217,28 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlockUID, selectionStart, hasMultiSelection } = this.props;
-
+		const { selectedBlockUID, selectionStart, hasMultiSelection, keyboardMode, nextBlockUid, previousBlockUid } = this.props;
 		const { keyCode, target } = event;
+
+		// In navigation mode, tab and arrows navigate from block to blocks
+		if ( keyboardMode === 'navigation' ) {
+			const navigateUp = ( keyCode === TAB && event.shiftKey ) || keyCode === UP;
+			const navigateDown = ( keyCode === TAB && ! event.shiftKey ) || keyCode === DOWN;
+
+			if ( ( navigateDown && nextBlockUid ) || ( navigateUp && previousBlockUid ) ) {
+				event.preventDefault();
+				this.moveSelection( navigateUp );
+			}
+
+			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
+			if ( navigateDown && selectedBlockUID && ! nextBlockUid && [ UP, DOWN ].indexOf( keyCode ) === -1 ) {
+				this.props.clearSelectedBlock();
+				this.appender.focus();
+			}
+			return;
+		}
+
+		// In edit mode, tab is kept natural and arrows navigate the cursor
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
@@ -263,6 +318,7 @@ class WritingFlow extends Component {
 					{ children }
 				</div>
 				<div
+					ref={ this.bindAppender }
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
@@ -281,9 +337,12 @@ export default connect(
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlockUID: get( getSelectedBlock( state ), [ 'uid' ] ),
+		keyboardMode: getKeyboardMode( state ),
 	} ),
 	{
 		onMultiSelect: multiSelect,
 		onSelectBlock: selectBlock,
+		clearSelectedBlock,
+		setKeyboardMode,
 	}
 )( WritingFlow );
