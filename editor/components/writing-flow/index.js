@@ -303,13 +303,17 @@ class WritingFlow extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
+		const { children, keyboardMode } = this.props;
+
+		const navigationMode = keyboardMode === 'navigation' ?
+			'is-navigation' :
+			'';
 
 		// Disable reason: Wrapper itself is non-interactive, but must capture
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="editor-writing-flow">
+			<div className={ `editor-writing-flow ${ navigationMode }` }>
 				<div
 					ref={ this.bindContainer }
 					onKeyDown={ this.onKeyDown }
