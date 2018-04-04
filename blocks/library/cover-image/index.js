@@ -23,9 +23,11 @@ const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 const blockAttributes = {
 	url: {
 		type: 'string',
+		default: 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=',
 	},
 	align: {
 		type: 'string',
+		default: 'wide',
 	},
 	id: {
 		type: 'number',
