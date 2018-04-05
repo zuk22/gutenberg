@@ -12,6 +12,10 @@
 		opacity: 0.5;
 	}
 
+	.editor-writing-flow.is-navigation & [data-is-placeholder-visible="true"] + * {
+		visibility: hidden;
+	}
+
 	&:not(.components-placeholder),
 	[contenteditable="true"] {
 		color: white;
