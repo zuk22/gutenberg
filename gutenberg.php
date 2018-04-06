@@ -527,3 +527,25 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
+
+function myplugin_register_book_post_type() {
+	$args = array(
+		'public' => true,
+		'label'  => 'Books',
+		'show_in_rest' => true,
+		'template' => array(
+			array( 'core/image', array(
+				'align' => 'left',
+			) ),
+			array( 'core/heading', array(
+				'placeholder' => 'Add Author...',
+			) ),
+			array( 'core/paragraph', array(
+				'placeholder' => 'Add Description...',
+			) ),
+		),
+		'template_lock' => 'all',
+	);
+	register_post_type( 'book', $args );
+}
+add_action( 'init', 'myplugin_register_book_post_type' );
