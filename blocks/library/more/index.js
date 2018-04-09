@@ -7,15 +7,13 @@ import { compact } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl } from '@wordpress/components';
 import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import { createBlock } from '../../api';
-import InspectorControls from '../../inspector-controls';
+import { edit } from './edit';
 
 export const name = 'core/more';
 
@@ -68,34 +66,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, isSelected } ) {
-		const { customText, noTeaser } = attributes;
-
-		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
-		const defaultText = __( 'Read more' );
-		const value = customText !== undefined ? customText : defaultText;
-		const inputLength = value.length ? value.length + 1 : 1;
-
-		return [
-			isSelected && (
-				<InspectorControls key="inspector">
-					<ToggleControl
-						label={ __( 'Hide the teaser before the "More" tag' ) }
-						checked={ !! noTeaser }
-						onChange={ toggleNoTeaser }
-					/>
-				</InspectorControls>
-			),
-			<div key="more-tag" className="wp-block-more">
-				<input
-					type="text"
-					value={ value }
-					size={ inputLength }
-					onChange={ ( event ) => setAttributes( { customText: event.target.value } ) }
-				/>
-			</div>,
-		];
-	},
+	edit: edit,
 
 	save( { attributes } ) {
 		const { customText, noTeaser } = attributes;
