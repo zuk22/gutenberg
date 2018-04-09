@@ -24,7 +24,7 @@ import * as code from './code';
 // import * as html from './html';
 // import * as latestPosts from './latest-posts';
 // import * as list from './list';
-// import * as more from './more';
+import * as more from './more';
 // import * as preformatted from './preformatted';
 // import * as pullquote from './pullquote';
 // import * as reusableBlock from './block';
@@ -80,7 +80,7 @@ export const registerCoreBlocks = () => {
 		// freeform,
 		// html,
 		// latestPosts,
-		// more,
+		more,
 		// preformatted,
 		// pullquote,
 		// reusableBlock,
