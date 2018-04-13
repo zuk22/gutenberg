@@ -475,8 +475,8 @@ export class RichText extends Component {
 				const afterNodes = childNodes.slice( index + 1 );
 
 				const { format } = this.props;
-				const before = domToFormat( beforeNodes, format );
-				const after = domToFormat( afterNodes, format );
+				const before = domToFormat( beforeNodes, format, this.editor );
+				const after = domToFormat( afterNodes, format, this.editor );
 
 				this.restoreContentAndSplit( before, after );
 			} else {
@@ -570,8 +570,8 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			const before = domToFormat( beforeFragment.childNodes, format );
-			const after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format );
+			const before = domToFormat( beforeFragment.childNodes, format, this.editor );
+			const after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
 
 			this.restoreContentAndSplit( before, after, blocks );
 		} else {
@@ -623,8 +623,8 @@ export class RichText extends Component {
 
 		const { format } = this.props;
 		this.restoreContentAndSplit(
-			domToFormat( before, format ),
-			domToFormat( after, format )
+			domToFormat( before, format, this.editor ),
+			domToFormat( after, format, this.editor )
 		);
 	}
 

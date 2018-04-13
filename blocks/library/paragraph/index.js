@@ -250,6 +250,7 @@ class ParagraphBlock extends Component {
 					} }
 					onSplit={ insertBlocksAfter ?
 						( before, after, ...blocks ) => {
+							window.console.log( before );
 							setAttributes( { content: before } );
 							insertBlocksAfter( [
 								...blocks,
@@ -264,6 +265,7 @@ class ParagraphBlock extends Component {
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 					isSelected={ isSelected }
 					autocompleters={ autocompleters }
+					format="string"
 				/>
 			</div>,
 		];
@@ -276,8 +278,8 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
-		source: 'children',
+		type: 'string',
+		source: 'html',
 		selector: 'p',
 		default: [],
 	},
@@ -438,6 +440,6 @@ export const settings = {
 			textAlign: align,
 		};
 
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		return <p style={ styles } className={ className ? className : undefined }><RawHTML>{ content }</RawHTML></p>;
 	},
 };

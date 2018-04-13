@@ -80,8 +80,14 @@ export function domToElement( value ) {
  *
  * @return {string} HTML.
  */
-export function domToString( value ) {
-	return map( value, element => element.outerHTML ).join( '' );
+export function domToString( value, editor ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+
+	Array.from( value ).forEach( ( child ) => {
+		doc.body.appendChild( child );
+	} );
+
+	return editor.serializer.serialize( doc.body );
 }
 
 /**
@@ -92,10 +98,10 @@ export function domToString( value ) {
  *
  * @return {*} Output.
  */
-export function domToFormat( value, format ) {
+export function domToFormat( value, format, editor ) {
 	switch ( format ) {
 		case 'string':
-			return domToString( value );
+			return domToString( value, editor );
 		default:
 			return domToElement( value );
 	}
