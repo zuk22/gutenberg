@@ -817,7 +817,7 @@ function get_autosave_newer_than_post_save( $post ) {
 		$autosave &&
 		mysql2date( 'U', $autosave->post_modified_gmt, false ) > mysql2date( 'U', $post->post_modified_gmt, false )
 	) {
-		return $autosave
+		return $autosave;
 	}
 
 	// If the autosave isn't newer, remove it.
