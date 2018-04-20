@@ -26,6 +26,11 @@ class EditorProvider extends Component {
 				...this.props.settings,
 			} );
 		}
+
+		// Display a notice if an autosave exists.
+		if ( props.settings.autosave ) {
+			this.props.showAutosaveNotice( props.settings.autosave );
+		}
 	}
 
 	render() {
@@ -109,11 +114,13 @@ export default withDispatch( ( dispatch ) => {
 		undo,
 		redo,
 		createUndoLevel,
+		showAutosaveNotice,
 	} = dispatch( 'core/editor' );
 	return {
 		setupEditor,
 		undo,
 		redo,
 		createUndoLevel,
+		showAutosaveNotice,
 	};
 } )( EditorProvider );
