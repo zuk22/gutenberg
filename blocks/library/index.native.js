@@ -10,7 +10,7 @@ import {
 } from '../api';
 // import * as paragraph from './paragraph';
 // import * as image from './image';
-// import * as heading from './heading';
+import * as heading from './heading';
 // import * as quote from './quote';
 // import * as gallery from './gallery';
 // import * as audio from './audio';
@@ -62,7 +62,7 @@ export const registerCoreBlocks = () => {
 		// // in various contexts — like the inserter and auto-complete components.
 		// paragraph,
 		// image,
-		// heading,
+		heading,
 		// gallery,
 		// list,
 		// quote,
