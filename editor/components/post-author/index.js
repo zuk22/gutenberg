@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { throttle, find, union } from 'lodash';
+import { get, filter } from 'lodash';
 import Select from 'react-select';
 
 /**
@@ -11,6 +10,7 @@ import Select from 'react-select';
 import { __ } from '@wordpress/i18n';
 import { withAPIData, withInstanceId } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -116,27 +116,21 @@ export class PostAuthor extends Component {
 	}
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			postAuthor: getEditedPostAttribute( state, 'author' ),
+			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onUpdateAuthor( author ) {
-			return editPost( { author } );
+			dispatch( 'core/editor' ).editPost( { author } );
 		},
-	},
-);
-
-const applyWithAPIData = withAPIData( () => {
+	} ) ),
+	withAPIData( () => {
 	return {
 		users: '/wp/v2/users?context=edit&per_page=100',
 	};
-} );
-
-export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	} ),
 	withInstanceId,
 ] )( PostAuthor );

@@ -7,8 +7,8 @@ import { compact } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl } from '@wordpress/components';
-import { Component, RawHTML } from '@wordpress/element';
+import { PanelBody, ToggleControl } from '@wordpress/components';
+import { Component, Fragment, RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -90,32 +90,34 @@ export const settings = {
 
 		render() {
 			const { customText, noTeaser } = this.props.attributes;
-			const { setAttributes, isSelected } = this.props;
+			const { setAttributes } = this.props;
 
 			const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
 			const { defaultText } = this.state;
 			const value = customText !== undefined ? customText : defaultText;
 			const inputLength = value.length + 1;
 
-			return [
-				isSelected && (
-					<InspectorControls key="inspector">
-						<ToggleControl
-							label={ __( 'Hide the teaser before the "More" tag' ) }
-							checked={ !! noTeaser }
-							onChange={ toggleNoTeaser }
-						/>
+			return (
+				<Fragment>
+					<InspectorControls>
+						<PanelBody>
+							<ToggleControl
+								label={ __( 'Hide the teaser before the "More" tag' ) }
+								checked={ !! noTeaser }
+								onChange={ toggleNoTeaser }
+							/>
+						</PanelBody>
 					</InspectorControls>
-				),
-				<div key="more-tag" className="wp-block-more">
-					<input
-						type="text"
-						value={ value }
-						size={ inputLength }
-						onChange={ this.onChangeInput }
-					/>
-				</div>,
-			];
+					<div className="wp-block-more">
+						<input
+							type="text"
+							value={ value }
+							size={ inputLength }
+							onChange={ this.onChangeInput }
+						/>
+					</div>
+				</Fragment>
+			);
 		}
 	},
 

@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,14 +9,14 @@ import {
 	Placeholder,
 	Toolbar,
 } from '@wordpress/components';
-import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { Component, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
+import editorMediaUpload from '../../editor-media-upload';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
@@ -93,7 +89,7 @@ export const settings = {
 				return false;
 			};
 			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAudio, 'audio' );
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 
 			if ( editing ) {
 				return (
@@ -107,7 +103,7 @@ export const settings = {
 								type="url"
 								className="components-placeholder__input"
 								placeholder={ __( 'Enter URL of audio file here…' ) }
-								onChange={ event => this.setState( { src: event.target.value } ) }
+								onChange={ ( event ) => this.setState( { src: event.target.value } ) }
 								value={ src || '' } />
 							<Button
 								isLarge
@@ -129,7 +125,7 @@ export const settings = {
 							value={ id }
 							render={ ( { open } ) => (
 								<Button isLarge onClick={ open }>
-									{ __( 'Add from Media Library' ) }
+									{ __( 'Media Library' ) }
 								</Button>
 							) }
 						/>
@@ -138,9 +134,9 @@ export const settings = {
 			}
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-			return [
-				isSelected && (
-					<BlockControls key="controls">
+			return (
+				<Fragment>
+					<BlockControls>
 						<Toolbar>
 							<IconButton
 								className="components-icon-button components-toolbar__control"
@@ -150,21 +146,20 @@ export const settings = {
 							/>
 						</Toolbar>
 					</BlockControls>
-				),
-				<figure key="audio" className={ className }>
-					<audio controls="controls" src={ src } />
-					{ ( ( caption && caption.length ) || !! isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							isSelected={ isSelected }
-							inlineToolbar
-						/>
-					) }
-				</figure>,
-			];
+					<figure className={ className }>
+						<audio controls="controls" src={ src } />
+						{ ( ( caption && caption.length ) || !! isSelected ) && (
+							<RichText
+								tagName="figcaption"
+								placeholder={ __( 'Write caption…' ) }
+								value={ caption }
+								onChange={ ( value ) => setAttributes( { caption: value } ) }
+								inlineToolbar
+							/>
+						) }
+					</figure>
+				</Fragment>
+			);
 			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		}
 	},
