@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { get, filter } from 'lodash';
-import Select from 'react-select';
 
 /**
  * WordPress dependencies
@@ -22,7 +21,7 @@ import PostAuthorCheck from './check';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 import './style.scss';
-import { authorAutocompleter } from '../../autocompleters';
+import { authorAutocompleter } from '../../../blocks/autocompleters';
 import RichText from '../../../blocks/rich-text';
 
 export class PostAuthor extends Component {
@@ -117,11 +116,11 @@ export default compose( [
 			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	withDispatch( ( dispatch ) => ( {
 		onUpdateAuthor( author ) {
 			dispatch( 'core/editor' ).editPost( { author } );
 		},
-	} )
+	} ) )
 ] );
 
 /*
@@ -162,3 +161,4 @@ export default compose( [
 ] )( PostAuthor );
 	withInstanceId,
 ] )( PostAuthor );
+*/
