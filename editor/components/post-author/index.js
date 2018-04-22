@@ -8,7 +8,10 @@ import Select from 'react-select';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withAPIData, withInstanceId } from '@wordpress/components';
+import {
+	withInstanceId,
+	Autocomplete,
+} from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -19,6 +22,8 @@ import PostAuthorCheck from './check';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 import './style.scss';
+import { authorAutocompleter } from '../../autocompleters';
+import RichText from '../../../blocks/rich-text';
 
 export class PostAuthor extends Component {
 	constructor() {
@@ -37,17 +42,6 @@ export class PostAuthor extends Component {
 		}
 		const { onUpdateAuthor } = this.props;
 		onUpdateAuthor( Number( value.id ) );
-	}
-
-	// Get the list of authors, returns default values or last search.
-	getAuthors() {
-		const { users, postAuthor } = this.props;
-		const { searchusers } = this.state;
-		const hasSearchResults = ( 0 !== searchusers.length );
-
-		if ( ! users.data ) {
-			users.data = [];
-		}
 
 		const allUsers = union( searchusers, users.data );
 
@@ -70,7 +64,7 @@ export class PostAuthor extends Component {
 	fetchAuthors( query ) {
 		// If the query is blank, return the default user list.
 		if ( ! query ) {
-			return Promise.resolve( { options: this.getAuthors() } );
+			return;
 		}
 		const request = wp.apiRequest( { path: '/wp/v2/users?context=edit&_fields=name,id&search=' + encodeURIComponent( query ) } );
 
@@ -81,40 +75,56 @@ export class PostAuthor extends Component {
 		} );
 	}
 
+	onFocus() {
+		this.value = '';
+	}
+
 	render() {
 		const { postAuthor, instanceId } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
-		const authors = this.getAuthors();
-
-		// Don't display component until authors have loaded.
-		if ( ! authors ) {
-			return null;
-		}
+		const className = 'post-author-selector';
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				<Select.Async
-					id={ selectId }
-					multi={ false }
+				<Autocomplete completers={ [
+					authorAutocompleter(),
+				] }>
+					{ ( { isExpanded, listBoxId, activeId } ) => (
+						<RichText
+							tagName="p"
+							className={ classnames( 'wp-block-paragraph', className, {
+							} ) }
 					value={ postAuthor }
-					onChange={ this.setAuthorId }
-					valueKey="id"
-					labelKey="name"
-					loadOptions={ this.fetchAuthors }
-					backspaceRemoves={ false }
-					options={ authors }
-					autoload={ false }
-					clearable={ false }
-					onBlurResetsInput={ false }
-					onCloseResetsInput={ false }
+							aria-autocomplete="list"
+							aria-expanded={ true }
+							aria-owns={ selectId }
+							placeholder={ __( 'Search for author...' ) }
+							onFocus={ onFocus }
 				/>
+					) }
+				</Autocomplete>
 			</PostAuthorCheck>
 		);
 		/* eslint-enable jsx-a11y/no-onchange */
 	}
 }
+
+export default compose( [
+	withSelect( ( select ) => {
+		return {
+			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		onUpdateAuthor( author ) {
+			dispatch( 'core/editor' ).editPost( { author } );
+		},
+	} )
+] );
+
+/*
 
 export default compose( [
 	withSelect( ( select ) => {
@@ -128,9 +138,27 @@ export default compose( [
 		},
 	} ) ),
 	withAPIData( () => {
-	return {
-		users: '/wp/v2/users?context=edit&per_page=100',
-	};
+		return {
+			users: '/wp/v2/users?context=edit&per_page=100',
+		};
 	} ),
+	withInstanceId,
+] )( PostAuthor );
+
+
+
+export default compose( [
+	applyConnect,
+	withSelect( ( select ) => ( {
+		author: select( 'core/editor' ).getEditedPostAttribute( state, 'author' ),
+	} ) ),
+	withAPIData( () => {
+	withAPIData( ( { postType } ) => ( {
+	return {
+		user: `/wp/v2/users?context=edit&id=${ author }`,
+	} ) ),
+	withInstanceId,
+	} ),
+] )( PostAuthor );
 	withInstanceId,
 ] )( PostAuthor );
