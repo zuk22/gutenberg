@@ -6,7 +6,7 @@ import {
 	createElement,
 	Component,
 	// cloneElement,
-	// Children,
+	Children,
 	// Fragment
 } from 'react';
 // import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
@@ -80,7 +80,7 @@ export { Component };
  */
 // export { findDOMNode };
 
-// export { Children };
+export { Children };
 
 /**
  * A component which renders its children without any wrapping element.

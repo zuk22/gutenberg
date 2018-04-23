@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-// import {
+import {
 // 	last,
 // 	isEqual,
 // 	omitBy,
-// 	forEach,
+	forEach,
 // 	merge,
-// 	identity,
-// 	find,
-// 	defer,
+	identity,
+	find,
+	defer,
 // 	noop,
 // 	reject,
-// } from 'lodash';
+} from 'lodash';
 // import { nodeListToReact } from 'dom-react';
 // import 'element-closest';
 
@@ -26,7 +26,11 @@ import {
 	Component,
 	// renderToString
 } from '@wordpress/element';
-// import { keycodes, createBlobURL, isHorizontalEdge } from '@wordpress/utils';
+import {
+	// keycodes,
+	createBlobURL,
+	// isHorizontalEdge
+} from '@wordpress/utils';
 // import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
@@ -35,11 +39,10 @@ import {
 import styles from './style.scss';
 // import { rawHandler } from '../api';
 // import FormatToolbar from './format-toolbar';
-// import TinyMCE from './tinymce';
+import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 // import patterns from './patterns';
-// import { EVENTS } from './constants';
-import PlainText from '../plain-text';
+import { EVENTS } from './constants';
 
 // const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -122,126 +125,126 @@ type PropsType = BlockType & {
 	value: string,
 	wrapperClassName: Object,
 	className: Object,
-onChange: ( uid: string, attributes: mixed ) => void,
+	onChange: ( uid: string, attributes: mixed ) => void,
 };
 type StateType = { };
 
 export default class RichText extends Component<PropsType, StateType> {
-	// constructor( props ) {
-	// 	super( ...arguments );
+	constructor( props: PropsType ) {
+		super( ...arguments );
 
-	// 	const { value } = props;
-	// 	if ( 'production' !== process.env.NODE_ENV && undefined !== value &&
-	// 				! Array.isArray( value ) ) {
-	// 		// eslint-disable-next-line no-console
-	// 		console.error(
-	// 			`Invalid value of type ${ typeof value } passed to RichText ` +
-	// 			'(expected array). Attribute values should be sourced using ' +
-	// 			'the `children` source when used with RichText.\n\n' +
-	// 			'See: https://wordpress.org/gutenberg/handbook/block-api/attributes/#children'
-	// 		);
-	// 	}
+		const { value } = props;
+		if ( 'production' !== process.env.NODE_ENV && undefined !== value &&
+					! Array.isArray( value ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Invalid value of type ${ typeof value } passed to RichText ` +
+				'(expected array). Attribute values should be sourced using ' +
+				'the `children` source when used with RichText.\n\n' +
+				'See: https://wordpress.org/gutenberg/handbook/block-api/attributes/#children'
+			);
+		}
 
-	// 	this.onInit = this.onInit.bind( this );
-	// 	this.getSettings = this.getSettings.bind( this );
-	// 	this.onSetup = this.onSetup.bind( this );
-	// 	this.onChange = this.onChange.bind( this );
-	// 	this.onNewBlock = this.onNewBlock.bind( this );
-	// 	this.onNodeChange = this.onNodeChange.bind( this );
-	// 	this.onKeyDown = this.onKeyDown.bind( this );
-	// 	this.onKeyUp = this.onKeyUp.bind( this );
-	// 	this.changeFormats = this.changeFormats.bind( this );
-	// 	this.onPropagateUndo = this.onPropagateUndo.bind( this );
-	// 	this.onPastePreProcess = this.onPastePreProcess.bind( this );
-	// 	this.onPaste = this.onPaste.bind( this );
-	// 	this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
+		this.onInit = this.onInit.bind( this );
+		this.getSettings = this.getSettings.bind( this );
+		this.onSetup = this.onSetup.bind( this );
+		this.onChange = this.onChange.bind( this );
+		this.onNewBlock = this.onNewBlock.bind( this );
+		this.onNodeChange = this.onNodeChange.bind( this );
+		// this.onKeyDown = this.onKeyDown.bind( this );
+		// this.onKeyUp = this.onKeyUp.bind( this );
+		this.changeFormats = this.changeFormats.bind( this );
+		this.onPropagateUndo = this.onPropagateUndo.bind( this );
+		this.onPastePreProcess = this.onPastePreProcess.bind( this );
+		this.onPaste = this.onPaste.bind( this );
+		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 
-	// 	this.state = {
-	// 		formats: {},
-	// 		selectedNodeId: 0,
-	// 	};
+		this.state = {
+			formats: {},
+			selectedNodeId: 0,
+		};
 
-	// 	this.isEmpty = ! value || ! value.length;
-	// }
+		this.isEmpty = ! value || ! value.length;
+	}
 
-// 	/**
-// 	 * Retrieves the settings for this block.
-// 	 *
-// 	 * Allows passing in settings which will be overwritten.
-// 	 *
-// 	 * @param {Object} settings The settings to overwrite.
-// 	 * @return {Object} The settings for this block.
-// 	 */
-// 	getSettings( settings ) {
-// 		return ( this.props.getSettings || identity )( {
-// 			...settings,
-// 			forced_root_block: this.props.multiline || false,
-// 			// Allow TinyMCE to keep one undo level for comparing changes.
-// 			// Prevent it otherwise from accumulating any history.
-// 			custom_undo_redo_levels: 1,
-// 		} );
-// 	}
+	/**
+	 * Retrieves the settings for this block.
+	 *
+	 * Allows passing in settings which will be overwritten.
+	 *
+	 * @param {Object} settings The settings to overwrite.
+	 * @return {Object} The settings for this block.
+	 */
+	getSettings( settings ) {
+		return ( this.props.getSettings || identity )( {
+			...settings,
+			forced_root_block: this.props.multiline || false,
+			// Allow TinyMCE to keep one undo level for comparing changes.
+			// Prevent it otherwise from accumulating any history.
+			custom_undo_redo_levels: 1,
+		} );
+	}
 
-// 	/**
-// 	 * Handles the onSetup event for the tinyMCE component.
-// 	 *
-// 	 * Will setup event handlers for the tinyMCE instance.
-// 	 * An `onSetup` function in the props will be called if it is present.
-// 	 *
-// 	 * @param {tinymce} editor The editor instance as passed by tinyMCE.
-// 	 */
-// 	onSetup( editor ) {
-// 		this.editor = editor;
+	/**
+	 * Handles the onSetup event for the tinyMCE component.
+	 *
+	 * Will setup event handlers for the tinyMCE instance.
+	 * An `onSetup` function in the props will be called if it is present.
+	 *
+	 * @param {tinymce} editor The editor instance as passed by tinyMCE.
+	 */
+	onSetup( editor ) {
+		this.editor = editor;
 
-// 		EVENTS.forEach( ( name ) => {
-// 			editor.on( name, this.proxyPropHandler( name ) );
-// 		} );
+		EVENTS.forEach( ( name ) => {
+			editor.on( name, this.proxyPropHandler( name ) );
+		} );
 
-// 		editor.on( 'init', this.onInit );
-// 		editor.on( 'NewBlock', this.onNewBlock );
-// 		editor.on( 'nodechange', this.onNodeChange );
-// 		editor.on( 'keydown', this.onKeyDown );
-// 		editor.on( 'keyup', this.onKeyUp );
-// 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-// 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-// 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
-// 		editor.on( 'input', this.onChange );
-// 		// The change event in TinyMCE fires every time an undo level is added.
-// 		editor.on( 'change', this.onCreateUndoLevel );
+		editor.on( 'init', this.onInit );
+		editor.on( 'NewBlock', this.onNewBlock );
+		editor.on( 'nodechange', this.onNodeChange );
+		// editor.on( 'keydown', this.onKeyDown );
+		// editor.on( 'keyup', this.onKeyUp );
+		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
+		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
+		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+		editor.on( 'input', this.onChange );
+		// The change event in TinyMCE fires every time an undo level is added.
+		editor.on( 'change', this.onCreateUndoLevel );
 
-// 		patterns.apply( this, [ editor ] );
+		// patterns.apply( this, [ editor ] );
 
-// 		if ( this.props.onSetup ) {
-// 			this.props.onSetup( editor );
-// 		}
-// 	}
+		if ( this.props.onSetup ) {
+			this.props.onSetup( editor );
+		}
+	}
 
-// 	/**
-// 	 * Allows prop event handlers to handle an event.
-// 	 *
-// 	 * Allow props an opportunity to handle the event, before default RichText
-// 	 * behavior takes effect. Should the event be handled by a prop, it should
-// 	 * `stopImmediatePropagation` on the event to stop continued event handling.
-// 	 *
-// 	 * @param {string} name The name of the event.
-// 	 *
-// 	 * @return {void} Void.
-// 	*/
-// 	proxyPropHandler( name ) {
-// 		return ( event ) => {
-// 			// Allow props an opportunity to handle the event, before default
-// 			// RichText behavior takes effect. Should the event be handled by a
-// 			// prop, it should `stopImmediatePropagation` on the event to stop
-// 			// continued event handling.
-// 			if ( 'function' === typeof this.props[ 'on' + name ] ) {
-// 				this.props[ 'on' + name ]( event );
-// 			}
-// 		};
-// 	}
+	/**
+	 * Allows prop event handlers to handle an event.
+	 *
+	 * Allow props an opportunity to handle the event, before default RichText
+	 * behavior takes effect. Should the event be handled by a prop, it should
+	 * `stopImmediatePropagation` on the event to stop continued event handling.
+	 *
+	 * @param {string} name The name of the event.
+	 *
+	 * @return {void} Void.
+	*/
+	proxyPropHandler( name ) {
+		return ( event ) => {
+			// Allow props an opportunity to handle the event, before default
+			// RichText behavior takes effect. Should the event be handled by a
+			// prop, it should `stopImmediatePropagation` on the event to stop
+			// continued event handling.
+			if ( 'function' === typeof this.props[ 'on' + name ] ) {
+				this.props[ 'on' + name ]( event );
+			}
+		};
+	}
 
-// 	onInit() {
-// 		this.registerCustomFormatters();
-// 	}
+	onInit() {
+		this.registerCustomFormatters();
+	}
 
 // 	adaptFormatter( options ) {
 // 		switch ( options.type ) {
@@ -254,173 +257,173 @@ export default class RichText extends Component<PropsType, StateType> {
 // 		}
 // 	}
 
-// 	registerCustomFormatters() {
-// 		forEach( this.props.formatters, ( formatter ) => {
-// 			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
-// 		} );
-// 	}
+	registerCustomFormatters() {
+		forEach( this.props.formatters, ( formatter ) => {
+			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
+		} );
+	}
 
-// 	/**
-// 	 * Handles an undo event from tinyMCE.
-// 	 *
-// 	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
-// 	 */
-// 	onPropagateUndo( event ) {
-// 		const { onUndo, onRedo } = this.context;
-// 		const { command } = event;
+	/**
+	 * Handles an undo event from tinyMCE.
+	 *
+	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
+	 */
+	onPropagateUndo( event ) {
+		const { onUndo, onRedo } = this.context;
+		const { command } = event;
 
-// 		if ( command === 'Undo' && onUndo ) {
-// 			defer( onUndo );
-// 			event.preventDefault();
-// 		}
+		if ( command === 'Undo' && onUndo ) {
+			defer( onUndo );
+			event.preventDefault();
+		}
 
-// 		if ( command === 'Redo' && onRedo ) {
-// 			defer( onRedo );
-// 			event.preventDefault();
-// 		}
-// 	}
+		if ( command === 'Redo' && onRedo ) {
+			defer( onRedo );
+			event.preventDefault();
+		}
+	}
 
-// 	/**
-// 	 * Handles a paste event from tinyMCE.
-// 	 *
-// 	 * Saves the pasted data as plain text in `pastedPlainText`.
-// 	 *
-// 	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
-// 	 */
-// 	onPaste( event ) {
-// 		const dataTransfer =
-// 			event.clipboardData ||
-// 			event.dataTransfer ||
-// 			this.editor.getDoc().dataTransfer ||
-// 			// Removes the need for further `dataTransfer` checks.
-// 			{ getData: () => '' };
+	/**
+	 * Handles a paste event from tinyMCE.
+	 *
+	 * Saves the pasted data as plain text in `pastedPlainText`.
+	 *
+	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
+	 */
+	onPaste( event ) {
+		const dataTransfer =
+			event.clipboardData ||
+			event.dataTransfer ||
+			this.editor.getDoc().dataTransfer ||
+			// Removes the need for further `dataTransfer` checks.
+			{ getData: () => '' };
 
-// 		const { items = [], files = [], types = [] } = dataTransfer;
-// 		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
-// 		const plainText = dataTransfer.getData( 'text/plain' );
-// 		const HTML = dataTransfer.getData( 'text/html' );
+		const { items = [], files = [], types = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const plainText = dataTransfer.getData( 'text/plain' );
+		const HTML = dataTransfer.getData( 'text/html' );
 
-// 		// Only process file if no HTML is present.
-// 		// Note: a pasted file may have the URL as plain text.
-// 		if ( item && ! HTML ) {
-// 			const blob = item.getAsFile ? item.getAsFile() : item;
-// 			const rootNode = this.editor.getBody();
-// 			const isEmpty = this.editor.dom.isEmpty( rootNode );
-// 			const content = rawHandler( {
-// 				HTML: `<img src="${ createBlobURL( blob ) }">`,
-// 				mode: 'BLOCKS',
-// 				tagName: this.props.tagName,
-// 			} );
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		if ( item && ! HTML ) {
+			const blob = item.getAsFile ? item.getAsFile() : item;
+			const rootNode = this.editor.getBody();
+			const isEmpty = this.editor.dom.isEmpty( rootNode );
+			const content = rawHandler( {
+				HTML: `<img src="${ createBlobURL( blob ) }">`,
+				mode: 'BLOCKS',
+				tagName: this.props.tagName,
+			} );
 
-// 			// Allows us to ask for this information when we get a report.
-// 			window.console.log( 'Received item:\n\n', blob );
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', blob );
 
-// 			if ( isEmpty && this.props.onReplace ) {
-// 				// Necessary to allow the paste bin to be removed without errors.
-// 				this.props.setTimeout( () => this.props.onReplace( content ) );
-// 			} else if ( this.props.onSplit ) {
-// 				// Necessary to get the right range.
-// 				// Also done in the TinyMCE paste plugin.
-// 				this.props.setTimeout( () => this.splitContent( content ) );
-// 			}
+			if ( isEmpty && this.props.onReplace ) {
+				// Necessary to allow the paste bin to be removed without errors.
+				this.props.setTimeout( () => this.props.onReplace( content ) );
+			} else if ( this.props.onSplit ) {
+				// Necessary to get the right range.
+				// Also done in the TinyMCE paste plugin.
+				this.props.setTimeout( () => this.splitContent( content ) );
+			}
 
-// 			event.preventDefault();
-// 		}
+			event.preventDefault();
+		}
 
-// 		this.pastedPlainText = plainText;
-// 		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
-// 	}
+		this.pastedPlainText = plainText;
+		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
+	}
 
-// 	/**
-// 	 * Handles a PrePasteProcess event from tinyMCE.
-// 	 *
-// 	 * Will call the paste handler with the pasted data. If it is a string tries
-// 	 * to put it in the containing tinyMCE editor. Otherwise call the `onSplit`
-// 	 * handler.
-// 	 *
-// 	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered
-// 	 *                                     by tinyMCE.
-// 	 */
-// 	onPastePreProcess( event ) {
-// 		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
-// 		// Allows us to ask for this information when we get a report.
-// 		window.console.log( 'Received HTML:\n\n', HTML );
-// 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
+	/**
+	 * Handles a PrePasteProcess event from tinyMCE.
+	 *
+	 * Will call the paste handler with the pasted data. If it is a string tries
+	 * to put it in the containing tinyMCE editor. Otherwise call the `onSplit`
+	 * handler.
+	 *
+	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered
+	 *                                     by tinyMCE.
+	 */
+	onPastePreProcess( event ) {
+		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', HTML );
+		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
-// 		// There is a selection, check if a link is pasted.
-// 		if ( ! this.editor.selection.isCollapsed() ) {
-// 			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
-// 			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
-// 			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
+		// There is a selection, check if a link is pasted.
+		if ( ! this.editor.selection.isCollapsed() ) {
+			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
+			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
 
-// 			// The pasted text is a link, and the selected text is not.
-// 			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
-// 				this.editor.execCommand( 'mceInsertLink', false, {
-// 					href: this.editor.dom.decode( pastedText ),
-// 				} );
+			// The pasted text is a link, and the selected text is not.
+			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+				this.editor.execCommand( 'mceInsertLink', false, {
+					href: this.editor.dom.decode( pastedText ),
+				} );
 
-// 				// Allows us to ask for this information when we get a report.
-// 				window.console.log( 'Created link:\n\n', pastedText );
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', pastedText );
 
-// 				event.preventDefault();
+				event.preventDefault();
 
-// 				return;
-// 			}
-// 		}
+				return;
+			}
+		}
 
-// 		const rootNode = this.editor.getBody();
-// 		const isEmpty = this.editor.dom.isEmpty( rootNode );
+		const rootNode = this.editor.getBody();
+		const isEmpty = this.editor.dom.isEmpty( rootNode );
 
-// 		let mode = 'INLINE';
+		let mode = 'INLINE';
 
-// 		if ( isEmpty && this.props.onReplace ) {
-// 			mode = 'BLOCKS';
-// 		} else if ( this.props.onSplit ) {
-// 			mode = 'AUTO';
-// 		}
+		if ( isEmpty && this.props.onReplace ) {
+			mode = 'BLOCKS';
+		} else if ( this.props.onSplit ) {
+			mode = 'AUTO';
+		}
 
-// 		const content = rawHandler( {
-// 			HTML,
-// 			plainText: this.pastedPlainText,
-// 			mode,
-// 			tagName: this.props.tagName,
-// 			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
-// 		} );
+		const content = rawHandler( {
+			HTML,
+			plainText: this.pastedPlainText,
+			mode,
+			tagName: this.props.tagName,
+			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
+		} );
 
-// 		if ( typeof content === 'string' ) {
-// 			// Let MCE process further with the given content.
-// 			event.content = content;
-// 		} else if ( this.props.onSplit ) {
-// 			// Abort pasting to split the content
-// 			event.preventDefault();
+		if ( typeof content === 'string' ) {
+			// Let MCE process further with the given content.
+			event.content = content;
+		} else if ( this.props.onSplit ) {
+			// Abort pasting to split the content
+			event.preventDefault();
 
-// 			if ( ! content.length ) {
-// 				return;
-// 			}
+			if ( ! content.length ) {
+				return;
+			}
 
-// 			if ( isEmpty && this.props.onReplace ) {
-// 				this.props.onReplace( content );
-// 			} else {
-// 				this.splitContent( content );
-// 			}
-// 		}
-// 	}
+			if ( isEmpty && this.props.onReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( content );
+			}
+		}
+	}
 
-// 	/**
-// 	 * Handles any case where the content of the tinyMCE instance has changed.
-// 	 */
+	/**
+	 * Handles any case where the content of the tinyMCE instance has changed.
+	 */
 
-// 	onChange() {
-// 		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
-// 		this.savedContent = this.isEmpty ? [] : this.getContent();
-// 		this.props.onChange( this.savedContent );
-// 	}
+	onChange() {
+		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
+		this.savedContent = this.isEmpty ? [] : this.getContent();
+		this.props.onChange( this.savedContent );
+	}
 
-// 	onCreateUndoLevel() {
-// 		// Always ensure the content is up-to-date.
-// 		this.onChange();
-// 		this.context.onCreateUndoLevel();
-// 	}
+	onCreateUndoLevel() {
+		// Always ensure the content is up-to-date.
+		this.onChange();
+		this.context.onCreateUndoLevel();
+	}
 
 // 	/**
 // 	 * Determines the DOM rectangle for the selection in the editor.
@@ -615,163 +618,163 @@ export default class RichText extends Component<PropsType, StateType> {
 // 	// 	}
 // 	}
 
-// 	onNewBlock() {
-// 	// 	if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
-// 	// 		return;
-// 	// 	}
+	onNewBlock() {
+	// 	if ( this.props.multiline !== 'p' || ! this.props.onSplit ) {
+	// 		return;
+	// 	}
 
-// 	// 	// Getting the content before and after the cursor
-// 	// 	const childNodes = Array.from( this.editor.getBody().childNodes );
-// 	// 	let selectedChild = this.editor.selection.getStart();
-// 	// 	while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
-// 	// 		selectedChild = selectedChild.parentNode;
-// 	// 	}
-// 	// 	const splitIndex = childNodes.indexOf( selectedChild );
-// 	// 	if ( splitIndex === -1 ) {
-// 	// 		return;
-// 	// 	}
-// 	// 	const beforeNodes = childNodes.slice( 0, splitIndex );
-// 	// 	const lastNodeBeforeCursor = last( beforeNodes );
-// 	// 	// Avoid splitting on single enter
-// 	// 	if (
-// 	// 		! lastNodeBeforeCursor ||
-// 	// 		beforeNodes.length < 2 ||
-// 	// 		!! lastNodeBeforeCursor.textContent
-// 	// 	) {
-// 	// 		return;
-// 	// 	}
+	// 	// Getting the content before and after the cursor
+	// 	const childNodes = Array.from( this.editor.getBody().childNodes );
+	// 	let selectedChild = this.editor.selection.getStart();
+	// 	while ( childNodes.indexOf( selectedChild ) === -1 && selectedChild.parentNode ) {
+	// 		selectedChild = selectedChild.parentNode;
+	// 	}
+	// 	const splitIndex = childNodes.indexOf( selectedChild );
+	// 	if ( splitIndex === -1 ) {
+	// 		return;
+	// 	}
+	// 	const beforeNodes = childNodes.slice( 0, splitIndex );
+	// 	const lastNodeBeforeCursor = last( beforeNodes );
+	// 	// Avoid splitting on single enter
+	// 	if (
+	// 		! lastNodeBeforeCursor ||
+	// 		beforeNodes.length < 2 ||
+	// 		!! lastNodeBeforeCursor.textContent
+	// 	) {
+	// 		return;
+	// 	}
 
-// 	// 	const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
+	// 	const before = beforeNodes.slice( 0, beforeNodes.length - 1 );
 
-// 	// 	// Removing empty nodes from the beginning of the "after"
-// 	// 	// avoids empty paragraphs at the beginning of newly created blocks.
-// 	// 	const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
-// 	// 		if ( ! memo.length && ! node.textContent ) {
-// 	// 			return memo;
-// 	// 		}
+	// 	// Removing empty nodes from the beginning of the "after"
+	// 	// avoids empty paragraphs at the beginning of newly created blocks.
+	// 	const after = childNodes.slice( splitIndex ).reduce( ( memo, node ) => {
+	// 		if ( ! memo.length && ! node.textContent ) {
+	// 			return memo;
+	// 		}
 
-// 	// 		memo.push( node );
-// 	// 		return memo;
-// 	// 	}, [] );
+	// 		memo.push( node );
+	// 		return memo;
+	// 	}, [] );
 
-// 	// 	// Splitting into two blocks
-// 	// 	this.setContent( this.props.value );
+	// 	// Splitting into two blocks
+	// 	this.setContent( this.props.value );
 
-// 	// 	this.restoreContentAndSplit(
-// 	// 		nodeListToReact( before, createTinyMCEElement ),
-// 	// 		nodeListToReact( after, createTinyMCEElement )
-// 	// 	);
-// 	}
+	// 	this.restoreContentAndSplit(
+	// 		nodeListToReact( before, createTinyMCEElement ),
+	// 		nodeListToReact( after, createTinyMCEElement )
+	// 	);
+	}
 
-// 	onNodeChange( { parents } ) {
-// 		if ( document.activeElement !== this.editor.getBody() ) {
-// 			return;
-// 		}
-// 		const formatNames = this.props.formattingControls;
-// 		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
-// 			accFormats[ activeFormat ] = {
-// 				isActive: true,
-// 				...getFormatProperties( activeFormat, parents ),
-// 			};
+	onNodeChange( { parents } ) {
+		if ( document.activeElement !== this.editor.getBody() ) {
+			return;
+		}
+		const formatNames = this.props.formattingControls;
+		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
+			accFormats[ activeFormat ] = {
+				isActive: true,
+				...getFormatProperties( activeFormat, parents ),
+			};
 
-// 			return accFormats;
-// 		}, {} );
+			return accFormats;
+		}, {} );
 
-// 		const focusPosition = this.getFocusPosition();
-// 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
-// 	}
+		const focusPosition = this.getFocusPosition();
+		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+	}
 
-// 	updateContent() {
-// 		// Do not trigger a change event coming from the TinyMCE undo manager.
-// 		// Our global state is already up-to-date.
-// 		this.editor.undoManager.ignore( () => {
-// 			const bookmark = this.editor.selection.getBookmark( 2, true );
+	updateContent() {
+		// Do not trigger a change event coming from the TinyMCE undo manager.
+		// Our global state is already up-to-date.
+		this.editor.undoManager.ignore( () => {
+			const bookmark = this.editor.selection.getBookmark( 2, true );
 
-// 			this.savedContent = this.props.value;
-// 			this.setContent( this.savedContent );
-// 			this.editor.selection.moveToBookmark( bookmark );
-// 		} );
-// 	}
+			this.savedContent = this.props.value;
+			this.setContent( this.savedContent );
+			this.editor.selection.moveToBookmark( bookmark );
+		} );
+	}
 
-// 	setContent( content = '' ) {
-// 		this.editor.setContent( renderToString( content ) );
-// 	}
+	setContent( content = '' ) {
+		this.editor.setContent( renderToString( content ) );
+	}
 
-// 	getContent() {
+	getContent() {
 // 		// return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
-// 	}
+	}
 
-// 	componentWillUnmount() {
-// 		this.onChange();
-// 	}
+	componentWillUnmount() {
+		this.onChange();
+	}
 
-// 	componentDidUpdate( prevProps ) {
-// 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
-// 		if (
-// 			!! this.editor &&
-// 			this.props.tagName === prevProps.tagName &&
-// 			this.props.value !== prevProps.value &&
-// 			this.props.value !== this.savedContent &&
+	componentDidUpdate( prevProps ) {
+		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
+		if (
+			!! this.editor &&
+			this.props.tagName === prevProps.tagName &&
+			this.props.value !== prevProps.value &&
+			this.props.value !== this.savedContent &&
 
-// 			// Comparing using isEqual is necessary especially to avoid unnecessary updateContent calls
-// 			// This fixes issues in multi richText blocks like quotes when moving the focus between
-// 			// the different editables.
-// 			! isEqual( this.props.value, prevProps.value ) &&
-// 			! isEqual( this.props.value, this.savedContent )
-// 		) {
-// 			this.updateContent();
-// 		}
-// 	}
+			// Comparing using isEqual is necessary especially to avoid unnecessary updateContent calls
+			// This fixes issues in multi richText blocks like quotes when moving the focus between
+			// the different editables.
+			! isEqual( this.props.value, prevProps.value ) &&
+			! isEqual( this.props.value, this.savedContent )
+		) {
+			this.updateContent();
+		}
+	}
 
-// 	componentWillReceiveProps( nextProps ) {
-// 		if ( 'development' === process.env.NODE_ENV ) {
-// 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
-// 				// eslint-disable-next-line no-console
-// 				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
-// 			}
-// 		}
-// 	}
+	componentWillReceiveProps( nextProps ) {
+		if ( 'development' === process.env.NODE_ENV ) {
+			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
+			}
+		}
+	}
 
-// 	isFormatActive( format ) {
-// 		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
-// 	}
+	isFormatActive( format ) {
+		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
+	}
 
-// 	removeFormat( format ) {
-// 		this.editor.focus();
-// 		this.editor.formatter.remove( format );
-// 	}
+	removeFormat( format ) {
+		this.editor.focus();
+		this.editor.formatter.remove( format );
+	}
 
-// 	applyFormat( format, args, node ) {
-// 		this.editor.focus();
-// 		this.editor.formatter.apply( format, args, node );
-// 	}
+	applyFormat( format, args, node ) {
+		this.editor.focus();
+		this.editor.formatter.apply( format, args, node );
+	}
 
-// 	changeFormats( formats ) {
-// 		forEach( formats, ( formatValue, format ) => {
-// 			if ( format === 'link' ) {
-// 				if ( formatValue !== undefined ) {
-// 					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
-// 					if ( ! anchor ) {
-// 						this.removeFormat( 'link' );
-// 					}
-// 					this.applyFormat( 'link', { href: formatValue.value }, anchor );
-// 				} else {
-// 					this.editor.execCommand( 'Unlink' );
-// 				}
-// 			} else {
-// 				const isActive = this.isFormatActive( format );
-// 				if ( isActive && ! formatValue ) {
-// 					this.removeFormat( format );
-// 				} else if ( ! isActive && formatValue ) {
-// 					this.applyFormat( format );
-// 				}
-// 			}
-// 		} );
+	changeFormats( formats ) {
+		forEach( formats, ( formatValue, format ) => {
+			if ( format === 'link' ) {
+				if ( formatValue !== undefined ) {
+					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
+					if ( ! anchor ) {
+						this.removeFormat( 'link' );
+					}
+					this.applyFormat( 'link', { href: formatValue.value }, anchor );
+				} else {
+					this.editor.execCommand( 'Unlink' );
+				}
+			} else {
+				const isActive = this.isFormatActive( format );
+				if ( isActive && ! formatValue ) {
+					this.removeFormat( format );
+				} else if ( ! isActive && formatValue ) {
+					this.applyFormat( format );
+				}
+			}
+		} );
 
-// 		this.setState( ( state ) => ( {
-// 			formats: merge( {}, state.formats, formats ),
-// 		} ) );
-// 	}
+		this.setState( ( state ) => ( {
+			formats: merge( {}, state.formats, formats ),
+		} ) );
+	}
 
 // 	/**
 // 	 * Calling onSplit means we need to abort the change done by TinyMCE.
@@ -802,7 +805,7 @@ export default class RichText extends Component<PropsType, StateType> {
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
 
-		// const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty;
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty;
 		const classes = [ wrapperClassName, styles[ 'blocks-rich-text' ] ];
 
 		// const formatToolbar = (
@@ -818,15 +821,15 @@ export default class RichText extends Component<PropsType, StateType> {
 
 		return (
 			<View className={ classes }>
-				<PlainText
-					value={ value }
-					className={ className }
-					multiline={ true }
-					underlineColorAndroid="transparent"
-					onChange={ content => this.props.onChange( this.props.uid, { content } ) }
+				<TinyMCE
+					getSettings={ this.getSettings }
+					onSetup={ this.onSetup }
+					defaultValue={ value }
+					isPlaceholderVisible={ isPlaceholderVisible }
 					aria-label={ placeholder }
 					aria-autocomplete="list"
 					{ ...ariaProps }
+					className={ className }
 				/>
 			</View>
 		);
