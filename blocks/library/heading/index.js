@@ -7,7 +7,6 @@ import { concatChildren } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import { createBlock } from '../../api';
 import { edit } from './edit';
 

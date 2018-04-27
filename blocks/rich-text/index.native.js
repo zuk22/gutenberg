@@ -39,7 +39,7 @@ import {
 import styles from './style.scss';
 // import { rawHandler } from '../api';
 // import FormatToolbar from './format-toolbar';
-import TinyMCE from './tinymce';
+import AztecEditor from './azteceditor';
 import { pickAriaProps } from './aria';
 // import patterns from './patterns';
 import { EVENTS } from './constants';
@@ -194,25 +194,25 @@ export default class RichText extends Component<PropsType, StateType> {
 	 * @param {tinymce} editor The editor instance as passed by tinyMCE.
 	 */
 	onSetup( editor ) {
-		this.editor = editor;
+		// this.editor = editor;
 
-		EVENTS.forEach( ( name ) => {
-			editor.on( name, this.proxyPropHandler( name ) );
-		} );
+		// EVENTS.forEach( ( name ) => {
+		// 	editor.on( name, this.proxyPropHandler( name ) );
+		// } );
 
-		editor.on( 'init', this.onInit );
-		editor.on( 'NewBlock', this.onNewBlock );
-		editor.on( 'nodechange', this.onNodeChange );
-		// editor.on( 'keydown', this.onKeyDown );
-		// editor.on( 'keyup', this.onKeyUp );
-		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
-		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
-		editor.on( 'input', this.onChange );
-		// The change event in TinyMCE fires every time an undo level is added.
-		editor.on( 'change', this.onCreateUndoLevel );
+		// editor.on( 'init', this.onInit );
+		// editor.on( 'NewBlock', this.onNewBlock );
+		// editor.on( 'nodechange', this.onNodeChange );
+		// // editor.on( 'keydown', this.onKeyDown );
+		// // editor.on( 'keyup', this.onKeyUp );
+		// editor.on( 'BeforeExecCommand', this.onPropagateUndo );
+		// editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
+		// editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+		// editor.on( 'input', this.onChange );
+		// // The change event in TinyMCE fires every time an undo level is added.
+		// editor.on( 'change', this.onCreateUndoLevel );
 
-		// patterns.apply( this, [ editor ] );
+		// // patterns.apply( this, [ editor ] );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
@@ -821,7 +821,8 @@ export default class RichText extends Component<PropsType, StateType> {
 
 		return (
 			<View className={ classes }>
-				<TinyMCE
+				<AztecEditor
+					onChange={ this.onChange }
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					defaultValue={ value }

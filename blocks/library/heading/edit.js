@@ -14,8 +14,6 @@ import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 
-export const name = 'core/heading';
-
 export function edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 	const { align, content, nodeName, placeholder } = attributes;
 

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import {
-	// createContext,
+	createContext,
 	createElement,
 	Component,
 	// cloneElement,
@@ -11,10 +11,10 @@ import {
 } from 'react';
 // import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import {
-	// camelCase,
+	camelCase,
 	// flowRight,
 	// isString,
-	// upperFirst,
+	upperFirst,
 	isEmpty,
 } from 'lodash';
 
@@ -94,7 +94,7 @@ export { Children };
  *
  * @return {Object} Context object.
  */
-// export { createContext };
+export { createContext };
 
 /**
  * Creates a portal into which a component can be rendered.
@@ -198,15 +198,15 @@ export { serialize as renderToString };
  *
  * @return {WPComponent} Component class with generated display name assigned.
  */
-// export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
-// 	return ( OriginalComponent ) => {
-// 		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
-// 		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
-// 		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+	return ( OriginalComponent ) => {
+		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
 
-// 		return EnhancedComponent;
-// 	};
-// }
+		return EnhancedComponent;
+	};
+}
 
 /**
  * Component used as equivalent of Fragment with unescaped HTML, in cases where
