@@ -26,11 +26,11 @@ import {
 	Component,
 	// renderToString
 } from '@wordpress/element';
-import {
+// import {
 	// keycodes,
-	createBlobURL,
+	// createBlobURL,
 	// isHorizontalEdge
-} from '@wordpress/utils';
+// } from '@wordpress/utils';
 // import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
@@ -291,47 +291,47 @@ export default class RichText extends Component<PropsType, StateType> {
 	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
 	 */
 	onPaste( event ) {
-		const dataTransfer =
-			event.clipboardData ||
-			event.dataTransfer ||
-			this.editor.getDoc().dataTransfer ||
-			// Removes the need for further `dataTransfer` checks.
-			{ getData: () => '' };
+		// const dataTransfer =
+		// 	event.clipboardData ||
+		// 	event.dataTransfer ||
+		// 	this.editor.getDoc().dataTransfer ||
+		// 	// Removes the need for further `dataTransfer` checks.
+		// 	{ getData: () => '' };
 
-		const { items = [], files = [], types = [] } = dataTransfer;
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
-		const plainText = dataTransfer.getData( 'text/plain' );
-		const HTML = dataTransfer.getData( 'text/html' );
+		// const { items = [], files = [], types = [] } = dataTransfer;
+		// const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		// const plainText = dataTransfer.getData( 'text/plain' );
+		// const HTML = dataTransfer.getData( 'text/html' );
 
-		// Only process file if no HTML is present.
-		// Note: a pasted file may have the URL as plain text.
-		if ( item && ! HTML ) {
-			const blob = item.getAsFile ? item.getAsFile() : item;
-			const rootNode = this.editor.getBody();
-			const isEmpty = this.editor.dom.isEmpty( rootNode );
-			const content = rawHandler( {
-				HTML: `<img src="${ createBlobURL( blob ) }">`,
-				mode: 'BLOCKS',
-				tagName: this.props.tagName,
-			} );
+		// // Only process file if no HTML is present.
+		// // Note: a pasted file may have the URL as plain text.
+		// if ( item && ! HTML ) {
+		// 	const blob = item.getAsFile ? item.getAsFile() : item;
+		// 	const rootNode = this.editor.getBody();
+		// 	const isEmpty = this.editor.dom.isEmpty( rootNode );
+		// 	const content = rawHandler( {
+		// 		HTML: `<img src="${ createBlobURL( blob ) }">`,
+		// 		mode: 'BLOCKS',
+		// 		tagName: this.props.tagName,
+		// 	} );
 
-			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', blob );
+		// 	// Allows us to ask for this information when we get a report.
+		// 	window.console.log( 'Received item:\n\n', blob );
 
-			if ( isEmpty && this.props.onReplace ) {
-				// Necessary to allow the paste bin to be removed without errors.
-				this.props.setTimeout( () => this.props.onReplace( content ) );
-			} else if ( this.props.onSplit ) {
-				// Necessary to get the right range.
-				// Also done in the TinyMCE paste plugin.
-				this.props.setTimeout( () => this.splitContent( content ) );
-			}
+		// 	if ( isEmpty && this.props.onReplace ) {
+		// 		// Necessary to allow the paste bin to be removed without errors.
+		// 		this.props.setTimeout( () => this.props.onReplace( content ) );
+		// 	} else if ( this.props.onSplit ) {
+		// 		// Necessary to get the right range.
+		// 		// Also done in the TinyMCE paste plugin.
+		// 		this.props.setTimeout( () => this.splitContent( content ) );
+		// 	}
 
-			event.preventDefault();
-		}
+		// 	event.preventDefault();
+		// }
 
-		this.pastedPlainText = plainText;
-		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
+		// this.pastedPlainText = plainText;
+		// this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
 	}
 
 	/**

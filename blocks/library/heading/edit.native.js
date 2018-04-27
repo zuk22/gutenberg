@@ -9,7 +9,7 @@ import { View, Text } from 'react-native';
  * Internal dependencies
  */
 import './editor.scss';
-// import RichText from '../../rich-text';
+import RichText from '../../rich-text';
 // import BlockControls from '../../block-controls';
 
 export const name = 'core/heading';
@@ -17,8 +17,7 @@ export const name = 'core/heading';
 export function edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 	const { align, content, nodeName, placeholder } = attributes;
 
-	return <View><Text>hello</Text></View>;
-	// [
+	return [
 		// isSelected && (
 		// 	<BlockControls
 		// 		key="controls"
@@ -33,11 +32,10 @@ export function edit( { attributes, setAttributes, isSelected, mergeBlocks, inse
 		// 		}
 		// 	/>
 		// ),
-		// <RichText
-		// 	key="editable"
-		// 	value={ content }
-		// 	isSelected={ isSelected }
-		// />,
-		// <View><Text>hello</Text></View>;
-	// ];
+		<RichText
+			key="editable"
+			value={ content }
+			isSelected={ isSelected }
+		/>,
+	];
 }

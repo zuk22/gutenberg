@@ -7,7 +7,7 @@ import { decodeEntities } from './entities';
 export { keycodes };
 export { decodeEntities };
 
-export * from './blob-cache';
+// export * from './blob-cache';
 // export * from './dom';
 export * from './mediaupload';
 export * from './terms';
