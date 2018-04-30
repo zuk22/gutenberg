@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import PlainText from '../../plain-text';
+import { PlainText } from '@wordpress/blocks';
 import styles from './editor.scss';
 
 export function edit( { attributes, setAttributes, isSelected } ) {
