@@ -27,7 +27,7 @@ export function edit( { attributes, setAttributes, isSelected } ) {
 					value={ value }
 					multiline={ true }
 					underlineColorAndroid="transparent"
-					onChange={ value => setAttributes( { customText: value } ) }
+					onChange={ ( newValue ) => setAttributes( { customText: newValue } ) }
 					placeholder={ defaultText }
 				/>
 				<Text className={ styles[ 'blocks-more-right-marker' ] }>--&gt;</Text>
