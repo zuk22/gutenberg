@@ -45,23 +45,38 @@
 
 .edit-post-header .components-button {
 	border-radius: $button-style__radius-roundrect;
+	overflow: visible;
 
 	// header toggle buttons
 	&.is-toggled {
-		color: $white;
+		color: $dark-gray-700;
 	}
 
 	// put the gray background on a separate layer, so as to match the size of the publish button (34px)
 	&.is-toggled:before {
 		content: "";
 		border-radius: $button-style__radius-roundrect;
+		//border-radius: 50%;
 		position: absolute;
 		z-index: -1;
-		background: $dark-gray-500;
+		background: $light-gray-500;
 		top: 1px;
 		right: 1px;
 		bottom: 1px;
 		left: 1px;
+	}
+
+	// show a tab indicator
+	&.is-toggled:after {
+		content: "";
+		display: block;
+		position: absolute;
+		z-index: -1;
+		background: $blue-medium-500;
+		height: 3px;
+		left: 1px;
+		right: 1px;
+		bottom: -9px;
 	}
 
 	&.is-toggled:hover,
@@ -95,5 +110,10 @@
 		&.editor-post-publish-panel__toggle {
 			margin: 0 12px 0 3px;
 		}
+	}
+
+	// the cog is not perfectly centered, @todo fix upstream
+	svg.dashicons-admin-generic {
+		transform: translate( .5px, -.5px );
 	}
 }

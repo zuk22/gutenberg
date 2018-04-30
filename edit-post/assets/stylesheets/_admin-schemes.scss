@@ -56,6 +56,10 @@ $scheme-sunrise__spot-color-2: #c8b03c;
 			border-bottom: 3px solid $spot-color;
 		}
 
+		.edit-post-header .components-button.is-toggled:after {
+			background-color: $spot-color;
+		}
+
 		// Switch
 		.components-form-toggle.is-checked {
 			.components-form-toggle__track {

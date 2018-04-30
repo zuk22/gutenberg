@@ -134,13 +134,10 @@
 	border-top: 0;
 	margin-top: 0;
 
+	// close button, hide on desktop
+	// @todo entire element appears to only be shown at the desktop, so if we decide to hide it, remove it entirely
 	.components-icon-button {
 		display: none;
-		margin-left: auto;
-
-		@include break-medium() {
-			display: flex;
-		}
 	}
 }
 
