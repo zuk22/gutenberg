@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { includes, first } from 'lodash';
+import { includes } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
  * Browser dependencies
  */
-const { getComputedStyle, DOMRect } = window;
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+const { getComputedStyle } = window;
+const { TEXT_NODE } = window.Node;
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
