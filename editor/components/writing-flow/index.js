@@ -12,6 +12,7 @@ import {
 	focus,
 	isTextField,
 	computeCaretRect,
+	hasCollapsedSelection,
 	isHorizontalEdge,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
@@ -197,7 +198,7 @@ class WritingFlow extends Component {
 			// Shift key is down and existing block multi-selection
 			event.preventDefault();
 			this.expandSelection( selectionStart, isReverse );
-		} else if ( isNav && isShift && this.isTabbableEdge( target, isReverse ) && isNavEdge( target, isReverse, true ) ) {
+		} else if ( isNav && isShift && this.isTabbableEdge( target, isReverse ) && isNavEdge( target, isReverse ) ) {
 			// Shift key is down, but no existing block multi-selection
 			event.preventDefault();
 			this.expandSelection( selectedBlockUID, isReverse );
@@ -205,13 +206,13 @@ class WritingFlow extends Component {
 			// Moving from block multi-selection to single block selection
 			event.preventDefault();
 			this.moveSelection( isReverse );
-		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
+		} else if ( isVertical && hasCollapsedSelection() && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			if ( closestTabbable ) {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
+		} else if ( isHorizontal && hasCollapsedSelection() && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
