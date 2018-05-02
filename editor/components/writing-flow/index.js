@@ -206,7 +206,7 @@ class WritingFlow extends Component {
 			// Moving from block multi-selection to single block selection
 			event.preventDefault();
 			this.moveSelection( isReverse );
-		} else if ( isVertical && hasCollapsedSelection() && isVerticalEdge( target, isReverse ) ) {
+		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			if ( closestTabbable ) {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
