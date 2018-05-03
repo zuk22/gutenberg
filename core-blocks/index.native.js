@@ -8,11 +8,13 @@ import {
 /**
  * Internal dependencies
  */
+import * as heading from './heading';
 import * as code from './code';
 import * as more from './more';
 
 export const registerCoreBlocks = () => {
 	[
+		heading,
 		code,
 		more,
 	].forEach( ( { name, settings } ) => {

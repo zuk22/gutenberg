@@ -2,8 +2,11 @@
  * External dependencies
  */
 import {
+	createContext,
 	createElement,
 	Component,
+	Children,
+	Fragment,
 } from 'react';
 
 /**
@@ -29,6 +32,22 @@ export { createElement };
  * A base class to create WordPress Components (Refs, state and lifecycle hooks)
  */
 export { Component };
+
+export { Children };
+
+/**
+ * A component which renders its children without any wrapping element.
+ */
+export { Fragment };
+
+/**
+ * Creates a context object containing two components: a provider and consumer.
+ *
+ * @param {Object} defaultValue Data stored in the context.
+ *
+ * @return {Object} Context object.
+ */
+export { createContext };
 
 /**
  * Renders a given element into a string.
