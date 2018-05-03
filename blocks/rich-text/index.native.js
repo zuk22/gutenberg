@@ -3,7 +3,7 @@
  */
 import {
 // 	last,
-// 	isEqual,
+	isEqual,
 // 	omitBy,
 	forEach,
 // 	merge,

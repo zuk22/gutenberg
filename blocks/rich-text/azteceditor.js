@@ -200,10 +200,10 @@ export default class AztecEditor extends Component {
 	}
 
 	configureIsPlaceholderVisible( isPlaceholderVisible ) {
-		const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
-		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
-			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
-		}
+		// const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
+		// if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
+		// 	this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
+		// }
 	}
 
 	componentWillReceiveProps( nextProps ) {
