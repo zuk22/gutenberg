@@ -19,6 +19,7 @@ export function edit( { attributes, setAttributes, isSelected, mergeBlocks, inse
 		<RichText
 			key="editable"
 			value={ content }
+			onChange={ setAttributes }
 			isSelected={ isSelected }
 		/>,
 	];

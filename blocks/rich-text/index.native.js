@@ -414,8 +414,8 @@ export default class RichText extends Component<PropsType, StateType> {
 	 */
 
 	onChange() {
-		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
-		this.savedContent = this.isEmpty ? [] : this.getContent();
+		// this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
+		// this.savedContent = this.isEmpty ? [] : this.getContent();
 		this.props.onChange( this.savedContent );
 	}
 

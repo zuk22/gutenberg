@@ -259,7 +259,7 @@ export default class AztecEditor extends Component {
 	}
 
 	render() {
-		const { style, defaultValue, className, isPlaceholderVisible } = this.props;
+		const { onChange, style, defaultValue, className, isPlaceholderVisible } = this.props;
 		const ariaProps = pickAriaProps( this.props );
 		// if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
 		// 	ariaProps.role = 'textbox';
@@ -276,6 +276,7 @@ export default class AztecEditor extends Component {
 		return createElement(
 			PlainText,
 			{
+				onChange,
 				...ariaProps,
 				className: classnames( className, 'blocks-rich-text__tinymce' ),
 				[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
