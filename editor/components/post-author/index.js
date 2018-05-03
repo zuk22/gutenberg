@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -79,7 +74,7 @@ export class PostAuthor extends Component {
 	}
 
 	render() {
-		const { postAuthor, instanceId } = this.props;
+		const { postAuthor, instanceId, authors } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
 		const className = 'post-author-selector';
 
@@ -114,6 +109,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
