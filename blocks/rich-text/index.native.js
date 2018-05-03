@@ -26,11 +26,11 @@ import {
 	Component,
 	// renderToString
 } from '@wordpress/element';
-import {
+// import {
 	// keycodes,
-	createBlobURL,
+	// createBlobURL,
 	// isHorizontalEdge
-} from '@wordpress/utils';
+// } from '@wordpress/utils';
 // import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
@@ -42,7 +42,7 @@ import styles from './style.scss';
 import AztecEditor from './azteceditor';
 import { pickAriaProps } from './aria';
 // import patterns from './patterns';
-// import { EVENTS } from './constants';
+import { EVENTS } from './constants';
 
 // const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -145,19 +145,19 @@ export default class RichText extends Component<PropsType, StateType> {
 			);
 		}
 
-	// 	this.onInit = this.onInit.bind( this );
+		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
-	// 	this.onChange = this.onChange.bind( this );
-	// 	this.onNewBlock = this.onNewBlock.bind( this );
-	// 	this.onNodeChange = this.onNodeChange.bind( this );
-	// 	// this.onKeyDown = this.onKeyDown.bind( this );
-	// 	// this.onKeyUp = this.onKeyUp.bind( this );
-	// 	this.changeFormats = this.changeFormats.bind( this );
-	// 	this.onPropagateUndo = this.onPropagateUndo.bind( this );
-	// 	this.onPastePreProcess = this.onPastePreProcess.bind( this );
-	// 	this.onPaste = this.onPaste.bind( this );
-	// 	this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
+		this.onChange = this.onChange.bind( this );
+		this.onNewBlock = this.onNewBlock.bind( this );
+		this.onNodeChange = this.onNodeChange.bind( this );
+		// this.onKeyDown = this.onKeyDown.bind( this );
+		// this.onKeyUp = this.onKeyUp.bind( this );
+		this.changeFormats = this.changeFormats.bind( this );
+		this.onPropagateUndo = this.onPropagateUndo.bind( this );
+		this.onPastePreProcess = this.onPastePreProcess.bind( this );
+		this.onPaste = this.onPaste.bind( this );
+		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 
 		this.state = {
 			formats: {},
@@ -194,7 +194,7 @@ export default class RichText extends Component<PropsType, StateType> {
 	 * @param {tinymce} editor The editor instance as passed by tinyMCE.
 	 */
 	onSetup( editor ) {
-		this.editor = editor;
+		// this.editor = editor;
 
 		// EVENTS.forEach( ( name ) => {
 		// 	editor.on( name, this.proxyPropHandler( name ) );
@@ -345,68 +345,68 @@ export default class RichText extends Component<PropsType, StateType> {
 	 *                                     by tinyMCE.
 	 */
 	onPastePreProcess( event ) {
-	// 	const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
-	// 	// Allows us to ask for this information when we get a report.
-	// 	window.console.log( 'Received HTML:\n\n', HTML );
-	// 	window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
+		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
+		// Allows us to ask for this information when we get a report.
+		window.console.log( 'Received HTML:\n\n', HTML );
+		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
 
-	// 	// There is a selection, check if a link is pasted.
-	// 	if ( ! this.editor.selection.isCollapsed() ) {
-	// 		const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
-	// 		const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
-	// 		const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
+		// There is a selection, check if a link is pasted.
+		if ( ! this.editor.selection.isCollapsed() ) {
+			const linkRegExp = /^(?:https?:)?\/\/\S+$/i;
+			const pastedText = event.content.replace( /<[^>]+>/g, '' ).trim();
+			const selectedText = this.editor.selection.getContent().replace( /<[^>]+>/g, '' ).trim();
 
-	// 		// The pasted text is a link, and the selected text is not.
-	// 		if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
-	// 			this.editor.execCommand( 'mceInsertLink', false, {
-	// 				href: this.editor.dom.decode( pastedText ),
-	// 			} );
+			// The pasted text is a link, and the selected text is not.
+			if ( linkRegExp.test( pastedText ) && ! linkRegExp.test( selectedText ) ) {
+				this.editor.execCommand( 'mceInsertLink', false, {
+					href: this.editor.dom.decode( pastedText ),
+				} );
 
-	// 			// Allows us to ask for this information when we get a report.
-	// 			window.console.log( 'Created link:\n\n', pastedText );
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', pastedText );
 
-	// 			event.preventDefault();
+				event.preventDefault();
 
-	// 			return;
-	// 		}
-	// 	}
+				return;
+			}
+		}
 
-	// 	const rootNode = this.editor.getBody();
-	// 	const isEmpty = this.editor.dom.isEmpty( rootNode );
+		const rootNode = this.editor.getBody();
+		const isEmpty = this.editor.dom.isEmpty( rootNode );
 
-	// 	let mode = 'INLINE';
+		let mode = 'INLINE';
 
-	// 	if ( isEmpty && this.props.onReplace ) {
-	// 		mode = 'BLOCKS';
-	// 	} else if ( this.props.onSplit ) {
-	// 		mode = 'AUTO';
-	// 	}
+		if ( isEmpty && this.props.onReplace ) {
+			mode = 'BLOCKS';
+		} else if ( this.props.onSplit ) {
+			mode = 'AUTO';
+		}
 
-	// 	const content = rawHandler( {
-	// 		HTML,
-	// 		plainText: this.pastedPlainText,
-	// 		mode,
-	// 		tagName: this.props.tagName,
-	// 		canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
-	// 	} );
+		const content = rawHandler( {
+			HTML,
+			plainText: this.pastedPlainText,
+			mode,
+			tagName: this.props.tagName,
+			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
+		} );
 
-	// 	if ( typeof content === 'string' ) {
-	// 		// Let MCE process further with the given content.
-	// 		event.content = content;
-	// 	} else if ( this.props.onSplit ) {
-	// 		// Abort pasting to split the content
-	// 		event.preventDefault();
+		if ( typeof content === 'string' ) {
+			// Let MCE process further with the given content.
+			event.content = content;
+		} else if ( this.props.onSplit ) {
+			// Abort pasting to split the content
+			event.preventDefault();
 
-	// 		if ( ! content.length ) {
-	// 			return;
-	// 		}
+			if ( ! content.length ) {
+				return;
+			}
 
-	// 		if ( isEmpty && this.props.onReplace ) {
-	// 			this.props.onReplace( content );
-	// 		} else {
-	// 			this.splitContent( content );
-	// 		}
-	// 	}
+			if ( isEmpty && this.props.onReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( content );
+			}
+		}
 	}
 
 	/**
@@ -808,18 +808,17 @@ export default class RichText extends Component<PropsType, StateType> {
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty;
 		const classes = [ wrapperClassName, styles[ 'blocks-rich-text' ] ];
 
-		// // const formatToolbar = (
-		// // 	<FormatToolbar
-		// // 		selectedNodeId={ this.state.selectedNodeId }
-		// // 		focusPosition={ this.state.focusPosition }
-		// // 		formats={ this.state.formats }
-		// // 		onChange={ this.changeFormats }
-		// // 		enabledControls={ formattingControls }
-		// // 		customControls={ formatters }
-		// // 	/>
-		// // );
+		// const formatToolbar = (
+		// 	<FormatToolbar
+		// 		selectedNodeId={ this.state.selectedNodeId }
+		// 		focusPosition={ this.state.focusPosition }
+		// 		formats={ this.state.formats }
+		// 		onChange={ this.changeFormats }
+		// 		enabledControls={ formattingControls }
+		// 		customControls={ formatters }
+		// 	/>
+		// );
 
-		// return <View><Text>hello</Text></View>;
 		return (
 			<View className={ classes }>
 				<AztecEditor
