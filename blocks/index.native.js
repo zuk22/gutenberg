@@ -7,7 +7,20 @@
 //
 // Blocks are inferred from the HTML source of a post through a parsing mechanism
 // and then stored as objects in state, from which it is then rendered for editing.
-export * from './api';
+
+// `export * from './api' doesn't seem to work on RN 0.55.3 so, have individual exports
+// export * from './api';
+export {
+	createBlock,
+} from './api/factory';
+export {
+	default as serialize,
+	getBlockContent,
+} from './api/serializer';
+export {
+	registerBlockType,
+	getBlockType,
+} from './api/registration';
 
 export { default as PlainText } from './plain-text';
 export { default as RichText } from './rich-text';
