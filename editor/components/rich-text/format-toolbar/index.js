@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { prependHTTP } from '@wordpress/url';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -22,7 +23,7 @@ import { filterURLForDisplay } from '../../../utils/url';
 
 const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } = keycodes;
 
-const FORMATTING_CONTROLS = [
+const FORMATTING_CONTROLS = applyFilters( 'editor.richText.formattingControls', [
 	{
 		icon: 'editor-bold',
 		title: __( 'Bold' ),
@@ -47,7 +48,7 @@ const FORMATTING_CONTROLS = [
 		shortcut: displayShortcut.primary( 'k' ),
 		format: 'link',
 	},
-];
+] );
 
 // Default controls shown if no `enabledControls` prop provided
 const DEFAULT_CONTROLS = [ 'bold', 'italic', 'strikethrough', 'link' ];
