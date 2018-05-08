@@ -3,16 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import {
-	createBlock,
-	RichText,
-} from '@wordpress/blocks';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { edit } from './edit';
+import edit from './edit';
 
 export const name = 'core/heading';
 
@@ -66,7 +64,15 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => /H\d/.test( node.nodeName ),
+				selector: 'h1,h2,h3,h4,h5,h6',
+				schema: {
+					h1: { children: getPhrasingContentSchema() },
+					h2: { children: getPhrasingContentSchema() },
+					h3: { children: getPhrasingContentSchema() },
+					h4: { children: getPhrasingContentSchema() },
+					h5: { children: getPhrasingContentSchema() },
+					h6: { children: getPhrasingContentSchema() },
+				},
 			},
 			{
 				type: 'pattern',
@@ -100,7 +106,7 @@ export const settings = {
 		};
 	},
 
-	edit: edit,
+	edit,
 
 	save( { attributes } ) {
 		const { align, nodeName, content } = attributes;

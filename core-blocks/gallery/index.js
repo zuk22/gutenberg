@@ -7,11 +7,11 @@ import { filter, every } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { mediaUpload } from '@wordpress/utils';
 import {
 	createBlock,
-	RichText,
+	editorMediaUpload,
 } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -135,7 +135,7 @@ export const settings = {
 				},
 				transform( files, onChange ) {
 					const block = createBlock( 'core/gallery' );
-					mediaUpload(
+					editorMediaUpload(
 						files,
 						( images ) => onChange( block.uid, { images } ),
 						'image'

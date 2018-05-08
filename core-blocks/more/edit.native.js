@@ -10,11 +10,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { PlainText } from '@wordpress/blocks';
+import { PlainText } from '@wordpress/editor';
 import styles from './editor.scss';
 
-export function edit( { attributes, setAttributes, isSelected } ) {
-	const { customText, noTeaser } = attributes;
+export default function edit( { attributes, setAttributes } ) {
+	const { customText } = attributes;
 	const defaultText = __( 'Read more' );
 	const value = customText !== undefined ? customText : defaultText;
 

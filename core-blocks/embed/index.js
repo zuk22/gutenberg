@@ -4,6 +4,7 @@
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
 import { stringify } from 'querystring';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -11,13 +12,12 @@ import { stringify } from 'querystring';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
-import classnames from 'classnames';
+import { createBlock } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -29,9 +29,11 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
+	// translators: %s: Name of service (e.g. VideoPress, YouTube)
+	const blockDescription = description || sprintf( __( 'Paste URLs from %s to embed the content in this block' ), title );
 	return {
 		title,
-		description: description || __( `Paste URLs from ${ title } to embed the content in this block.` ),
+		description: blockDescription,
 		icon,
 		category,
 		keywords,

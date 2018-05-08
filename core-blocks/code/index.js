@@ -2,9 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -50,11 +48,22 @@ export const settings = {
 					node.children.length === 1 &&
 					node.firstChild.nodeName === 'CODE'
 				),
+				schema: {
+					pre: {
+						children: {
+							code: {
+								children: {
+									'#text': {},
+								},
+							},
+						},
+					},
+				},
 			},
 		],
 	},
 
-	edit: edit,
+	edit,
 
 	save( { attributes } ) {
 		return <pre><code>{ attributes.content }</code></pre>;

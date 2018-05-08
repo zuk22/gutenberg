@@ -8,14 +8,12 @@ import { compact } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
-import {
-	createBlock,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { edit } from './edit';
+import edit from './edit';
 
 export const name = 'core/more';
 
@@ -50,6 +48,9 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
+				schema: {
+					'wp-block': { attributes: [ 'data-block' ] },
+				},
 				isMatch: ( node ) => node.dataset && node.dataset.block === 'core/more',
 				transform( node ) {
 					const { customText, noTeaser } = node.dataset;
@@ -68,7 +69,7 @@ export const settings = {
 		],
 	},
 
-	edit: edit,
+	edit,
 
 	save( { attributes } ) {
 		const { customText, noTeaser } = attributes;

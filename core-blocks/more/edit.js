@@ -4,14 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import InspectorControls from '../../inspector-controls';
 
-export default class extends Component {
+export default class edit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChangeInput = this.onChangeInput.bind( this );

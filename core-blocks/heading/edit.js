@@ -17,7 +17,7 @@ import {
  */
 import './editor.scss';
 
-export function edit( { attributes, setAttributes, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
+export default function edit( { attributes, setAttributes, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 	const { align, content, nodeName, placeholder } = attributes;
 
 	return (
@@ -64,7 +64,8 @@ export function edit( { attributes, setAttributes, mergeBlocks, insertBlocksAfte
 				onMerge={ mergeBlocks }
 				onSplit={
 					insertBlocksAfter ?
-						( unused, after, ...blocks ) => {
+						( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
 							insertBlocksAfter( [
 								...blocks,
 								createBlock( 'core/paragraph', { content: after } ),

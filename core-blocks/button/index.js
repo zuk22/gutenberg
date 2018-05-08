@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+import { omit, pick } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -7,7 +13,6 @@ import {
 	Dashicon,
 	IconButton,
 	PanelBody,
-	PanelColor,
 	ToggleControl,
 	withFallbackStyles,
 } from '@wordpress/components';
@@ -16,10 +21,12 @@ import {
 	RichText,
 	BlockControls,
 	BlockAlignmentToolbar,
-	ColorPalette,
 	ContrastChecker,
 	InspectorControls,
-} from '@wordpress/blocks';
+	getColorClass,
+	withColors,
+	PanelColor,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -67,6 +74,10 @@ class ButtonBlock extends Component {
 	render() {
 		const {
 			attributes,
+			backgroundColor,
+			textColor,
+			setBackgroundColor,
+			setTextColor,
 			setAttributes,
 			isSelected,
 			className,
@@ -77,8 +88,6 @@ class ButtonBlock extends Component {
 			url,
 			title,
 			align,
-			color,
-			textColor,
 			clear,
 		} = attributes;
 
@@ -94,10 +103,17 @@ class ButtonBlock extends Component {
 						value={ text }
 						onChange={ ( value ) => setAttributes( { text: value } ) }
 						formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-						className="wp-block-button__link"
+						className={ classnames(
+							'wp-block-button__link', {
+								'has-background': backgroundColor.value,
+								[ backgroundColor.class ]: backgroundColor.class,
+								'has-text-color': textColor.value,
+								[ textColor.class ]: textColor.class,
+							}
+						) }
 						style={ {
-							backgroundColor: color,
-							color: textColor,
+							backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
+							color: textColor.class ? undefined : textColor.value,
 						} }
 						keepPlaceholderOnFocus
 					/>
@@ -108,22 +124,20 @@ class ButtonBlock extends Component {
 								checked={ !! clear }
 								onChange={ this.toggleClear }
 							/>
-							<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
-								<ColorPalette
-									value={ color }
-									onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
-								/>
-							</PanelColor>
-							<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
-								<ColorPalette
-									value={ textColor }
-									onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-								/>
-							</PanelColor>
+							<PanelColor
+								colorValue={ backgroundColor.value }
+								title={ __( 'Background Color' ) }
+								onChange={ setBackgroundColor }
+							/>
+							<PanelColor
+								colorValue={ textColor.value }
+								title={ __( 'Text Color' ) }
+								onChange={ setTextColor }
+							/>
 							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
 								node={ this.nodeRef }
-								textColor={ textColor }
-								backgroundColor={ color }
+								textColor={ textColor.value }
+								backgroundColor={ backgroundColor.value }
 								isLargeText={ true }
 							/> }
 						</PanelBody>
@@ -168,15 +182,29 @@ const blockAttributes = {
 		type: 'string',
 		default: 'none',
 	},
-	color: {
+	backgroundColor: {
 		type: 'string',
 	},
 	textColor: {
 		type: 'string',
 	},
+	customBackgroundColor: {
+		type: 'string',
+	},
+	customTextColor: {
+		type: 'string',
+	},
 };
 
 export const name = 'core/button';
+
+const colorsMigration = ( attributes ) => {
+	return omit( {
+		...attributes,
+		customTextColor: attributes.textColor && '#' === attributes.textColor[ 0 ] ? attributes.textColor : undefined,
+		customBackgroundColor: attributes.color && '#' === attributes.color[ 0 ] ? attributes.color : undefined,
+	}, [ 'color', 'textColor' ] );
+};
 
 export const settings = {
 	title: __( 'Button' ),
@@ -204,23 +232,47 @@ export const settings = {
 		return props;
 	},
 
-	edit: ButtonBlock,
+	edit: withColors( ( getColor, setColor, { attributes, setAttributes } ) => {
+		return {
+			backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
+			setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor', setAttributes ),
+			textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
+			setTextColor: setColor( 'textColor', 'customTextColor', setAttributes ),
+		};
+	} )( ButtonBlock ),
 
 	save( { attributes } ) {
-		const { url, text, title, align, color, textColor } = attributes;
+		const {
+			url,
+			text,
+			title,
+			align,
+			backgroundColor,
+			textColor,
+			customBackgroundColor,
+			customTextColor,
+		} = attributes;
+
+		const textClass = getColorClass( 'color', textColor );
+		const backgroundClass = getColorClass( 'background-color', backgroundColor );
+
+		const buttonClasses = classnames( 'wp-block-button__link', {
+			'has-text-color': textColor || customTextColor,
+			[ textClass ]: textClass,
+			'has-background': backgroundColor || customBackgroundColor,
+			[ backgroundClass ]: backgroundClass,
+		} );
 
 		const buttonStyle = {
-			backgroundColor: color,
-			color: textColor,
+			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+			color: textClass ? undefined : customTextColor,
 		};
-
-		const linkClass = 'wp-block-button__link';
 
 		return (
 			<div className={ `align${ align }` }>
 				<RichText.Content
 					tagName="a"
-					className={ linkClass }
+					className={ buttonClasses }
 					href={ url }
 					title={ title }
 					style={ buttonStyle }
@@ -231,7 +283,51 @@ export const settings = {
 	},
 
 	deprecated: [ {
-		attributes: blockAttributes,
+		attributes: {
+			...pick( blockAttributes, [ 'url', 'title', 'text', 'align' ] ),
+			color: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+		},
+
+		save( { attributes } ) {
+			const { url, text, title, align, color, textColor } = attributes;
+
+			const buttonStyle = {
+				backgroundColor: color,
+				color: textColor,
+			};
+
+			const linkClass = 'wp-block-button__link';
+
+			return (
+				<div className={ `align${ align }` }>
+					<RichText.Content
+						tagName="a"
+						className={ linkClass }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+					/>
+				</div>
+			);
+		},
+		migrate: colorsMigration,
+	},
+	{
+		attributes: {
+			...pick( blockAttributes, [ 'url', 'title', 'text', 'align' ] ),
+			color: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+		},
 
 		save( { attributes } ) {
 			const { url, text, title, align, color, textColor } = attributes;
@@ -248,5 +344,7 @@ export const settings = {
 				</div>
 			);
 		},
-	} ],
+		migrate: colorsMigration,
+	},
+	],
 };
