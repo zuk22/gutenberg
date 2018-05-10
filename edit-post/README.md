@@ -9,6 +9,10 @@ Refer to [the plugins module documentation](../plugins/) for more information.
 The following components can be used with the `registerPlugin` ([see documentation](../plugins)) API.
 They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
 
+**Note:** Plugin scripts should be enqueued to footer by setting `in_footer` option to true ( [see wp_enqueue_script documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) ).
+
+Experimental components can be found under `wp.editPost.__experimental`. Experimental components are still being evaluated and can change in a future version.
+
 ### `PluginSidebar`
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -67,8 +71,10 @@ const { PluginSidebarMoreMenuItem } = wp.editPost;
 
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem
-		target="my-sidebar"
+		name="my-plugin"
 		icon="yes"
+		type="sidebar"
+		target="my-sidebar"
 	>
 		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
@@ -76,6 +82,20 @@ const MySidebarMoreMenuItem = () => (
 ```
 
 #### Props
+
+##### name
+
+A string identifying the menu item. Must be unique for every menu item registered within the scope of your plugin.
+
+- Type: `String`
+- Required: Yes
+
+##### type
+
+A string identifying the type of UI element you wish this menu item to activate. Can be: `sidebar`.
+
+- Type: `String`
+- Required: Yes
 
 ##### target
 
@@ -92,21 +112,35 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 
 
-### `PluginPostStatusInfo`
+### PluginPrePublishPanel
+**Experimental**
 
-Renders a row in the Status & Visibility panel of the Document sidebar.
+Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when user first pushes "Publish" from main editor).
+
+#### Usage
 It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
 
 _Example:_
 ```jsx
-const { __ } = wp.i18n;
-const { PluginPostStatusInfo } = wp.editPost;
+<PluginPrePublishPanel>
+    <div>My plugin content</div>
+</PluginPrePublishPanel>
+```
 
-const MyPluginPostStatusInfo = () => (
+### PluginPostPublishPanel
+**Experimental**
+
+Renders provided content to the post-publish panel in the publish flow (panel that opens after user publishes the post)
 	<PluginPostStatusInfo>
 		{ __( 'My post status info' ) }
 	</PluginPostStatusInfo>
 );
 ```
 
+#### Usage
 
+```jsx
+<PluginPostPublishPanel>
+    <div>My plugin content</div>
+</PluginPostPublishPanel>
+```
