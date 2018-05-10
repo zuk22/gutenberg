@@ -130,11 +130,8 @@ _Example:_
 ### PluginPostPublishPanel
 **Experimental**
 
-Renders provided content to the post-publish panel in the publish flow (panel that opens after user publishes the post)
-	<PluginPostStatusInfo>
-		{ __( 'My post status info' ) }
-	</PluginPostStatusInfo>
-);
+Renders provided content to the post-publish panel in the publish flow (panel that opens after user publishes the post).
+
 ```
 
 #### Usage
@@ -143,4 +140,21 @@ Renders provided content to the post-publish panel in the publish flow (panel th
 <PluginPostPublishPanel>
     <div>My plugin content</div>
 </PluginPostPublishPanel>
+```
+
+### `PluginPostStatusInfo`
+
+Renders a row in the Status & Visibility panel of the Document sidebar.
+It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
+
+_Example:_
+```jsx
+const { __ } = wp.i18n;
+const { PluginPostStatusInfo } = wp.editPost;
+
+const MyPluginPostStatusInfo = () => (
+	<PluginPostStatusInfo>
+		{ __( 'My post status info' ) }
+	</PluginPostStatusInfo>
+);
 ```
