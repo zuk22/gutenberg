@@ -26,22 +26,6 @@ class SharedBlockEditPanel extends Component {
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 		this.handleTitleChange = this.handleTitleChange.bind( this );
 		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
-		this.handleClickOutside = this.handleClickOutside.bind( this );
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'click', this.handleClickOutside, true );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'click', this.handleClickOutside, true );
-	}
-
-	handleClickOutside( event ) {
-		// The form is rendered only when isEditing.
-		if ( this.props.isEditing && ! this.editForm.current.contains( event.target ) ) {
-			this.props.onCancel();
-		}
 	}
 
 	componentDidUpdate( prevProps ) {
