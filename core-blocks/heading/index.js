@@ -9,7 +9,6 @@ import { RichText } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import edit from './edit';
 
 export const name = 'core/heading';

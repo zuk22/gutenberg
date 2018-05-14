@@ -14,6 +14,9 @@ export {
 	createBlock,
 } from './api/factory';
 export {
+	getPhrasingContentSchema,
+} from './api/raw-handling';
+export {
 	default as serialize,
 	getBlockContent,
 } from './api/serializer';

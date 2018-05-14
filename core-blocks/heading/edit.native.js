@@ -1,26 +1,23 @@
+import { View } from 'react-native';
+
 /**
  * WordPress dependencies
  */
 import {
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import './editor.scss';
-
-export const name = 'core/heading';
-
-export function edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
+export default function edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 	const { content } = attributes;
 
-	return [
-		<RichText
-			key="editable"
-			value={ content }
-			onChange={ setAttributes }
-			isSelected={ isSelected }
-		/>,
-	];
+	return (
+		<View>
+			<RichText
+				key="editable"
+				value={ content }
+				onChange={ setAttributes }
+				isSelected={ isSelected }
+			/>
+		</View>
+	);
 }

@@ -1,6 +1,5 @@
 /**
  * @format
- * @flow
  */
 
 /**
@@ -184,21 +183,9 @@ export type Settings = {
 	// imagetools_api_key?: string,
 };
 
-// TODO: Aztec should be an external dependency
-class AztecEditor {
-	static init( settings: Settings ): void {
-		if ( settings.setup ) {
-			settings.setup( new AztecEditor() );
-		}
-	}
-
-	on( eventName: string, event: Object ) {
-		
-	}
-}
-
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
-export default class TinyMCE extends Component {
+// TODO: Aztec should be an external dependency
+export default class AztecEditor extends Component {
 	componentDidMount() {
 		this.initialize();
 	}
@@ -212,10 +199,10 @@ export default class TinyMCE extends Component {
 	}
 
 	configureIsPlaceholderVisible( isPlaceholderVisible ) {
-		const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
-		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
-			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
-		}
+		// const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
+		// if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
+		// 	this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
+		// }
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -267,18 +254,11 @@ export default class TinyMCE extends Component {
 
 		settings.plugins.push( 'paste' );
 
-		AztecEditor.init( {
-			...settings,
-			// target: this.editorNode,
-			setup: editor => {
-				this.editor = editor;
-				this.props.onSetup( editor );
-			},
-		} );
+		this.props.onSetup( this );
 	}
 
 	render() {
-		const { tagName = PlainText, style, defaultValue, className, isPlaceholderVisible } = this.props;
+		const { onChange, style, defaultValue, className, isPlaceholderVisible } = this.props;
 		const ariaProps = pickAriaProps( this.props );
 		// if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
 		// 	ariaProps.role = 'textbox';
@@ -293,8 +273,9 @@ export default class TinyMCE extends Component {
 		}
 
 		return createElement(
-			tagName,
+			PlainText,
 			{
+				onChange,
 				...ariaProps,
 				className: classnames( className, 'blocks-rich-text__tinymce' ),
 				[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,

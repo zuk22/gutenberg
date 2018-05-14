@@ -18,6 +18,7 @@ export const registerCoreBlocks = () => {
 		code,
 		more,
 	].forEach( ( { name, settings } ) => {
+		debugger;
 		registerBlockType( name, settings );
 	} );
 };
