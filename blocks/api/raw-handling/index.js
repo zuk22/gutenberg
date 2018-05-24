@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { find, flatMap, filter, compact } from 'lodash';
+import { flatMap, filter, compact } from 'lodash';
 // Also polyfills Element#matches.
 import 'element-closest';
 
 /**
  * Internal dependencies
  */
-import { createBlock, getBlockTransforms } from '../factory';
+import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
@@ -87,6 +87,11 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	if ( mode !== 'INLINE' && HTML.indexOf( '<!-- wp:' ) !== -1 ) {
 		return parseWithGrammar( HTML );
 	}
+
+	// Normalize unicode to use composed characters.
+	// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
+	// See https://core.trac.wordpress.org/ticket/30130
+	HTML = HTML.normalize();
 
 	// Parse Markdown (and encoded HTML) if:
 	// * There is a plain text version.
@@ -169,7 +174,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 		doc.body.innerHTML = piece;
 
 		return Array.from( doc.body.children ).map( ( node ) => {
-			const rawTransformation = find( rawTransformations, ( { isMatch } ) => isMatch( node ) );
+			const rawTransformation = findTransform( rawTransformations, ( { isMatch } ) => isMatch( node ) );
 
 			if ( ! rawTransformation ) {
 				warn(
