@@ -152,8 +152,7 @@ input[type="search"].editor-inserter__search {
 	transition: all 0.05s ease-in-out;
 
 	svg {
-		width: 22px;
-		height: 22px;
+		fill: currentColor;
 		transition: all 0.15s ease-out;
 	}
 }
