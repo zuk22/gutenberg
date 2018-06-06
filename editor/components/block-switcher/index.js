@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { castArray, filter, first, get, mapKeys, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,19 +36,27 @@ export class BlockSwitcher extends Component {
 	}
 
 	render() {
-		const { blocks, onTransform, isLocked } = this.props;
+		const { blocks, onTransform, inserterItems } = this.props;
 		const { hoveredClassName } = this.state;
 
 		if ( ! blocks || ! blocks.length ) {
 			return null;
 		}
 
-		const allowedBlocks = getPossibleBlockTransformations( blocks );
+		const itemsByName = mapKeys( inserterItems, ( { name } ) => name );
+		const possibleBlockTransformations = sortBy(
+			filter(
+				getPossibleBlockTransformations( blocks ),
+				( block ) => !! itemsByName[ block.name ]
+			),
+			( block ) => -itemsByName[ block.name ].frecency,
+		);
+
 		const sourceBlockName = blocks[ 0 ].name;
 		const blockType = getBlockType( sourceBlockName );
 		const hasStyles = blocks.length === 1 && get( blockType, [ 'styles' ], [] ).length !== 0;
 
-		if ( ! hasStyles && ( ! allowedBlocks.length || isLocked ) ) {
+		if ( ! hasStyles && ( ! possibleBlockTransformations.length ) ) {
 			return null;
 		}
 
@@ -93,13 +101,13 @@ export class BlockSwitcher extends Component {
 								<BlockStyles uid={ blocks[ 0 ].uid } onSwitch={ onClose } onHoverClassName={ this.onHoverClassName } />
 							</PanelBody>
 						}
-						{ allowedBlocks.length !== 0 && ! isLocked &&
+						{ possibleBlockTransformations.length !== 0 &&
 							<PanelBody
 								title={ __( 'Transform To:' ) }
 								initialOpen
 							>
 								<BlockTypesList
-									items={ allowedBlocks.map( ( destinationBlockType ) => ( {
+									items={ possibleBlockTransformations.map( ( destinationBlockType ) => ( {
 										id: destinationBlockType.name,
 										icon: destinationBlockType.icon,
 										title: destinationBlockType.title,
@@ -127,12 +135,12 @@ export class BlockSwitcher extends Component {
 }
 
 export default compose(
-	withSelect( ( select, ownProps ) => {
-		const { getBlock, getEditorSettings } = select( 'core/editor' );
-		const { templateLock } = getEditorSettings();
+	withSelect( ( select, { uids } ) => {
+		const { getBlocksByUID, getBlockRootUID, getInserterItems } = select( 'core/editor' );
+		const rootUID = getBlockRootUID( first( castArray( uids ) ) );
 		return {
-			blocks: ownProps.uids.map( getBlock ),
-			isLocked: !! templateLock,
+			blocks: getBlocksByUID( uids ),
+			inserterItems: getInserterItems( rootUID ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
