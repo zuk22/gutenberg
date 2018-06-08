@@ -6,17 +6,31 @@ import { noop, map, isString, isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement } from '@wordpress/element';
+import {
+	Component,
+	Children,
+	Fragment,
+	cloneElement,
+	createRef,
+} from '@wordpress/element';
 
 class Slot extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindNode = this.bindNode.bind( this );
+		this.placeholderRef = createRef();
 	}
 
 	componentDidMount() {
 		const { registerSlot = noop } = this.context;
+
+		if ( this.props.bubblesVirtually ) {
+			this.node = this.placeholderRef.current.parentNode;
+
+			// Trigger another render, which will cause the temporary div to be
+			// removed now that `this.node` is assigned.
+			this.forceUpdate();
+		}
 
 		registerSlot( this.props.name, this );
 	}
@@ -40,16 +54,23 @@ class Slot extends Component {
 		}
 	}
 
-	bindNode( node ) {
-		this.node = node;
-	}
-
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {} } = this.props;
+		const { children, name, bubblesVirtually, fillProps = {} } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
-			return <div ref={ this.bindNode } />;
+			// For virtual event bubbling, the Fill needs a DOM node to use as
+			// target for createPortal. The behavior of portals is such that if
+			// there is existing children, it is not overridden, and any later
+			// unmounts are managed automatically. Thus, it is reasonable to
+			// use the node parent from which the Slot is rendered, which can
+			// be determined by rendering a placeholder node, with ref, and
+			// accessing the node's parent on mount.
+			if ( this.node ) {
+				return null;
+			}
+
+			return <div ref={ this.placeholderRef } />;
 		}
 
 		const fills = map( getFills( name ), ( fill ) => {
@@ -71,9 +92,9 @@ class Slot extends Component {
 		} );
 
 		return (
-			<div ref={ this.bindNode }>
+			<Fragment>
 				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
-			</div>
+			</Fragment>
 		);
 	}
 }

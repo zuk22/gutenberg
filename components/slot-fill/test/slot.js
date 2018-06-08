@@ -16,6 +16,15 @@ import Provider from '../provider';
  */
 import { Component } from '@wordpress/element';
 
+// TODO: Avoid mock when Enzyme supports React 16.3.0+ Fragment. May require
+// updates to existing tests where a `div` is not expected.
+jest.mock( '@wordpress/element', () => {
+	return {
+		...require.requireActual( '@wordpress/element' ),
+		Fragment: ( { children } ) => <div>{ children }</div>,
+	};
+} );
+
 class Filler extends Component {
 	constructor() {
 		super( ...arguments );
@@ -41,7 +50,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div></div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div></div>' );
 	} );
 
 	it( 'should render a string Fill', () => {
@@ -54,7 +63,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>content</div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div>content</div>' );
 	} );
 
 	it( 'should render a Fill containing an element', () => {
@@ -67,7 +76,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span></div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div><span></span></div>' );
 	} );
 
 	it( 'should render a Fill containing an array', () => {
@@ -80,7 +89,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span><div></div>text</div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div><span></span><div></div>text</div>' );
 	} );
 
 	it( 'calls the functions passed as the Slot\'s fillProps in the Fill', () => {
@@ -118,7 +127,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div></div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div></div>' );
 	} );
 
 	it( 'should render a string Fill with HTML wrapper when render props used', () => {
@@ -137,7 +146,7 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><blockquote>content</blockquote></div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div><blockquote>content</blockquote></div>' );
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
@@ -148,11 +157,11 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>1</div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div>1</div>' );
 
 		element.find( 'button' ).simulate( 'click' );
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>2</div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div>2</div>' );
 	} );
 
 	it( 'should render in expected order', () => {
@@ -185,6 +194,6 @@ describe( 'Slot', () => {
 			],
 		} );
 
-		expect( element.find( 'Slot > div' ).html() ).toBe( '<div>firstsecond</div>' );
+		expect( element.find( 'Slot' ).html() ).toBe( '<div>firstsecond</div>' );
 	} );
 } );
