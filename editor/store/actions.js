@@ -211,17 +211,19 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} uids   Block UID(s) to replace.
- * @param {(Object|Object[])} blocks Replacement block(s).
+ * @param {(string|string[])} uids                          Block UID(s) to replace.
+ * @param {(Object|Object[])} blocks                        Replacement block(s).
+ * @param {?boolean}          ignoreAllowedBlocksValidation Optional root UID of block list to insert.
  *
  * @return {Object} Action object.
  */
-export function replaceBlocks( uids, blocks ) {
+export function replaceBlocks( uids, blocks, ignoreAllowedBlocksValidation ) {
 	return {
 		type: 'REPLACE_BLOCKS',
 		uids: castArray( uids ),
 		blocks: castArray( blocks ),
 		time: Date.now(),
+		ignoreAllowedBlocksValidation,
 	};
 }
 
@@ -301,19 +303,21 @@ export function insertBlock( block, index, rootUID ) {
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks  Block objects to insert.
- * @param {?number}  index   Index at which block should be inserted.
- * @param {?string}  rootUID Optional root UID of block list to insert.
+ * @param {Object[]}  blocks                        Block objects to insert.
+ * @param {?number}   index                         Index at which block should be inserted.
+ * @param {?string}   rootUID                       Optional root UID of block list to insert.
+ * @param {?boolean}  ignoreAllowedBlocksValidation Optional root UID of block list to insert.
  *
  * @return {Object} Action object.
  */
-export function insertBlocks( blocks, index, rootUID ) {
+export function insertBlocks( blocks, index, rootUID, ignoreAllowedBlocksValidation ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
 		index,
 		rootUID,
 		time: Date.now(),
+		ignoreAllowedBlocksValidation,
 	};
 }
 

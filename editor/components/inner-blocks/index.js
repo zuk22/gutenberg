@@ -137,9 +137,9 @@ InnerBlocks = compose( [
 			replaceInnerBlocks( blocks ) {
 				const uids = map( block.innerBlocks, 'uid' );
 				if ( uids.length ) {
-					replaceBlocks( uids, blocks );
+					replaceBlocks( uids, blocks, true );
 				} else {
-					insertBlocks( blocks, undefined, uid );
+					insertBlocks( blocks, undefined, uid, true );
 				}
 			},
 			updateNestedSettings( settings ) {
