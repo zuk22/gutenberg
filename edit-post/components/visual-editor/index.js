@@ -11,6 +11,7 @@ import {
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 	_BlockSettingsMenuFirstItem,
+	Annotator,
 } from '@wordpress/editor';
 
 /**
@@ -34,6 +35,7 @@ function VisualEditor() {
 			<_BlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } role="menuitem" /> }
 			</_BlockSettingsMenuFirstItem>
+			<Annotator />
 		</BlockSelectionClearer>
 	);
 }

@@ -98,6 +98,7 @@ export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
+export { default as Annotator } from "./annotator";
 
 // State Related Components
 export { default as EditorProvider } from './provider';

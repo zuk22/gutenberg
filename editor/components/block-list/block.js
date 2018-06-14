@@ -50,6 +50,7 @@ import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
+import Commenting from '../annotator/commenting';
 import { createInnerBlockList } from '../../utils/block-list';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
@@ -405,6 +406,9 @@ export class BlockListBlock extends Component {
 			isSelected,
 			isMultiSelected,
 			isFirstMultiSelected,
+			annotations,
+			showCommentingUI,
+			isLastInSelection,
 			isTypingWithinBlock,
 			isMultiSelecting,
 			hoverArea,
@@ -449,6 +453,7 @@ export class BlockListBlock extends Component {
 			'is-shared': isSharedBlock( blockType ),
 			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,
+			'is-fully-annotated': annotations.length !== 0,
 		} );
 
 		const { onReplace } = this.props;
@@ -492,6 +497,7 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
+				<Commenting uid={ block.uid } />
 				{ ! isMultiSelected && (
 					<BlockDraggable
 						rootUID={ rootUID }
@@ -618,6 +624,8 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		getSelectedBlocksInitialCaretPosition,
 		getEditorSettings,
 		hasSelectedInnerBlock,
+		getAnnotationsForBlock,
+		isCommentingOnBlock,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
 	const isParentOfSelectedBlock = hasSelectedInnerBlock( uid );
@@ -647,6 +655,8 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		block,
 		isSelected,
 		hasFixedToolbar,
+		annotations: getAnnotationsForBlock( uid ),
+		showCommentingUI: isCommentingOnBlock( uid ),
 	};
 } );
 

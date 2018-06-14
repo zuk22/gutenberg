@@ -12,8 +12,15 @@ import {
 	defer,
 	noop,
 	reject,
+	isString,
+	map,
+	flatMap,
+	flatten,
+	pick,
 } from 'lodash';
 import 'element-closest';
+import ReactDOM from 'react-dom';
+import { diffChars } from 'diff';
 
 /**
  * WordPress dependencies
@@ -125,6 +132,33 @@ export class RichText extends Component {
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
+			annotations: [
+				{
+					rects: [ { width: 43.5938, height: 22, top: 60, left: 221 } ],
+					params: {
+						id: "id1",
+					},
+				},
+				{
+					rects: [ { width: 332.656, height: 22, top: 60, left: 264.594 } ],
+					params: {
+						id: "id2",
+					},
+				},
+				{
+					rects: [ { width: 4.15625, height: 22, top: 60, left: 597.25 } ],
+					params: {
+						id: "id3",
+					},
+				},
+				{
+					rects: [ { width: 140.281, height: 22, top: 88, left: 0 } ],
+					params: {
+						id: "id4",
+					},
+				},
+			],
+			propsAnnotations: [],
 		};
 
 		this.containerRef = createRef();
@@ -386,9 +420,16 @@ export class RichText extends Component {
 	/**
 	 * Handles any case where the content of the TinyMCE instance has changed.
 	 */
-
 	onChange() {
-		this.savedContent = this.getContent();
+		const nextContent = this.getContent();
+
+		this.props.onBeforeChange( this.savedContent );
+		const prevContent = this.props.value;
+
+		this.diff( prevContent, nextContent );
+
+		this.savedContent = nextContent;
+
 		this.props.onChange( this.savedContent );
 	}
 
@@ -726,7 +767,7 @@ export class RichText extends Component {
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate( prevProps, prevState ) {
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
 			!! this.editor &&
@@ -742,6 +783,236 @@ export class RichText extends Component {
 		) {
 			this.updateContent();
 		}
+
+		this.updateAnnotationPositions( prevProps, prevState );
+	}
+
+	componentDidMount() {
+		// this.updateAnnotationPositions();
+	}
+
+	matchEditorXPath( xpath ) {
+		const body = this.editor.getBody();
+		const container = body.parentNode;
+
+		const results = document.evaluate( xpath, container, null, XPathResult.UNORDERED_NODE_ITERATOR_TYPE );
+		const firstResult = results.iterateNext();
+		if ( firstResult ) {
+			return firstResult;
+		}
+
+		return null;
+	}
+
+	matchXPath( nodeList, xpath ) {
+		const container = document.createElement( 'div' );
+		const paragraph = document.createElement( 'p' );
+		container.appendChild( paragraph );
+
+		ReactDOM.render( nodeList, paragraph );
+
+		const results = document.evaluate( xpath, container, null, XPathResult.UNORDERED_NODE_ITERATOR_TYPE );
+		const firstResult = results.iterateNext();
+		if ( firstResult ) {
+			return firstResult;
+		}
+
+		return null;
+	}
+
+	newPosition( oldPos, diffThisThing ) {
+		let newPos = oldPos;
+
+		let offset = 0;
+		diffThisThing.forEach( ( diffDetection ) => {
+			if ( offset < oldPos ) {
+				if ( diffDetection.added ) {
+					newPos += diffDetection.count;
+				}
+
+				if ( diffDetection.removed ) {
+					newPos -= diffDetection.count;
+				}
+			}
+
+			offset += diffDetection.count;
+		} );
+
+		return newPos;
+	}
+
+	diffAnnotation( annotation, prevContent, nextContent ) {
+		const {
+			start,
+			startPos,
+			end,
+			endPos,
+		} = annotation;
+
+		const prevStartNode = this.matchXPath( prevContent, start );
+		const nextStartNode = this.matchXPath( nextContent, start );
+		const prevEndNode = this.matchXPath( prevContent, end );
+		const nextEndNode = this.matchXPath( nextContent, end );
+
+		const changes = {};
+
+		if ( prevStartNode !== nextStartNode ) {
+			const diffThisThing = diffChars( prevStartNode.nodeValue, nextStartNode.nodeValue );
+
+			const newStartPos = this.newPosition( startPos, diffThisThing );
+
+			if ( newStartPos !== startPos ) {
+				// changes.deltaStartPos = newStartPos - startPos;
+				changes.startPos = newStartPos;
+			}
+		}
+
+		if ( prevEndNode !== nextEndNode ) {
+			const diffThisThing = diffChars( prevEndNode.nodeValue, nextEndNode.nodeValue );
+
+			const newEndPos = this.newPosition( endPos, diffThisThing );
+
+			if ( newEndPos !== endPos ) {
+				// changes.deleteEndPos = newEndPos - endPos;
+				changes.endPos = newEndPos;
+			}
+		}
+
+		return changes;
+	}
+
+	diff( prevContent, nextContent ) {
+		this.state.annotations.forEach( ( annotation ) => {
+			const changes = this.diffAnnotation( annotation.params, prevContent, nextContent );
+
+			if ( Object.keys( changes ).length > 0 ) {
+				const annotationParams = {
+					...annotation.params,
+					...changes,
+				};
+
+				const newAnnotation = {
+					...annotation,
+					params: annotationParams,
+				};
+
+				this.replaceAnnotation( annotation.params.id, newAnnotation );
+
+				this.props.onAnnotationChange( annotation.params.id, changes );
+
+				// const annotationParams = {
+				// 	...annotation.params,
+				// 	...changes,
+				// };
+				//
+				// const newAnnotation = this.calculateAnnotationPosition( annotationParams );
+				//
+				// this.replaceAnnotation( annotation.params.id, newAnnotation );
+			}
+		} );
+	}
+
+	updateAnnotationPositions( prevProps ) {
+		if ( ! this.editor ) {
+			return;
+		}
+
+		if ( isEqual( this.props.annotations, this.state.propsAnnotations ) ) {
+			return;
+		}
+
+		setTimeout( () => {
+			this.setState( {
+				annotations: this.calculateAnnotationPositions( this.props.annotations || [] ),
+				propsAnnotations: this.props.annotations,
+			} );
+		}, 10 );
+	}
+
+	replaceAnnotation( id, newAnnotation ) {
+		const annotations = this.state.annotations;
+
+		this.setState( {
+			annotations: annotations.map( ( annotation ) => {
+				if ( annotation.params.id === id ) {
+					return newAnnotation;
+				}
+
+				return annotation;
+			} ),
+		} );
+	}
+
+	findAnnotationCalculation( id ) {
+		let foundAnnotation = null;
+
+		this.state.annotations.forEach( ( annotation ) => {
+			if ( annotation.params.id === id ) {
+				foundAnnotation = annotation;
+			}
+		} );
+
+		return foundAnnotation;
+	}
+
+	createRange( startNode, endNode, startOffset, endOffset ) {
+		const range = document.createRange();
+
+		range.setStart( startNode, startOffset );
+		range.setEnd( endNode, endOffset );
+
+		return range;
+	};
+
+	calculateAnnotationPosition( annotation ) {
+		const {
+			start,
+			startPos,
+			end,
+			endPos,
+		} = annotation;
+
+		const startNode = this.matchEditorXPath( start );
+		const endNode = this.matchEditorXPath( end );
+
+		console.log( startNode, endNode, startPos, endPos );
+		const range = this.createRange( startNode, endNode, startPos, endPos );
+
+		const editorRect = this.containerRef.current.getBoundingClientRect();
+
+		return {
+			rects: map( range.getClientRects(), ( rect ) => {
+				return {
+					width: rect.width,
+					height: rect.height,
+					top: rect.top - editorRect.top,
+					left: rect.left - editorRect.left,
+				};
+			} ),
+			params: annotation,
+		};
+	}
+
+	calculateAnnotationPositions( annotations ) {
+		if ( ! this.editor ) {
+			return [];
+		}
+
+		const calculatedAnnotations = [];
+
+		annotations.forEach( ( annotation ) => {
+			const id = annotation.id;
+			const previousCalculation = this.findAnnotationCalculation( id );
+
+			// If the previous calculation is based on the same params we can reuse the calculation.
+			if ( previousCalculation && isEqual( previousCalculation.params, annotation ) ) {
+				calculatedAnnotations.push( previousCalculation );
+			} else {
+				calculatedAnnotations.push( this.calculateAnnotationPosition( annotation ) );
+			}
+		} );
+
+		return calculatedAnnotations;
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -852,6 +1123,8 @@ export class RichText extends Component {
 			formatters,
 			autocompleters,
 			format,
+			annotations = [],
+			annotationTarget = '',
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -860,8 +1133,14 @@ export class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
+
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
-		const classes = classnames( wrapperClassName, 'editor-rich-text' );
+		const classes = [ wrapperClassName, 'editor-rich-text' ];
+
+		if ( annotationTarget !== '' ) {
+			classes.push( 'annotation-target' );
+			classes.push( 'annotation-target' + annotationTarget );
+		}
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -874,8 +1153,13 @@ export class RichText extends Component {
 			/>
 		);
 
+		const annotationRectangles = flatMap( this.state.annotations, ( annotation ) => {
+			return annotation.rects;
+		} );
+
 		return (
-			<div className={ classes }
+			<div
+				className={ classnames( classes ) }
 				ref={ this.containerRef }
 				onFocus={ this.setFocusedElement }
 			>
@@ -921,6 +1205,27 @@ export class RichText extends Component {
 						</Fragment>
 					) }
 				</Autocomplete>
+				<div className="annotation-markers">
+					<div className="annotation-marker">
+						{ annotationRectangles.map( ( rectangle ) => {
+							let {
+								width,
+								height,
+								top,
+								left,
+							} = rectangle;
+
+							width = width + 'px';
+							height = height + 'px';
+							top = top + 'px';
+							left = left + 'px';
+
+							return <div
+								key={ 'w' + width + 'h' + height + 't' + top + 'l' + left }
+								style={ { width, height, top, left } } />;
+						} ) }
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -937,6 +1242,8 @@ RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
 	format: 'element',
+	onBeforeChange: () => {},
+	onAnnotationChange: noop,
 };
 
 const RichTextContainer = compose( [

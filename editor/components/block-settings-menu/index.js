@@ -2,15 +2,15 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { castArray } from 'lodash';
+import { castArray, head, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -53,6 +53,9 @@ export class BlockSettingsMenu extends Component {
 			focus,
 			rootUID,
 			isHidden,
+			isMultiSelecting,
+			onAnnotate,
+			onComment,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blockUIDs = castArray( uids );
@@ -101,6 +104,22 @@ export class BlockSettingsMenu extends Component {
 							<BlockDuplicateButton uids={ uids } rootUID={ rootUID } role="menuitem" />
 							{ count === 1 && <SharedBlockSettings uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" /> }
 							<BlockTransformations uids={ uids } onClick={ onClose } itemsRole="menuitem" />
+							<IconButton
+								key="annotate"
+								className="editor-block-settings-menu__control"
+								onClick={ () => onAnnotate( isMultiSelecting, blockUIDs ) }
+								icon="admin-generic"
+							>
+								{ __( 'Annotate' ) }
+							</IconButton>
+
+							<IconButton
+								key="comment"
+								className="editor-block-settings-menu__control"
+								onClick={ () => onComment( blockUIDs ) }
+								icon="admin-comments" >
+								{ __( 'Add Comment' ) }
+							</IconButton>
 						</NavigableMenu>
 					) }
 				/>
@@ -114,8 +133,35 @@ export class BlockSettingsMenu extends Component {
 	}
 }
 
-export default withDispatch( ( dispatch ) => ( {
-	onSelect( uid ) {
-		dispatch( 'core/editor' ).selectBlock( uid );
-	},
-} ) )( BlockSettingsMenu );
+export default compose( [
+	withSelect( ( select ) => {
+		return {
+			isMultiSelecting: select( 'core/editor' ).isMultiSelecting(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onSelect( uid ) {
+			dispatch( 'core/editor' ).selectBlock( uid );
+		},
+		onAnnotate( isMultiSelecting, uids ) {
+			const firstBlock = head( uids );
+			const lastBlock = last( uids );
+
+			if (firstBlock === lastBlock) {
+				dispatch( 'core/editor' ).annotateSelection();
+			} else {
+				dispatch( 'core/editor' ).annotateBlocks( firstBlock, lastBlock );
+			}
+		},
+		onComment( uids ) {
+			const firstBlock = head( uids );
+			// const lastBlock = last( uids );
+
+			const commentingOn = firstBlock;
+
+			console.log( commentingOn );
+
+			dispatch( 'core/editor' ).showCommentingUI( commentingOn );
+		},
+	} ) )
+] )( BlockSettingsMenu );

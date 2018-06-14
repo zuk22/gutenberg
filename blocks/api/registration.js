@@ -69,6 +69,7 @@ const POST_FORMAT_BLOCK_MAP = {
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
+		attributes: {},
 		...get( window._wpBlocks, name ),
 		...settings,
 	};
@@ -140,6 +141,13 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
+	if ( typeof settings.attributes !== 'object' || settings.attributes === null ) {
+		console.error(
+			'Block attributes must be an object.',
+		);
+		return;
+	}
+
 	settings.icon = normalizeIconObject( settings.icon );
 	if ( ! isValidIcon( settings.icon.src ) ) {
 		console.error(
@@ -157,6 +165,14 @@ export function registerBlockType( name, settings ) {
 		} );
 		set( settings, [ 'supports', 'inserter' ], ! settings.isPrivate );
 	}
+
+	settings.attributes.annotations = {
+		type: 'array',
+		items: {
+			type: 'integer',
+		},
+		default: [],
+	};
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
 

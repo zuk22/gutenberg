@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFinite, find, omit } from 'lodash';
+import { isFinite, find, omit, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -82,6 +82,62 @@ class ParagraphBlock extends Component {
 		this.toggleDropCap = this.toggleDropCap.bind( this );
 		this.getFontSize = this.getFontSize.bind( this );
 		this.setFontSize = this.setFontSize.bind( this );
+		this.handleAnnotationChange = debounce( this.handleAnnotationChange.bind( this ), 10000 );
+
+		this.state = {
+			annotations: [
+				{
+					id: 'id1',
+					start: './p[1]/text()[1]',
+					startPos: 5,
+					end: './p[1]/text()[1]',
+					endPos: 100,
+				},
+				{
+					id: 'id2',
+					start: './p[1]/text()[1]',
+					startPos: 200,
+					end: './p[1]/text()[1]',
+					endPos: 210,
+				},
+			],
+		};
+	}
+
+	findAnnotation( id ) {
+		let foundAnnotation = null;
+
+		this.state.annotations.forEach( ( annotation ) => {
+			if ( annotation.id === id ) {
+				foundAnnotation = annotation;
+			}
+		} );
+
+		return foundAnnotation;
+	}
+
+	replaceAnnotation( id, newAnnotation ) {
+		const annotations = this.state.annotations;
+
+		this.setState( {
+			annotations: annotations.map( ( annotation ) => {
+				if ( annotation.id === id ) {
+					return newAnnotation;
+				}
+
+				return annotation;
+			} ),
+		} );
+	}
+
+	handleAnnotationChange( id, changes ) {
+		const oldAnnotation = this.findAnnotation( id );
+		const newAnnotation = {
+			...oldAnnotation,
+			...changes,
+		};
+
+		this.replaceAnnotation( id, newAnnotation );
 	}
 
 	onReplace( blocks ) {
@@ -251,6 +307,9 @@ class ParagraphBlock extends Component {
 						onReplace={ this.onReplace }
 						onRemove={ () => onReplace( [] ) }
 						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+						annotations={ this.state.annotations }
+						annotationTarget="paragraph/rich-text"
+						onAnnotationChange={ this.handleAnnotationChange }
 					/>
 				</div>
 			</Fragment>

@@ -718,3 +718,492 @@ export function updateEditorSettings( settings ) {
 		settings,
 	};
 }
+
+function createBlockSelector( start, end ) {
+	return {
+		type: 'RangeSelector',
+		startSelector: {
+			type: 'XPathSelector',
+			value: `//*[@id='${ start }']`,
+		},
+		endSelector: {
+			type: 'XPathSelector',
+			value: `//*[@id='${ end }']`,
+		},
+	};
+}
+
+export function annotate( selector ) {
+	return {
+		type: 'ADD_ANNOTATION',
+		annotation: {
+			selector: selector,
+		},
+	};
+}
+
+/**
+ * Returns an action object used to add an annotation to the editor.
+ *
+ * @param {string} start Start block to annotate.
+ * @param {string} end End block to annotate.
+ *
+ * @return {Object} Action object.
+ */
+export function annotateBlocks( start, end ) {
+	const selector = createBlockSelector( start, end );
+
+	return annotate( selector );
+}
+
+export function annotateSelection() {
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt(0) : null;
+	const editable = range ? getClosestEditable(range.startContainer) : null;
+
+	if (!range || !editable) {
+		console.log( range, editable );
+		return {
+			type: "HIHIHI",
+		};; // Not an editable selection.
+	}
+	if (range.startContainer === range.endContainer) {
+		if (range.startOffset === range.endOffset) {
+			console.log( "???", range );
+			return {
+				type: "HIHIHI",
+			};; // Selection is empty.
+		}
+	}
+	const w3cSelector = getW3CSelector(editable, range);
+	demoOutput(w3cSelector, range);
+	markW3CSelector(w3cSelector);
+
+	return annotate( w3cSelector );
+}
+
+/**
+ * Returns if the given range is a collapsed range.
+ *
+ * @param {Range} range The DOM selection range.
+ * @return {boolean} Whether its a collapsed range.
+ */
+function isCollapsed( range ) {
+	return range.startContainer === range.endContainer &&
+		range.startOffset === range.endOffset;
+}
+
+function getSelectorFromDOMSelection() {
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const editable = range ? getClosestEditable( range.startContainer ) : null;
+
+	// There needs to be some text selected.
+	if ( ! range || ! editable ) {
+		return null;
+	}
+
+	// Cannot annotate a collapsed range.
+	if ( isCollapsed( range ) ) {
+		return null;
+	}
+
+	const w3cSelector = getW3CSelector( editable, range );
+
+	return w3cSelector;
+}
+
+
+function getSelectorFromSelection( state ) {
+	const { blockSelection } = state;
+
+	if ( blockSelection.start === null && blockSelection.end === null ) {
+		return null;
+	}
+
+	// Selecting inside a block
+	if ( blockSelection.start === blockSelection.end ) {
+		// Create a granular selector
+		return getSelectorFromDOMSelection();
+	}
+
+	// Create a multi-select selector
+}
+
+
+
+
+
+
+
+const onSelectionChange = (e) => {
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt(0) : null;
+	const editable = range ? getClosestEditable(range.startContainer) : null;
+
+	if (!range || !editable) {
+		return; // Not an editable selection.
+	}
+	if (range.startContainer === range.endContainer) {
+		if (range.startOffset === range.endOffset) {
+			return; // Selection is empty.
+		}
+	}
+	const w3cSelector = getW3CSelector(editable, range);
+	demoOutput(w3cSelector, range);
+	markW3CSelector(w3cSelector);
+};
+
+const markW3CSelector = (w3cSelector) => {
+	const range = getW3CXPathSelectorRange(w3cSelector);
+	const editable = getClosestEditable(range.startContainer);
+
+	const editor = getClosestEditor(editable);
+	const editorRect = editor.getBoundingClientRect();
+
+	let markers = editor.querySelector('.annotation-markers');
+	let marker = document.createElement('div');
+
+	if (markers) {
+		markers.innerHTML = '';
+	} else {
+		markers = document.createElement('div');
+		markers.classList.add('annotation-markers');
+		editor.appendChild(markers);
+	}
+	marker.classList.add('annotation-marker');
+	markers.appendChild(marker);
+
+	_.forEach(range.getClientRects(), (rect) => {
+		const rectDiv = document.createElement('div');
+
+		rectDiv.style.width = rect.width + 'px';
+		rectDiv.style.height = rect.height + 'px';
+
+		rectDiv.style.top = (rect.top - editorRect.top) + 'px';
+		rectDiv.style.left = (rect.left - editorRect.left) + 'px';
+
+		marker.appendChild(rectDiv);
+	});
+};
+
+/* ---------------------------------- */
+
+const getW3CSelector = (editable, range) => {
+	let xPathStartSelector = getXPathSelector(editable, range.startContainer);
+	xPathStartSelector = prefixXPathSelector(editable, xPathStartSelector);
+
+	let xPathEndSelector = getXPathSelector(editable, range.endContainer);
+	xPathEndSelector = prefixXPathSelector(editable, xPathEndSelector);
+
+	return {
+		type: 'RangeSelector',
+		startSelector: {
+			type: 'XPathSelector',
+			value: xPathStartSelector,
+			refinedBy: {
+				type: 'TextPositionSelector',
+				start: range.startOffset,
+				end: range.startOffset,
+			},
+		},
+		endSelector: {
+			type: 'XPathSelector',
+			value: xPathEndSelector,
+			refinedBy: {
+				type: 'TextPositionSelector',
+				start: range.endOffset,
+				end: range.endOffset,
+			},
+		},
+	};
+};
+
+const getTagName = (element) => {
+	return element.tagName.toLowerCase();
+};
+
+const prefixXPathSelector = (editable, xPathSelector) => {
+	xPathSelector = xPathSelector ? '/' + xPathSelector : xPathSelector;
+
+	console.log( xPathSelector );
+
+	let blockContainer = editable.closest( '.editor-block-list__block' );
+	console.log( blockContainer );
+
+	console.log( editable );
+	console.log( editable.classes );
+
+	let classNames = editable.classList;
+
+	let className = [ ...classNames ].filter( ( candidate ) => candidate.startsWith( "annotation-target" ) && candidate !== "annotation-target" )[ 0 ];
+
+	// let classNames = editable.class.split( ' ' );
+	// console.log( classNames );
+
+	return "//*[@id='" + blockContainer.id + "']" + '//*[contains(@class, "' + className + '")]' + xPathSelector;
+};
+
+const getXPathNode = (xPath) => {
+	const resultType = XPathResult.FIRST_ORDERED_NODE_TYPE;
+	const result = document.evaluate(xPath, document, null, resultType, null);
+	const node = result ? (result.singleNodeValue || null) : null;
+
+	return node;
+};
+
+const getXPathSelector = (root, node) => {
+	const selectors = [];
+
+	while (node.parentNode) {
+		if (node === root) {
+			break;
+		}
+
+		switch (node.nodeType) {
+			case Node.ELEMENT_NODE:
+				selectors.unshift(getTagName(node) + '[' + getXPathNodeIndex(node) + ']');
+				break;
+
+			case Node.TEXT_NODE:
+				selectors.unshift('text()[' + getXPathNodeIndex(node) + ']');
+				break;
+
+			default: // e.g., comments, processing instructions.
+				break; // Do not include.
+		}
+
+		node = node.parentNode;
+	}
+
+	return selectors.join('/');
+};
+
+const getXPathNodeIndex = (node) => {
+	let typeIndex = 1; // Default index.
+
+	if (!node.parentNode || !node.parentNode.hasChildNodes()) {
+		return typeIndex;
+	}
+
+	const childNodes = node.parentNode.childNodes;
+
+	for (let i = 0; i < childNodes.length; i++) {
+		if (childNodes[i] === node) {
+			break;
+		}
+
+		if (childNodes[i].nodeType !== node.nodeType) {
+			continue;
+		}
+
+		switch (childNodes[i].nodeType) {
+			case Node.ELEMENT_NODE:
+				typeIndex += childNodes[i].tagName === node.tagName ? 1 : 0;
+				break;
+
+			case Node.TEXT_NODE:
+			default: // e.g., comments, processing instructions.
+				typeIndex += 1;
+				break;
+		}
+	}
+
+	return typeIndex;
+};
+
+const isW3CRangeSelector = (w3cSelector) => {
+	if (!w3cSelector) {
+		return false;
+	} else if (w3cSelector.type !== 'RangeSelector') {
+		return false;
+	} else if (typeof w3cSelector.startSelector !== 'object') {
+		return false;
+	} else if (typeof w3cSelector.endSelector !== 'object') {
+		return false;
+	}
+	return true;
+};
+
+const isW3CXPathSelector = (w3cSelector) => {
+	if (!w3cSelector) {
+		return false;
+	} else if (w3cSelector.type !== 'XPathSelector') {
+		return false;
+	} else if (typeof w3cSelector.value !== 'string' || !w3cSelector.value) {
+		return false;
+	}
+	return true;
+};
+
+const isW3CTextPositionSelector = (w3cSelector) => {
+	if (!w3cSelector) {
+		return false;
+	} else if (w3cSelector.type !== 'TextPositionSelector') {
+		return false;
+	} else if (typeof w3cSelector.start !== 'number' || w3cSelector.start < 0) {
+		return false;
+	} else if (w3cSelector.start !== w3cSelector.end) {
+		return false;
+	}
+	return true;
+};
+
+const isW3CXPathRangeSelector = (w3cSelector) => {
+	if (!isW3CRangeSelector(w3cSelector)) {
+		return false;
+	} else if (!isW3CXPathSelector(w3cSelector.startSelector)) {
+		return false;
+	} else if (!isW3CXPathSelector(w3cSelector.endSelector)) {
+		return false;
+	} else if (!isW3CTextPositionSelector(w3cSelector.startSelector.refinedBy)) {
+		return false;
+	} else if (!isW3CTextPositionSelector(w3cSelector.endSelector.refinedBy)) {
+		return false;
+	}
+	return true;
+};
+
+const getW3CXPathSelectorRange = (w3cSelector) => {
+	if (!isW3CXPathRangeSelector(w3cSelector)) {
+		return null;
+	}
+
+	const startNode = getXPathNode(w3cSelector.startSelector.value);
+	const endNode = getXPathNode(w3cSelector.endSelector.value);
+
+	if (!startNode || !endNode) {
+		return null;
+	}
+
+	const startOffset = w3cSelector.startSelector.refinedBy.start;
+	const endOffset = w3cSelector.endSelector.refinedBy.end;
+
+	return createRange(startNode, endNode, startOffset, endOffset);
+};
+
+const getClosestElement = (node) => {
+	switch (node.nodeType) {
+		case Node.ELEMENT_NODE:
+			return node;
+
+		case Node.TEXT_NODE:
+		default: // e.g., comments, processing instructions.
+			return node.parentElement || null;
+	}
+};
+
+const getClosestEditable = (node) => {
+	const element = getClosestElement(node);
+
+	if (!element) {
+		return null;
+	}
+
+	return element.closest( '.annotation-target' )
+		|| element.closest('.blocks-editable__tinymce')
+		|| element.closest('.blocks-editable__textarea')
+		|| element.closest('.editor-block-list__block-html-textarea')
+		|| element.closest('.blocks-rich-text__tinymce')
+		|| null;
+};
+
+const getClosestEditor = (node) => {
+	const element = getClosestElement(node);
+
+	if (!element) {
+		return null;
+	}
+
+	return element.closest('.editor-block-list__block-edit') || null;
+};
+
+const selectNode = (node) => {
+	let selection = window.getSelection();
+	let range = document.createRange();
+
+	range.selectNode(node);
+	selection.removeAllRanges();
+	selection.addRange(range);
+};
+
+const createRange = (startNode, endNode, startOffset, endOffset) => {
+	let range = document.createRange();
+
+	range.setStart(startNode, startOffset);
+	range.setEnd(endNode, endOffset);
+
+	return range;
+};
+
+/* ---------------------------------- */
+
+/*
+ * For demo only.
+ */
+// document.addEventListener('selectionchange', _.debounce(onSelectionChange, 500));
+// document.querySelectorAll('.blocks-editable__tinymce img').forEach((img) => {
+// 	img.addEventListener('click', (e) => selectNode(e.target));
+// });
+
+/*
+ * For demo only.
+ */
+const demoOutput = (w3cSelector, range) => {
+	// console.clear();
+	const h1Styles = 'font-size:1.2em; font-weight:bold;';
+
+	console.log('%cW3C Selector', h1Styles);
+	console.log(JSON.stringify(w3cSelector, null, 4));
+
+	console.log('%cSelection Range', h1Styles);
+	console.log(range);
+
+	console.log('%cXPath Nodes', h1Styles);
+	console.log('start: %o', getXPathNode(w3cSelector.startSelector.value));
+	console.log('end:   %o', getXPathNode(w3cSelector.endSelector.value));
+};
+
+export const showCommentingUI = ( commentingOn, selector = null ) => {
+	if ( selector === null ) {
+		selector = getSelectorFromSelection( store.getState() );
+	}
+
+	return {
+		type: 'SHOW_COMMENTING_UI',
+		commentingOn,
+		selector,
+	};
+};
+
+// export const comment = () => {
+// 	return {
+// 		type: "ADD_COMMENT",
+// 	};
+// };
+
+export const cancelCommenting = () => {
+	return {
+		type: 'CANCEL_COMMENTING_UI',
+	};
+};
+
+import store from '../store';
+
+export const addComment = ( text, { author = '', date = '', selector = null } = {} ) => {
+	if ( author === '' ) {
+		author = 'Tim Hengeveld';
+	}
+
+	if ( date === '' ) {
+		date = '14-02-2018 - 10:24';
+	}
+
+	return {
+		type: 'ADD_COMMENT',
+		content: text,
+		author: author,
+		date: date,
+		selector: selector,
+	};
+};

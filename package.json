@@ -25,6 +25,7 @@
 		"@wordpress/wordcount": "1.0.2",
 		"classnames": "2.2.5",
 		"clipboard": "1.7.1",
+		"diff": "3.5.0",
 		"dom-react": "2.2.1",
 		"dom-scroll-into-view": "1.2.1",
 		"element-closest": "2.0.2",

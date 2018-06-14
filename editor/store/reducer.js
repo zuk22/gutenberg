@@ -1091,6 +1091,68 @@ export function autosave( state = null, action ) {
 	return state;
 }
 
+export function annotations( state = [], action ) {
+	switch ( action.type ) {
+		case 'ADD_ANNOTATION':
+			return [
+				action.annotation,
+				...state,
+			];
+	}
+
+	return state;
+}
+
+export function commenting( state = { comments: [] }, action ) {
+	switch ( action.type ) {
+		case 'SHOW_COMMENTING_UI':
+			return {
+				...state,
+				isCommenting: true,
+				commentingOn: action.commentingOn,
+				selector: action.selector,
+			};
+
+		case 'CANCEL_COMMENTING_UI':
+			return {
+				...state,
+				isCommenting: false,
+			};
+
+		case 'ADD_COMMENT':
+			let content = action.content;
+
+			return {
+				...state,
+				isCommenting: false,
+				comments: [
+					...state.comments,
+					{
+						content: content,
+						author: action.author,
+						date: action.date,
+						onBlock: state.commentingOn,
+						selector: state.selector,
+					},
+				],
+			};
+
+		case 'UPDATE_BLOCK_ATTRIBUTES':
+			let newComments = [ ...state.comments ];
+
+			newComments.forEach( ( comment ) => {
+
+			} );
+
+			return {
+				...state,
+				newComments,
+			};
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1107,4 +1169,6 @@ export default optimist( combineReducers( {
 	template,
 	autosave,
 	settings,
+	annotations,
+	commenting,
 } ) );

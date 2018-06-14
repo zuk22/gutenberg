@@ -1825,12 +1825,91 @@ export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
 }
 
 /*
- * Returns the editor settings.
- *
- * @param {Object} state Editor state.
- *
- * @return {Object} The editor settings object
- */
+* Returns the editor settings.
+*
+* @param {Object} state Editor state.
+*
+* @return {Object} The editor settings object
+*/
 export function getEditorSettings( state ) {
 	return state.settings;
 }
+
+/*
+return {
+		type: 'RangeSelector',
+		startSelector: {
+			type: 'XPathSelector',
+			value: `//*[@id='${ start }']`,
+		},
+		endSelector: {
+			type: 'XPathSelector',
+			value: `//*[@id='${ end }']`,
+		},
+	};
+ */
+
+function getBlockFromXPath( XPath ) {
+	const idFinder = /\/\/\*\[@id='([a-zA-Z0-9-]+)']/;
+
+	const results = idFinder.exec( XPath );
+
+	if ( results !== null ) {
+		return results[ 1 ];
+	}
+
+	console.log( results );
+
+	return '';
+}
+
+export const getAnnotations = ( state ) => {
+	return state.annotations;
+};
+
+/**
+ * Returns all the annotations for a specific block.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid The block UID to get annotations for.
+ * @returns {Object[]} The annotations relevant for this block.
+ */
+export const getAnnotationsForBlock = createSelector(
+	( state, uid ) => {
+		const blockOrder = getBlockOrder( state );
+
+		const { annotations } = state;
+
+		console.log( annotations );
+
+		return annotations.filter( ( annotation ) => {
+			const startBlock = getBlockFromXPath( annotation.selector.startSelector.value );
+			const endBlock = getBlockFromXPath( annotation.selector.endSelector.value );
+
+			const startIndex = blockOrder.indexOf( startBlock );
+			const endIndex = blockOrder.indexOf( endBlock );
+
+			const annotatedBlocks = blockOrder.slice( startIndex, endIndex + 1 );
+
+			return annotatedBlocks.includes( uid );
+		} );
+	},
+	( state, uid ) => [
+		state.annotations,
+	],
+);
+
+export const isCommentingOnBlock = ( state, uid ) => {
+	return state.commenting.isCommenting && state.commenting.commentingOn === uid;
+};
+
+export const getCommentsForBlock = createSelector(
+	( state, uid ) => {
+		const comments = state.commenting.comments;
+
+		return comments.filter( ( comment ) => comment.onBlock === uid );
+	},
+	( state, uid ) => [
+		state.commenting.comments,
+	],
+);

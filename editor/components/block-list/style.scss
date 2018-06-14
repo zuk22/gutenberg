@@ -291,7 +291,6 @@
 	}
 }
 
-
 /**
  * Block styles and alignments
  */
@@ -332,6 +331,24 @@
 	.editor-block-list__side-inserter {
 		opacity: 1;
 		transition: opacity 0.2s;
+	}
+
+	&.is-fully-annotated {
+		outline: 1px solid $annotation-highlight;
+	}
+
+	.editor-block-list__block-edit {
+		position: relative;
+
+		> .annotation-markers {
+			> .annotation-marker {
+				> * {
+					z-index: -1;
+					position: absolute;
+					background: #fdf451;
+				}
+			}
+		}
 	}
 
 	// Shared blocks
@@ -455,7 +472,7 @@
 		> .editor-block-list__breadcrumb {
 			right: -1px;
 		}
-		
+
 		// compensate for main container padding, subtract border
 		@include break-small() {
 			margin-left: -$block-side-ui-padding + 1px;
@@ -856,7 +873,7 @@
 		padding: 4px 4px;
 		background: theme( outlines );
 		color: $white;
-	
+
 		// Animate in
 		.editor-block-list__block:hover & {
 			@include fade_in( .1s );
