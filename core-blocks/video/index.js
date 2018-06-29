@@ -26,14 +26,95 @@ export const settings = {
 	category: 'common',
 
 	attributes: {
-		id: {
+		width: {
 			type: 'number',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'width',
 		},
-		src: {
+		height: {
+			type: 'number',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'height',
+		},
+		sources: {
+			type: 'array',
+			default: [],
+			source: 'query',
+			selector: 'source',
+			query: {
+				src: {
+					source: 'attribute',
+					attribute: 'src',
+				},
+				type: {
+					source: 'attribute',
+					attribute: 'type',
+				},
+			},
+		},
+		subtitles: {
+			type: 'array',
+			default: [],
+			source: 'query',
+			selector: 'track',
+			query: {
+				src: {
+					source: 'attribute',
+					attribute: 'src',
+				},
+				srclang: {
+					source: 'attribute',
+					attribute: 'srclang',
+				},
+				kind: {
+					source: 'attribute',
+					attribute: 'kind',
+				},
+				label: {
+					source: 'attribute',
+					attribute: 'label',
+				},
+			},
+		},
+		controls: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'controls',
+			default: true,
+		},
+		loop: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'loop',
+		},
+		poster: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'video',
-			attribute: 'src',
+			attribute: 'poster',
+			default: '',
+		},
+		autoplay: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'autoplay',
+		},
+		muted: {
+			type: 'boolean',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'muted',
+		},
+		preload: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'preload',
 		},
 		caption: {
 			type: 'array',
@@ -49,11 +130,41 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { src, caption } = attributes;
+		const { autoplay, caption, controls, loop, muted, poster, preload, sources, subtitles } = attributes;
 		return (
 
 			<figure>
-				{ src && <video controls src={ src } /> }
+				{ sources.length &&
+				<video
+					autoPlay={ autoplay }
+					controls={ controls }
+					loop={ loop }
+					muted={ muted }
+					preload={ preload }
+					poster={ poster }
+				>
+					{ sources.map( ( source ) => {
+						return (
+							<source
+								key={ source.src }
+								src={ source.src }
+								type={ source.type }
+							/>
+						);
+					} ) }
+					{ subtitles.map( ( subtitle ) => {
+						return (
+							<track
+								key={ subtitle.src }
+								srcLang={ subtitle.srclang }
+								label={ subtitle.label }
+								kind={ subtitle.kind }
+								src={ subtitle.src }
+							/>
+						);
+					} ) }
+				</video>
+				}
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);

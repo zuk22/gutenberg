@@ -1,13 +1,30 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Toolbar, withNotices } from '@wordpress/components';
+import {
+	Button,
+	ButtonGroup,
+	IconButton,
+	PanelBody,
+	SelectControl,
+	TextControl,
+	Toolbar,
+	ToggleControl,
+	withNotices,
+} from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
-	MediaPlaceholder,
-	RichText,
 	BlockControls,
+	InspectorControls,
+	MediaPlaceholder,
+	MediaUpload,
+	RichText,
 } from '@wordpress/editor';
 
 /**
@@ -21,39 +38,120 @@ class VideoEdit extends Component {
 		// edit component has its own src in the state so it can be edited
 		// without setting the actual value outside of the edit UI
 		this.state = {
-			editing: ! this.props.attributes.src,
+			editing: ! this.props.attributes.sources.length,
+		};
+
+		this.toggleAttribute = this.toggleAttribute.bind( this );
+		this.setSubtitleAttributes = this.setSubtitleAttributes.bind( this );
+		this.addSubtitle = this.addSubtitle.bind( this );
+		this.onSelectPoster = this.onSelectPoster.bind( this );
+		this.onRemovePoster = this.onRemovePoster.bind( this );
+		this.videoSourceTypeExists = this.videoSourceTypeExists.bind( this );
+		this.addSource = this.addSource.bind( this );
+	}
+
+	toggleAttribute( attribute ) {
+		return ( newValue ) => {
+			this.props.setAttributes( { [ attribute ]: newValue } );
 		};
 	}
 
+	setSubtitleAttributes( index, attributes ) {
+		const { attributes: { subtitles }, setAttributes } = this.props;
+		if ( ! subtitles[ index ] ) {
+			return;
+		}
+		setAttributes( {
+			subtitles: [
+				...subtitles.slice( 0, index ),
+				{
+					...subtitles[ index ],
+					...attributes,
+				},
+				...subtitles.slice( index + 1 ),
+			],
+		} );
+	}
+
+	addSubtitle() {
+		const { attributes: { subtitles }, setAttributes } = this.props;
+		setAttributes( {
+			subtitles: [ ...subtitles, {} ],
+		} );
+	}
+
+	removeSubtitle( index ) {
+		const { attributes: { subtitles }, setAttributes } = this.props;
+		const tempSubtitles = [ ...subtitles ];
+		tempSubtitles.splice( index, 1 );
+		setAttributes( {
+			subtitles: tempSubtitles,
+		} );
+	}
+
+	onSelectPoster( image ) {
+		const { setAttributes } = this.props;
+		setAttributes( { poster: image.url } );
+	}
+
+	onRemovePoster() {
+		const { setAttributes } = this.props;
+		setAttributes( { poster: '' } );
+	}
+
+	videoSourceTypeExists( type ) {
+		return this.props.attributes.sources.find( ( source ) => type === source.type );
+	}
+
+	removeSource( type ) {
+		const { setAttributes, attributes } = this.props;
+		const filteredSources = attributes.sources.filter( ( source ) => source.type !== type );
+		setAttributes( {
+			sources: filteredSources,
+		} );
+	}
+
+	addSource( media ) {
+		const { setAttributes, attributes } = this.props;
+		setAttributes( {
+			sources: [ ...attributes.sources, { src: media.url, type: media.mime } ],
+		} );
+	}
+
 	render() {
-		const { caption, src } = this.props.attributes;
+		const {
+			autoplay,
+			caption,
+			controls,
+			loop,
+			muted,
+			poster,
+			preload,
+			sources,
+			src,
+			subtitles,
+		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { editing } = this.state;
 		const switchToEditing = () => {
-			this.setState( { editing: true } );
+			setAttributes( { sources: [] } );
 		};
 		const onSelectVideo = ( media ) => {
 			if ( ! media || ! media.url ) {
 				// in this case there was an error and we should continue in the editing state
 				// previous attributes should be removed because they may be temporary blob urls
-				setAttributes( { src: undefined, id: undefined } );
-				switchToEditing();
+				setAttributes( { src: undefined } );
 				return;
 			}
-			// sets the block's attribute and updates the edit component from the
-			// selected media, then switches off the editing UI
-			setAttributes( { src: media.url, id: media.id } );
-			this.setState( { src: media.url, editing: false } );
+			this.addSource( media );
 		};
 		const onSelectUrl = ( newSrc ) => {
 			// set the block's src from the edit component's state, and switch off the editing UI
 			if ( newSrc !== src ) {
-				setAttributes( { src: newSrc, id: undefined } );
+				setAttributes( { src: newSrc } );
 			}
-			this.setState( { editing: false } );
 		};
 
-		if ( editing ) {
+		if ( ! sources.length ) {
 			return (
 				<MediaPlaceholder
 					icon="media-video"
@@ -86,8 +184,220 @@ class VideoEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Playback Controls' ) }>
+						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ this.toggleAttribute( 'autoplay' ) }
+							checked={ autoplay }
+						/>
+						<ToggleControl
+							label={ __( 'Controls' ) }
+							onChange={ this.toggleAttribute( 'controls' ) }
+							checked={ controls }
+						/>
+						<ToggleControl
+							label={ __( 'Loop' ) }
+							onChange={ this.toggleAttribute( 'loop' ) }
+							checked={ loop }
+						/>
+						<ToggleControl
+							label={ __( 'Muted' ) }
+							onChange={ this.toggleAttribute( 'muted' ) }
+							checked={ muted }
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Source' ) }>
+						{ sources.map( ( source ) => {
+							return (
+								<div key={ source.src }>
+									<TextControl
+										type="text"
+										label={ source.type }
+										value={ source.src }
+										disabled
+									/>
+									<Button
+										isLink
+										className="is-destructive"
+										onClick={ () => this.removeSource( source.type ) }
+									>{ __( 'Remove video source' ) }</Button>
+								</div>
+							);
+						} ) }
+
+						{ sources.length < 3 && ( <p>Add alternate sources for maximum HTML5 playback:</p> ) }
+						{ ! this.videoSourceTypeExists( 'video/mp4' ) && (
+							<MediaUpload
+								title={ 'Add Video Source' }
+								onSelect={ this.addSource }
+								type="video/mp4"
+								render={ ( { open } ) => (
+									<Button isDefault onClick={ open }>
+										mp4
+									</Button>
+								) }
+							/>
+						) }
+						{ ! this.videoSourceTypeExists( 'video/ogg' ) && (
+							<MediaUpload
+								title={ 'Add Video Source' }
+								onSelect={ this.addSource }
+								type="video/ogg"
+								render={ ( { open } ) => (
+									<Button isDefault onClick={ open }>
+										ovg
+									</Button>
+								) }
+							/>
+						) }
+						{ ! this.videoSourceTypeExists( 'video/webm' ) && (
+							<MediaUpload
+								title={ 'Add Video Source' }
+								onSelect={ this.addSource }
+								type="video/webm"
+								render={ ( { open } ) => (
+									<Button isDefault onClick={ open }>
+										webm
+									</Button>
+								) }
+							/>
+						) }
+
+					</PanelBody>
+					<PanelBody title={ __( 'Preload' ) }>
+						<ButtonGroup aria-label={ __( 'Preload' ) }>
+							{ map( [
+								{
+									name: __( 'Auto' ),
+									key: 'auto',
+									attributeValue: 'auto',
+								},
+								{
+									name: __( 'Metadata' ),
+									key: 'metadata',
+									attributeValue: 'metadata',
+								},
+								{
+									name: __( 'None' ),
+									key: 'none',
+									attributeValue: undefined,
+								},
+							], ( { name, key, attributeValue } ) => (
+								<Button
+									key={ key }
+									isLarge
+									isPrimary={ attributeValue === preload }
+									aria-pressed={ attributeValue === preload }
+									onClick={ () => setAttributes( { preload: attributeValue } ) }
+								>
+									{ name }
+								</Button>
+							) ) }
+						</ButtonGroup>
+					</PanelBody>
+					<PanelBody title={ __( 'Poster' ) }>
+						<div>
+							{ ! this.props.attributes.poster &&
+								<MediaUpload
+									title={ 'Select Poster Image' }
+									onSelect={ this.onSelectPoster }
+									type="image"
+									modalClass="editor-post-featured-image__media-modal"
+									render={ ( { open } ) => (
+										<Button className="editor-post-featured-image__toggle" onClick={ open }>
+											{ __( 'Select Poster Image' ) }
+										</Button>
+									) }
+								/>
+							}
+							{ !! this.props.attributes.poster &&
+								<Button onClick={ this.onRemovePoster } isLink isDestructive>
+									{ __( 'Remove Poster Image' ) }
+								</Button>
+							}
+						</div>
+					</PanelBody>
+					<PanelBody title={ __( 'Subtitles' ) }>
+						{ subtitles.map( ( subtitle, index ) => {
+							return (
+								<div key={ subtitle.src } className="subtitle-track">
+									<TextControl
+										type="text"
+										className="core-blocks-subtitle__srclang"
+										label={ __( 'srclang' ) }
+										value={ subtitle.srclang }
+										placeholder="en"
+										help={ __( 'Valid BCP 47 language tag' ) }
+										onChange={ ( newValue ) => this.setSubtitleAttributes( index, { srclang: newValue } ) }
+									/>
+									<TextControl
+										type="text"
+										className="core-blocks-subtitle__label"
+										label={ __( 'Label' ) }
+										value={ subtitle.label }
+										placeholder="English"
+										onChange={ ( newValue ) => this.setSubtitleAttributes( index, { label: newValue } ) }
+									/>
+									<div>
+										<SelectControl
+											label={ __( 'Source Type' ) }
+											value={ subtitle.kind }
+											options={ [
+												{ value: 'subtitles', label: __( 'Subtitles' ) },
+												{ value: 'captions', label: __( 'Captions' ) },
+												{ value: 'descriptions', label: __( 'Descriptions' ) },
+												{ value: 'chapters', label: __( 'Chapters' ) },
+												{ value: 'metadata', label: __( 'Metadata' ) },
+											] }
+											onChange={ ( newValue ) => this.setSubtitleAttributes( index, { kind: newValue } ) }
+										/>
+									</div>
+									<TextControl
+										type="text"
+										className="core-blocks-subtitle__src"
+										label={ __( 'Source' ) }
+										value={ subtitle.src }
+										onChange={ ( newValue ) => this.setSubtitleAttributes( index, { src: newValue } ) }
+									/>
+									<Button isDefault>Change File</Button>
+									<Button isLink className="is-destructive" onClick={ () => this.removeSubtitle( index ) }>Remove Video Track</Button>
+								</div>
+							);
+						} ) }
+						<Button isDefault onClick={ this.addSubtitle }>Add Subtitle</Button>
+					</PanelBody>
+				</InspectorControls>
 				<figure className={ className }>
-					<video controls src={ src } />
+					<video
+						controls={ controls }
+						loop={ loop }
+						muted={ muted }
+						poster={ poster }
+					>
+						{ sources.map( ( source ) => {
+							return (
+								<source
+									key={ source.src }
+									src={ source.src }
+									type={ source.type }
+								/>
+							);
+						} ) }
+
+						{ subtitles.map( ( subtitle ) => {
+							return (
+								<track
+									key={ subtitle.src }
+									srcLang={ subtitle.srclang }
+									label={ subtitle.label }
+									kind={ subtitle.kind }
+									src={ subtitle.src }
+								/>
+							);
+						} ) }
+					</video>
+
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"
