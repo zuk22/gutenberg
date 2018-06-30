@@ -134,7 +134,7 @@ export const settings = {
 		return (
 
 			<figure>
-				{ sources.length &&
+				{ !! sources.length &&
 				<video
 					autoPlay={ autoplay }
 					controls={ controls }

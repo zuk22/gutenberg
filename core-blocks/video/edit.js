@@ -92,6 +92,7 @@ class VideoEdit extends Component {
 	onSelectPoster( image ) {
 		const { setAttributes } = this.props;
 		setAttributes( { poster: image.url } );
+		document.getElementById( 'block-' + this.props.id ).getElementsByTagName( 'video' )[ 0 ].load();
 	}
 
 	onRemovePoster() {
@@ -103,9 +104,9 @@ class VideoEdit extends Component {
 		return this.props.attributes.sources.find( ( source ) => type === source.type );
 	}
 
-	removeSource( type ) {
+	removeSource( url ) {
 		const { setAttributes, attributes } = this.props;
-		const filteredSources = attributes.sources.filter( ( source ) => source.type !== type );
+		const filteredSources = attributes.sources.filter( ( source ) => source.url !== url );
 		setAttributes( {
 			sources: filteredSources,
 		} );
@@ -113,9 +114,27 @@ class VideoEdit extends Component {
 
 	addSource( media ) {
 		const { setAttributes, attributes } = this.props;
+		const type = media.mime || this.getVideoMimeType( media.url );
 		setAttributes( {
-			sources: [ ...attributes.sources, { src: media.url, type: media.mime } ],
+			sources: [ ...attributes.sources, { src: media.url, type } ],
 		} );
+	}
+
+	getVideoMimeType( url ) {
+		const fileType = url.substring( url.lastIndexOf( '.' ) + 1 );
+		let mime = 'undefined';
+		switch ( fileType ) {
+			case 'mp4':
+				mime = 'video/mp4';
+				break;
+			case 'webm':
+				mime = 'video/webm';
+				break;
+			case 'ogv':
+				mime = 'video/ogg';
+				break;
+		}
+		return mime;
 	}
 
 	render() {
@@ -128,7 +147,6 @@ class VideoEdit extends Component {
 			poster,
 			preload,
 			sources,
-			src,
 			subtitles,
 		} = this.props.attributes;
 		const { setAttributes, isSelected, className, noticeOperations, noticeUI } = this.props;
@@ -136,19 +154,16 @@ class VideoEdit extends Component {
 			setAttributes( { sources: [] } );
 		};
 		const onSelectVideo = ( media ) => {
-			if ( ! media || ! media.url ) {
+			if ( ! media || ! media.id ) {
 				// in this case there was an error and we should continue in the editing state
 				// previous attributes should be removed because they may be temporary blob urls
-				setAttributes( { src: undefined } );
+				setAttributes( { sources: [] } );
 				return;
 			}
 			this.addSource( media );
 		};
 		const onSelectUrl = ( newSrc ) => {
-			// set the block's src from the edit component's state, and switch off the editing UI
-			if ( newSrc !== src ) {
-				setAttributes( { src: newSrc } );
-			}
+			setAttributes( { sources: [ { src: newSrc, type: this.getVideoMimeType( newSrc ) } ] } );
 		};
 
 		if ( ! sources.length ) {
@@ -207,7 +222,7 @@ class VideoEdit extends Component {
 							checked={ muted }
 						/>
 					</PanelBody>
-					<PanelBody title={ __( 'Source' ) }>
+					<PanelBody title={ __( 'Sources' ) }>
 						{ sources.map( ( source ) => {
 							return (
 								<div key={ source.src }>
@@ -220,7 +235,7 @@ class VideoEdit extends Component {
 									<Button
 										isLink
 										className="is-destructive"
-										onClick={ () => this.removeSource( source.type ) }
+										onClick={ () => this.removeSource( source.src ) }
 									>{ __( 'Remove video source' ) }</Button>
 								</div>
 							);
@@ -305,7 +320,7 @@ class VideoEdit extends Component {
 									type="image"
 									modalClass="editor-post-featured-image__media-modal"
 									render={ ( { open } ) => (
-										<Button className="editor-post-featured-image__toggle" onClick={ open }>
+										<Button isDefault onClick={ open }>
 											{ __( 'Select Poster Image' ) }
 										</Button>
 									) }
