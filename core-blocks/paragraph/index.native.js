@@ -75,6 +75,9 @@ export const settings = {
 				selector: 'p',
 				schema: {
 					p: {
+						// we should put 
+						// children: getPhrasingContentSchema(),
+						// here, but for some reason it's not working ok
 						children: {
 							strong: {},
 							em: {},
