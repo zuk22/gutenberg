@@ -8,12 +8,12 @@ import { flow, castArray, mapValues, omit } from 'lodash';
  * WordPress dependencies
  */
 import { autop } from '@wordpress/autop';
+import { parse as grammarParse } from '@wordpress/grammar';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { parse as grammarParse } from './post.pegjs';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
