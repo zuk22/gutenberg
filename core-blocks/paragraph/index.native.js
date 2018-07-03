@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { PlainText } from '@wordpress/editor';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 
-//import RCTAztecView from 'react-native-aztec';
+import RCTAztecView from 'react-native-aztec';
 
 export const name = 'core/paragraph';
 
@@ -98,18 +98,36 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, style } ) {
+		const _minHeight = 50;
 		return (
-			<View>
-				<PlainText
-					value={ attributes.content }
-					style={ style }
-					multiline={ true }
-					underlineColorAndroid="transparent"
-					onChange={ ( content ) => setAttributes( { content } ) }
-					placeholder={ __( 'Write code…' ) }
-					aria-label={ __( 'Code' ) }
+			// <View>
+			// 	<PlainText
+			// 		value={ attributes.content }
+			// 		style={ style }
+			// 		multiline={ true }
+			// 		underlineColorAndroid="transparent"
+			// 		onChange={ ( content ) => setAttributes( { content } ) }
+			// 		placeholder={ __( 'Write code…' ) }
+			// 		aria-label={ __( 'Code' ) }
+			// 	/>
+			// </View>
+
+				<RCTAztecView
+					accessibilityLabel="aztec-view"
+					text={ { text: attributes.content, eventCount: attributes.eventCount } }
+					minHeight={50}
+					//onChange={ ( content ) => setAttributes( { content } ) }
+					// onChange={ ( event ) => {
+					// 	this.props.onChange( this.props.uid, {
+					// 		...this.props.attributes,
+					// 		content: event.nativeEvent.text,
+					// 		eventCount: event.nativeEvent.eventCount,
+					// 	} );
+					// } }
+					color={ 'black' }
+					maxImagesWidth={ 200 }
 				/>
-			</View>
+
 		);
 	},
 	
