@@ -316,7 +316,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 				// to the component, including state changes.
 				//
 				// See: https://reactjs.org/blog/2018/05/23/react-v-16-4.html#bugfix-for-getderivedstatefromprops
-				this.setState( () => ( {} ) );
+				this.setState( {} );
 			} );
 		}
 
