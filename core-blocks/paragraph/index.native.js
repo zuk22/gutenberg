@@ -99,7 +99,10 @@ export const settings = {
 
 	edit( { attributes, setAttributes, style } ) {
 		const _minHeight = 50;
-		return (
+		console.log("ATTRIBUTES PASSED ARE: " + JSON.stringify(attributes));
+		console.log("ATTRIBUTES PASSED ARE2: " + JSON.stringify(setAttributes));
+		console.log("ATTRIBUTES PASSED ARE3: " + JSON.stringify(style));
+			return (
 			// <View>
 			// 	<PlainText
 			// 		value={ attributes.content }
@@ -115,8 +118,30 @@ export const settings = {
 				<RCTAztecView
 					accessibilityLabel="aztec-view"
 					text={ { text: attributes.content, eventCount: attributes.eventCount } }
-					minHeight={50}
-					//onChange={ ( content ) => setAttributes( { content } ) }
+					// minHeight={50}
+					style = {
+						style, [
+							{ minHeight: Math.max( _minHeight, attributes.aztecHeight ) }
+						]
+					}
+					// onChange={ ( content ) => setAttributes( { content } ) }
+					onContentSizeChange={ ( event ) => {
+						setAttributes( {
+							...attributes,
+							aztecHeight: event.nativeEvent.contentSize.height
+							}
+						);
+					} }
+					onChange={ ( event ) => { 
+						console.log("Estamos dentro de onChange");
+						setAttributes( 
+								{ 
+									...attributes,
+									content: event.nativeEvent.text ,
+									eventCount: event.nativeEvent.eventCount
+								} 
+							) } 
+					}
 					// onChange={ ( event ) => {
 					// 	this.props.onChange( this.props.uid, {
 					// 		...this.props.attributes,
