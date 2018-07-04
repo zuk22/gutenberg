@@ -410,3 +410,35 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
+
+/**
+ * Adds the current git branch name to the admin bar in dev mode.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar WP_Admin_Bar instance, passed by reference
+ */
+function gutenberg_add_git_branch_name( $wp_admin_bar ) {
+	if ( ! defined( 'GUTENBERG_DEVELOPMENT_MODE' ) || ! GUTENBERG_DEVELOPMENT_MODE ) {
+		return;
+	}
+
+	$path = dirname( __FILE__ ) . '/.git/HEAD';
+
+	if ( ! file_exists( $path ) ) {
+		return;
+	}
+
+	$file = file( $path );
+
+	if ( ! isset( $file[ 0 ] ) ) {
+		return;
+	}
+
+	$branch = substr( $file[ 0 ], strlen( 'ref: refs/heads/' ) );
+
+	$wp_admin_bar->add_node( array(
+		'id' => 'gutenberg_dev_branch_name',
+		'title' => '<span class="ab-icon dashicons dashicons-networking"></span>' . $branch
+	) );
+}
+add_action( 'admin_bar_menu', 'gutenberg_add_git_branch_name', 100 );
+
