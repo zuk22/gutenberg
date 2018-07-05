@@ -1877,6 +1877,12 @@ export function canUserUseUnfilteredHTML( state ) {
 	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
 }
 
+export function getAnnotationsForBlock( state, uid ) {
+	return state.annotations.filter( ( annotation ) => {
+		return annotation.block === uid;
+	} );
+}
+
 export function getAdjacentBlockUid( state, startUID, modifier ) {
 	deprecated( 'getAdjacentBlockUid', {
 		alternative: 'getAdjacentBlockClientId',

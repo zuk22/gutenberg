@@ -43,6 +43,7 @@ import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
+import Annotations from './annotations';
 
 /**
  * Browser dependencies
@@ -800,7 +801,13 @@ export class RichText extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
-		const classes = classnames( wrapperClassName, 'editor-rich-text' );
+		let classes = classnames( wrapperClassName, 'editor-rich-text' );
+
+		// if ( annotationTarget !== '' ) {
+		classes += " annotation-target";
+			// classes.push( 'annotation-target' );
+			// classes.push( 'annotation-target' + annotationTarget );
+		// }
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -865,6 +872,11 @@ export class RichText extends Component {
 						</Fragment>
 					) }
 				</Autocomplete>
+				<Annotations
+					annotations={ this.props.annotations }
+					containerRef={ this.containerRef }
+					editor={ this.editor }
+				/>
 			</div>
 		);
 	}
@@ -900,15 +912,17 @@ const RichTextContainer = compose( [
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
+			clientId: context.clientId,
 		};
 	} ),
-	withSelect( ( select ) => {
+	withSelect( ( select, props ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			annotations: select( 'core/editor' ).getAnnotationsForBlock( props.clientId ),
 		};
 	} ),
 	withSafeTimeout,

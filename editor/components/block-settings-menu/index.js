@@ -10,7 +10,7 @@ import { castArray } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -56,6 +56,8 @@ export class BlockSettingsMenu extends Component {
 			focus,
 			rootClientId,
 			isHidden,
+			isMultiSelecting,
+			onAnnotate,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blockClientIds = castArray( clientIds );
@@ -139,6 +141,19 @@ export class BlockSettingsMenu extends Component {
 								clientIds={ clientIds }
 								role="menuitem"
 							/>
+							{ ! isMultiSelecting &&
+								<IconButton
+									key="annotate"
+									className="editor-block-settings-menu__control"
+									onClick={ () => {
+										onAnnotate( firstBlockClientId );
+										onClose();
+									} }
+									icon="admin-generic"
+								>
+									{ __( 'Annotate' ) }
+								</IconButton>
+							}
 						</NavigableMenu>
 					) }
 				/>
@@ -149,9 +164,15 @@ export class BlockSettingsMenu extends Component {
 
 export default compose( [
 	withDeprecatedUniqueId,
+	withSelect( ( select ) => ( {
+		isMultiSelecting: select( 'core/editor' ).isMultiSelecting(),
+	} ) ),
 	withDispatch( ( dispatch ) => ( {
 		onSelect( clientId ) {
 			dispatch( 'core/editor' ).selectBlock( clientId );
+		},
+		onAnnotate( clientId ) {
+			dispatch( 'core/editor' ).addAnnotationOnSelection( clientId );
 		},
 	} ) ),
 ] )( BlockSettingsMenu );
