@@ -35,21 +35,6 @@ class WP_REST_Blocks_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Handle a DELETE request.
-	 *
-	 * @since 1.10.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 */
-	public function delete_item( $request ) {
-		// Always hard-delete a block.
-		$request->set_param( 'force', true );
-
-		return parent::delete_item( $request );
-	}
-
-	/**
 	 * Given an update or create request, build the post object that is saved to
 	 * the database.
 	 *
@@ -63,6 +48,9 @@ class WP_REST_Blocks_Controller extends WP_REST_Posts_Controller {
 
 		// Force blocks to always be published.
 		$prepared_post->post_status = 'publish';
+
+		// Always update the slug.
+		$prepared_post->post_name = sanitize_title( $prepared_post->post_title );
 
 		return $prepared_post;
 	}

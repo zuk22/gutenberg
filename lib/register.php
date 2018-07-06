@@ -389,7 +389,8 @@ function gutenberg_register_post_types() {
 			'name'          => 'Blocks',
 			'singular_name' => 'Block',
 		),
-		'public'                => false,
+		'show_ui'               => true,
+		'show_in_menu'          => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'blocks',
 		'rest_controller_class' => 'WP_REST_Blocks_Controller',
@@ -399,6 +400,9 @@ function gutenberg_register_post_types() {
 			'create_posts' => 'create_blocks',
 		),
 		'map_meta_cap'          => true,
+		'supports'              => array(
+			'title',
+		),
 	) );
 
 	$editor_caps = array(
