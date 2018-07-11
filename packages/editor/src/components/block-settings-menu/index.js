@@ -55,6 +55,7 @@ export class BlockSettingsMenu extends Component {
 			focus,
 			rootClientId,
 			isHidden,
+			canEdit,
 		} = this.props;
 		const { isFocused } = this.state;
 		const blockClientIds = castArray( clientIds );
@@ -100,6 +101,7 @@ export class BlockSettingsMenu extends Component {
 									clientId={ firstBlockClientId }
 									onToggle={ onClose }
 									role="menuitem"
+									enabled={ canEdit }
 								/>
 							) }
 							{ count === 1 && (
