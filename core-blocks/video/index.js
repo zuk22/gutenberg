@@ -60,6 +60,12 @@ export const settings = {
 			selector: 'video',
 			attribute: 'muted',
 		},
+		preload: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'video',
+			attribute: 'preload',
+		},
 		src: {
 			type: 'string',
 			source: 'attribute',
@@ -75,16 +81,17 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { autoplay, caption, controls, loop, muted, src } = attributes;
+		const { autoplay, caption, controls, loop, muted, preload, src } = attributes;
 		return (
 			<figure>
 				{ src && (
 					<video
 						autoPlay={ autoplay }
 						controls={ controls }
-						src={ src }
 						loop={ loop }
 						muted={ muted }
+						preload={ preload }
+						src={ src }
 					/>
 				) }
 				{ caption && caption.length > 0 && (
