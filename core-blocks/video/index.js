@@ -65,6 +65,7 @@ export const settings = {
 			source: 'attribute',
 			selector: 'video',
 			attribute: 'preload',
+			default: 'metadata',
 		},
 		src: {
 			type: 'string',
@@ -90,7 +91,7 @@ export const settings = {
 						controls={ controls }
 						loop={ loop }
 						muted={ muted }
-						preload={ preload }
+						preload={ preload !== 'metadata' ? preload : null }
 						src={ src }
 					/>
 				) }
