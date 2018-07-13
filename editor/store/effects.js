@@ -49,6 +49,7 @@ import {
 import {
 	getCurrentPost,
 	getCurrentPostType,
+	getEditedPostAttribute,
 	getEditedPostContent,
 	getPostEdits,
 	isEditedPostAutosaveable,
@@ -130,6 +131,7 @@ export default {
 		let toSend = {
 			...edits,
 			content: getEditedPostContent( state ),
+			title: getEditedPostAttribute( state, 'title' ),
 			id: post.id,
 		};
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
