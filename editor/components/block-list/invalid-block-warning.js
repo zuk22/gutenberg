@@ -45,10 +45,10 @@ export default withDispatch( ( dispatch, { block } ) => {
 			} ) );
 		},
 		convertToBlocks() {
-			replaceBlock( block.uid, rawHandler( {
+			rawHandler( {
 				HTML: block.originalContent,
 				mode: 'BLOCKS',
-			} ) );
+			} ).then( ( content ) => replaceBlock( block.uid, content ) );
 		},
 	};
 } )( InvalidBlockWarning );

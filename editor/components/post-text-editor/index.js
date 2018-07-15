@@ -117,8 +117,10 @@ export default compose( [
 				editPost( { content } );
 			},
 			onPersist( content ) {
-				resetBlocks( parse( content ) );
-				checkTemplateValidity();
+				parse( content ).then( ( blocks ) => {
+					resetBlocks( blocks );
+					checkTemplateValidity();
+				} );
 			},
 		};
 	} ),

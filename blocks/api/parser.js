@@ -366,13 +366,14 @@ export function createBlockWithFallback( blockNode ) {
  * @return {Function} An implementation which parses the post content.
  */
 export const createParse = ( parseImplementation ) =>
-	( content ) => parseImplementation( content ).reduce( ( memo, blockNode ) => {
-		const block = createBlockWithFallback( blockNode );
-		if ( block ) {
-			memo.push( block );
-		}
-		return memo;
-	}, [] );
+	( content ) => parseImplementation( content )
+		.then( ( parsed ) => parsed.reduce( ( memo, blockNode ) => {
+			const block = createBlockWithFallback( blockNode );
+			if ( block ) {
+				memo.push( block );
+			}
+			return memo;
+		}, [] ) );
 
 /**
  * Parses the post content with a PegJS grammar and returns a list of blocks.

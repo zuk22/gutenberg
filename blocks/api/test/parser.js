@@ -562,7 +562,7 @@ describe( 'block parser', () => {
 
 	// encapsulate the test cases so we can run them multiple time but with a different parse() function
 	function testCases( parse ) {
-		it( 'should parse the post content, including block attributes', () => {
+		it( 'should parse the post content, including block attributes', async () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
 					content: {
@@ -578,7 +578,7 @@ describe( 'block parser', () => {
 				title: 'test block',
 			} );
 
-			const parsed = parse(
+			const parsed = await parse(
 				'<!-- wp:core/test-block {"smoked":"yes","url":"http://google.com","chicken":"ribs & \'wings\'"} -->' +
 				'Brisket' +
 				'<!-- /wp:core/test-block -->'
@@ -595,13 +595,13 @@ describe( 'block parser', () => {
 			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
 		} );
 
-		it( 'should parse empty post content', () => {
-			const parsed = parse( '' );
+		it( 'should parse empty post content', async () => {
+			const parsed = await parse( '' );
 
 			expect( parsed ).toEqual( [] );
 		} );
 
-		it( 'should parse the post content, ignoring unknown blocks', () => {
+		it( 'should parse the post content, ignoring unknown blocks', async () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
 					content: {
@@ -614,7 +614,7 @@ describe( 'block parser', () => {
 				title: 'test block',
 			} );
 
-			const parsed = parse(
+			const parsed = await parse(
 				'<!-- wp:core/test-block -->\nRibs\n<!-- /wp:core/test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
@@ -628,10 +628,10 @@ describe( 'block parser', () => {
 			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
 		} );
 
-		it( 'should add the core namespace to un-namespaced blocks', () => {
+		it( 'should add the core namespace to un-namespaced blocks', async () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const parsed = parse(
+			const parsed = await parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->'
 			);
 
@@ -639,12 +639,12 @@ describe( 'block parser', () => {
 			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
 		} );
 
-		it( 'should ignore blocks with a bad namespace', () => {
+		it( 'should ignore blocks with a bad namespace', async () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const parsed = parse(
+			const parsed = await parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
@@ -653,13 +653,13 @@ describe( 'block parser', () => {
 			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
 		} );
 
-		it( 'should parse the post content, using unknown block handler', () => {
+		it( 'should parse the post content, using unknown block handler', async () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const parsed = parse(
+			const parsed = await parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
@@ -673,13 +673,13 @@ describe( 'block parser', () => {
 			] );
 		} );
 
-		it( 'should parse the post content, including raw HTML at each end', () => {
+		it( 'should parse the post content, including raw HTML at each end', async () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const parsed = parse(
+			const parsed = await parse(
 				'<p>Cauliflower</p>' +
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'\n<p>Broccoli</p>\n' +
@@ -700,9 +700,9 @@ describe( 'block parser', () => {
 			expect( parsed[ 4 ].attributes.content ).toEqual( '<p>Romanesco</p>' );
 		} );
 
-		it( 'should parse blocks with empty content', () => {
+		it( 'should parse blocks with empty content', async () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const parsed = parse(
+			const parsed = await parse(
 				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->'
 			);
 
@@ -712,10 +712,10 @@ describe( 'block parser', () => {
 			] );
 		} );
 
-		it( 'should parse void blocks', () => {
+		it( 'should parse void blocks', async () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/void-block', defaultBlockSettings );
-			const parsed = parse(
+			const parsed = await parse(
 				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' +
 				'<!-- wp:core/void-block /-->'
 			);
@@ -726,7 +726,7 @@ describe( 'block parser', () => {
 			] );
 		} );
 
-		it( 'should parse with unicode escaped returned to original representation', () => {
+		it( 'should parse with unicode escaped returned to original representation', async () => {
 			registerBlockType( 'core/code', {
 				category: 'common',
 				title: 'Code Block',
@@ -741,7 +741,7 @@ describe( 'block parser', () => {
 			const content = '$foo = "My \"escaped\" text.";';
 			const block = createBlock( 'core/code', { content } );
 			const serialized = serialize( block );
-			const parsed = parse( serialized );
+			const parsed = await parse( serialized );
 			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
 	}

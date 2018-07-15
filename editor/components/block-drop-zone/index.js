@@ -52,11 +52,11 @@ class BlockDropZone extends Component {
 	}
 
 	onHTMLDrop( HTML, position ) {
-		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
-
-		if ( blocks.length ) {
-			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
-		}
+		rawHandler( { HTML, mode: 'BLOCKS' } ).then( ( blocks ) => {
+			if ( blocks.length ) {
+				this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
+			}
+		} );
 	}
 
 	onDrop( event, position ) {

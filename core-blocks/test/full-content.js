@@ -106,7 +106,7 @@ describe( 'full post content fixture', () => {
 	} );
 
 	fileBasenames.forEach( ( f ) => {
-		it( f, () => {
+		it( f, async () => {
 			const content = readFixtureFile( f + '.html' );
 			if ( content === null ) {
 				throw new Error(
@@ -114,7 +114,7 @@ describe( 'full post content fixture', () => {
 				);
 			}
 
-			const parserOutputActual = grammarParse( content );
+			const parserOutputActual = await grammarParse( content );
 			let parserOutputExpectedString = readFixtureFile( f + '.parsed.json' );
 
 			if ( ! parserOutputExpectedString ) {
@@ -145,7 +145,7 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			const blocksActual = parse( content );
+			const blocksActual = await parse( content );
 
 			// Block validation logs during deprecation migration. Since this
 			// is expected for deprecated blocks, match on filename and allow.

@@ -389,60 +389,66 @@ export default {
 			]
 		) );
 	},
-	SETUP_EDITOR( action, { getState } ) {
+	SETUP_EDITOR( action, { dispatch, getState } ) {
 		const { post, autosave } = action;
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
 
+		const makeBlocks = () => {
+			if ( post.content.raw ) {
+				return parse( post.content.raw );
+			}
+
+			if ( template ) {
+				return Promise.resolve( synchronizeBlocksWithTemplate( [], template ) );
+			}
+
+			if ( getDefaultBlockForPostFormat( post.format ) ) {
+				return Promise.resolve( [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ] );
+			}
+
+			return Promise.resolve( [] );
+		};
+
 		// Parse content as blocks
-		let blocks;
 		let isValidTemplate = true;
-		if ( post.content.raw ) {
-			blocks = parse( post.content.raw );
+		makeBlocks().then( ( blocks ) => {
+			if ( post.content.raw ) {
+				// Unlocked templates are considered always valid because they act as default values only.
+				isValidTemplate = (
+					! template ||
+					templateLock !== 'all' ||
+					doBlocksMatchTemplate( blocks, template )
+				);
+			}
 
-			// Unlocked templates are considered always valid because they act as default values only.
-			isValidTemplate = (
-				! template ||
-				templateLock !== 'all' ||
-				doBlocksMatchTemplate( blocks, template )
-			);
-		} else if ( template ) {
-			blocks = synchronizeBlocksWithTemplate( [], template );
-		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
-			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
-		} else {
-			blocks = [];
-		}
+			// Include auto draft title in edits while not flagging post as dirty
+			const edits = {};
+			if ( post.status === 'auto-draft' ) {
+				edits.title = post.title.raw;
+			}
 
-		// Include auto draft title in edits while not flagging post as dirty
-		const edits = {};
-		if ( post.status === 'auto-draft' ) {
-			edits.title = post.title.raw;
-		}
+			// Check the auto-save status
+			let autosaveAction;
+			if ( autosave ) {
+				const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+				autosaveAction = createWarningNotice(
+					<p>{ noticeMessage } <a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a></p>,
+					{
+						id: AUTOSAVE_POST_NOTICE_ID,
+						spokenMessage: noticeMessage,
+					}
+				);
+			}
 
-		// Check the auto-save status
-		let autosaveAction;
-		if ( autosave ) {
-			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-			autosaveAction = createWarningNotice(
-				<p>
-					{ noticeMessage }
-					{ ' ' }
-					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
-				</p>,
-				{
-					id: AUTOSAVE_POST_NOTICE_ID,
-					spokenMessage: noticeMessage,
-				}
-			);
-		}
+			dispatch( setTemplateValidity( isValidTemplate ) );
+			dispatch( setupEditorState( post, blocks, edits ) );
 
-		return [
-			setTemplateValidity( isValidTemplate ),
-			setupEditorState( post, blocks, edits ),
-			...( autosaveAction ? [ autosaveAction ] : [] ),
-		];
+			if ( autosaveAction ) {
+				dispatch( autosaveAction );
+			}
+		} );
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
@@ -488,17 +494,17 @@ export default {
 
 		result.then(
 			( sharedBlockOrBlocks ) => {
-				dispatch( receiveSharedBlocks( map(
+				Promise.all( map(
 					castArray( sharedBlockOrBlocks ),
-					( sharedBlock ) => ( {
-						sharedBlock,
-						parsedBlock: parse( sharedBlock.content )[ 0 ],
-					} )
-				) ) );
+					( sharedBlock ) => parse( sharedBlock.content )
+						.then( ( blocks ) => ( { sharedBlock, parsedBlock: blocks[ 0 ] } ) )
+				) ).then( ( sharedBlockParsings ) => {
+					dispatch( receiveSharedBlocks( sharedBlockParsings ) );
 
-				dispatch( {
-					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
-					id,
+					dispatch( {
+						type: 'FETCH_SHARED_BLOCKS_SUCCESS',
+						id,
+					} );
 				} );
 			},
 			( error ) => {
