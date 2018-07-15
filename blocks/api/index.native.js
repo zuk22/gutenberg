@@ -4,6 +4,7 @@ export {
 export {
 	default as parse,
 } from './parser';
+export { default as rawHandler, getPhrasingContentSchema } from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,

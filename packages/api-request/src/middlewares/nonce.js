@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import jQuery from 'jquery';
+// import jQuery from 'jquery';
 
 const createNonceMiddleware = ( nonce ) => ( options, next ) => {
 	let usedNonce = nonce;

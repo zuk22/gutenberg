@@ -518,6 +518,7 @@ export const settings = {
 			textAlign: align,
 		};
 
+		debugger;
 		return (
 			<RichText.Content
 				tagName="p"

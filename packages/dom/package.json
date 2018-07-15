@@ -19,6 +19,7 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
 		"element-closest": "2.0.2",
 		"lodash": "4.17.10",

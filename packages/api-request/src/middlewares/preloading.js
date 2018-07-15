@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import jQuery from 'jquery';
+// import jQuery from 'jquery';
 
 const createPreloadingMiddleware = ( preloadedData ) => ( options, next ) => {
 	function getStablePath( path ) {

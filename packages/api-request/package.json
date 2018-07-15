@@ -19,6 +19,7 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
 		"jquery": "3.3.1"
 	},

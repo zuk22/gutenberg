@@ -13,7 +13,7 @@ import {
 	noop,
 	reject,
 } from 'lodash';
-import 'element-closest';
+// import 'element-closest';
 
 /**
  * WordPress dependencies
@@ -33,13 +33,14 @@ import { rawHandler } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import './style.scss';
+// import './style.scss';
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
-import TinyMCE from './tinymce';
+// import TinyMCE from './tinymce';
+import PlainText from '../plain-text';
 import { pickAriaProps } from './aria';
-import patterns from './patterns';
+// import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
@@ -188,7 +189,7 @@ export class RichText extends Component {
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
 
-		patterns.apply( this, [ editor ] );
+		// patterns.apply( this, [ editor ] );
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
@@ -949,7 +950,7 @@ export class RichText extends Component {
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
-							<TinyMCE
+							<PlainText
 								tagName={ Tagname }
 								getSettings={ this.getSettings }
 								onSetup={ this.onSetup }

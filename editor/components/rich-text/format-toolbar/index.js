@@ -19,7 +19,7 @@ import { prependHTTP } from '@wordpress/url';
  */
 import './style.scss';
 import PositionedAtSelection from './positioned-at-selection';
-import UrlInput from '../../url-input';
+// import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../utils/url';
 
 const FORMATTING_CONTROLS = [
@@ -284,4 +284,5 @@ class FormatToolbar extends Component {
 	}
 }
 
-export default withSpokenMessages( FormatToolbar );
+// export default withSpokenMessages( FormatToolbar );
+export default FormatToolbar;
