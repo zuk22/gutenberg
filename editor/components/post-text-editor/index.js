@@ -116,11 +116,9 @@ export default compose( [
 			onChange( content ) {
 				editPost( { content } );
 			},
-			onPersist( content ) {
-				parse( content ).then( ( blocks ) => {
-					resetBlocks( blocks );
-					checkTemplateValidity();
-				} );
+			async onPersist( content ) {
+				resetBlocks( await parse( content ) );
+				checkTemplateValidity();
 			},
 		};
 	} ),

@@ -3,13 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import {
-	getBlockType,
-	createBlock,
-	rawHandler,
-} from '@wordpress/blocks';
+import { createBlock, getBlockType, rawHandler } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
-
 /**
  * Internal dependencies
  */
@@ -44,11 +39,11 @@ export default withDispatch( ( dispatch, { block } ) => {
 				content: block.originalContent,
 			} ) );
 		},
-		convertToBlocks() {
-			rawHandler( {
+		async convertToBlocks() {
+			replaceBlock( block.uid, await rawHandler( {
 				HTML: block.originalContent,
 				mode: 'BLOCKS',
-			} ).then( ( content ) => replaceBlock( block.uid, content ) );
+			} ) );
 		},
 	};
 } )( InvalidBlockWarning );

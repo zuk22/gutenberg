@@ -389,66 +389,58 @@ export default {
 			]
 		) );
 	},
-	SETUP_EDITOR( action, { dispatch, getState } ) {
+	async SETUP_EDITOR( action, { dispatch, getState } ) {
 		const { post, autosave } = action;
 		const state = getState();
 		const template = getTemplate( state );
 		const templateLock = getTemplateLock( state );
 
-		const makeBlocks = () => {
-			if ( post.content.raw ) {
-				return parse( post.content.raw );
-			}
-
-			if ( template ) {
-				return Promise.resolve( synchronizeBlocksWithTemplate( [], template ) );
-			}
-
-			if ( getDefaultBlockForPostFormat( post.format ) ) {
-				return Promise.resolve( [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ] );
-			}
-
-			return Promise.resolve( [] );
-		};
-
 		// Parse content as blocks
+		let blocks;
 		let isValidTemplate = true;
-		makeBlocks().then( ( blocks ) => {
-			if ( post.content.raw ) {
-				// Unlocked templates are considered always valid because they act as default values only.
-				isValidTemplate = (
-					! template ||
-					templateLock !== 'all' ||
-					doBlocksMatchTemplate( blocks, template )
-				);
-			}
 
-			// Include auto draft title in edits while not flagging post as dirty
-			const edits = {};
-			if ( post.status === 'auto-draft' ) {
-				edits.title = post.title.raw;
-			}
+		if ( post.content.raw ) {
+			blocks = await parse( post.content.raw );
 
-			// Check the auto-save status
-			let autosaveAction;
-			if ( autosave ) {
-				const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-				autosaveAction = createWarningNotice(
-					<p>{ noticeMessage } <a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a></p>,
-					{
-						id: AUTOSAVE_POST_NOTICE_ID,
-						spokenMessage: noticeMessage,
-					}
-				);
-			}
+			// Unlocked templates are considered always valid because they act as default values only.
+			isValidTemplate = (
+				! template ||
+				templateLock !== 'all' ||
+				doBlocksMatchTemplate( blocks, template )
+			);
+		} else if ( template ) {
+			blocks = synchronizeBlocksWithTemplate( [], template );
+		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
+			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
+		} else {
+			blocks = [];
+		}
 
-			dispatch( setTemplateValidity( isValidTemplate ) );
-			dispatch( setupEditorState( post, blocks, edits ) );
+		// Include auto draft title in edits while not flagging post as dirty
+		const edits = {};
+		if ( post.status === 'auto-draft' ) {
+			edits.title = post.title.raw;
+		}
 
-			if ( autosaveAction ) {
-				dispatch( autosaveAction );
-			}
-		} );
+		// Check the auto-save status
+		let autosaveAction;
+		if ( autosave ) {
+			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+			autosaveAction = createWarningNotice(
+				<p>{ noticeMessage } <a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a></p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+					spokenMessage: noticeMessage,
+				}
+			);
+		}
+
+		dispatch( setTemplateValidity( isValidTemplate ) );
+		dispatch( setupEditorState( post, blocks, edits ) );
+
+		if ( autosaveAction ) {
+			dispatch( autosaveAction );
+		}
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();
@@ -474,7 +466,7 @@ export default {
 
 		return setTemplateValidity( isValid );
 	},
-	FETCH_SHARED_BLOCKS( action, store ) {
+	async FETCH_SHARED_BLOCKS( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use shared blocks if undefined
 		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
@@ -485,39 +477,33 @@ export default {
 		const { id } = action;
 		const { dispatch } = store;
 
-		let result;
-		if ( id ) {
-			result = apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
-		} else {
-			result = apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
+		const path = id ? `/wp/v2/${ basePath }/${ id }` : `/wp/v2/${ basePath }?per_page=-1`;
+
+		try {
+			const sharedBlockOrBlocks = await apiRequest( { path } );
+
+			dispatch( receiveSharedBlocks( await Promise.all( map(
+				castArray( sharedBlockOrBlocks ),
+				async ( sharedBlock ) => ( {
+					sharedBlock,
+					parsedBlock: ( await parse( sharedBlock.content ) )[ 0 ],
+				} )
+			) ) ) );
+
+			dispatch( {
+				type: 'FETCH_SHARED_BLOCKS_SUCCESS',
+				id,
+			} );
+		} catch ( error ) {
+			dispatch( {
+				type: 'FETCH_SHARED_BLOCKS_FAILURE',
+				id,
+				error: error.responseJSON || {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				},
+			} );
 		}
-
-		result.then(
-			( sharedBlockOrBlocks ) => {
-				Promise.all( map(
-					castArray( sharedBlockOrBlocks ),
-					( sharedBlock ) => parse( sharedBlock.content )
-						.then( ( blocks ) => ( { sharedBlock, parsedBlock: blocks[ 0 ] } ) )
-				) ).then( ( sharedBlockParsings ) => {
-					dispatch( receiveSharedBlocks( sharedBlockParsings ) );
-
-					dispatch( {
-						type: 'FETCH_SHARED_BLOCKS_SUCCESS',
-						id,
-					} );
-				} );
-			},
-			( error ) => {
-				dispatch( {
-					type: 'FETCH_SHARED_BLOCKS_FAILURE',
-					id,
-					error: error.responseJSON || {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					},
-				} );
-			}
-		);
 	},
 	RECEIVE_SHARED_BLOCKS( action ) {
 		return receiveBlocks( map( action.results, 'parsedBlock' ) );

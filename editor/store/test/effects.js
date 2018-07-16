@@ -479,7 +479,7 @@ describe( 'effects', () => {
 			} );
 		} );
 
-		it( 'should return post reset action', () => {
+		it( 'should return post reset action', async () => {
 			const post = {
 				id: 1,
 				title: {
@@ -490,6 +490,7 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const dispatch = jest.fn();
 			const getState = () => ( {
 				settings: {
 					template: null,
@@ -497,15 +498,13 @@ describe( 'effects', () => {
 				},
 			} );
 
-			const result = handler( { post, settings: {} }, { getState } );
+			await handler( { post, settings: {} }, { dispatch, getState } );
 
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, [], {} ),
-			] );
+			expect( dispatch ).toHaveBeenCalledWith( setTemplateValidity( true ) );
+			expect( dispatch ).toHaveBeenCalledWith( setupEditorState( post, [], {} ) );
 		} );
 
-		it( 'should return block reset with non-empty content', () => {
+		it( 'should return block reset with non-empty content', async () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const post = {
 				id: 1,
@@ -517,6 +516,7 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const dispatch = jest.fn();
 			const getState = () => ( {
 				settings: {
 					template: null,
@@ -524,16 +524,15 @@ describe( 'effects', () => {
 				},
 			} );
 
-			const result = handler( { post }, { getState } );
+			await handler( { post }, { dispatch, getState } );
 
-			expect( result[ 1 ].blocks ).toHaveLength( 1 );
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, result[ 1 ].blocks, {} ),
-			] );
+			const result = dispatch.mock.calls;
+			expect( result[ 1 ][ 0 ].blocks ).toHaveLength( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( setTemplateValidity( true ) );
+			expect( dispatch ).toHaveBeenCalledWith( setupEditorState( post, result[ 1 ][ 0 ].blocks, {} ) );
 		} );
 
-		it( 'should return post setup action only if auto-draft', () => {
+		it( 'should return post setup action only if auto-draft', async () => {
 			const post = {
 				id: 1,
 				title: {
@@ -544,6 +543,7 @@ describe( 'effects', () => {
 				},
 				status: 'auto-draft',
 			};
+			const dispatch = jest.fn();
 			const getState = () => ( {
 				settings: {
 					template: null,
@@ -551,12 +551,10 @@ describe( 'effects', () => {
 				},
 			} );
 
-			const result = handler( { post }, { getState } );
+			await handler( { post }, { dispatch, getState } );
 
-			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, [], { title: 'A History of Pork' } ),
-			] );
+			expect( dispatch ).toHaveBeenCalledWith( setTemplateValidity( true ) );
+			expect( dispatch ).toHaveBeenCalledWith( setupEditorState( post, [], { title: 'A History of Pork' } ) );
 		} );
 	} );
 
@@ -585,14 +583,14 @@ describe( 'effects', () => {
 			unregisterBlockType( 'core/block' );
 		} );
 
-		describe( '.FETCH_SHARED_BLOCKS', () => {
+		describe( '.FETCH_SHARED_BLOCKS', async () => {
 			const handler = effects.FETCH_SHARED_BLOCKS;
 
 			afterEach( () => {
 				jest.unmock( '@wordpress/api-request' );
 			} );
 
-			it( 'should fetch multiple shared blocks', () => {
+			it( 'should fetch multiple shared blocks', async () => {
 				const promise = Promise.resolve( [
 					{
 						id: 123,
@@ -606,32 +604,30 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
 
-				handler( fetchSharedBlocks(), store );
+				await handler( fetchSharedBlocks(), store );
 
-				return promise.then( () => {
-					expect( dispatch ).toHaveBeenCalledWith(
-						receiveSharedBlocks( [
-							{
-								sharedBlock: {
-									id: 123,
-									title: 'My cool block',
-									content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
-								},
-								parsedBlock: expect.objectContaining( {
-									name: 'core/test-block',
-									attributes: { name: 'Big Bird' },
-								} ),
+				expect( dispatch ).toHaveBeenCalledWith(
+					receiveSharedBlocks( [
+						{
+							sharedBlock: {
+								id: 123,
+								title: 'My cool block',
+								content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 							},
-						] )
-					);
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'FETCH_SHARED_BLOCKS_SUCCESS',
-						id: undefined,
-					} );
+							parsedBlock: expect.objectContaining( {
+								name: 'core/test-block',
+								attributes: { name: 'Big Bird' },
+							} ),
+						},
+					] )
+				);
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
+					id: undefined,
 				} );
 			} );
 
-			it( 'should fetch a single shared block', () => {
+			it( 'should fetch a single shared block', async () => {
 				const promise = Promise.resolve( {
 					id: 123,
 					title: 'My cool block',
@@ -643,28 +639,26 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
 
-				handler( fetchSharedBlocks( 123 ), store );
+				await handler( fetchSharedBlocks( 123 ), store );
 
-				return promise.then( () => {
-					expect( dispatch ).toHaveBeenCalledWith(
-						receiveSharedBlocks( [
-							{
-								sharedBlock: {
-									id: 123,
-									title: 'My cool block',
-									content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
-								},
-								parsedBlock: expect.objectContaining( {
-									name: 'core/test-block',
-									attributes: { name: 'Big Bird' },
-								} ),
+				expect( dispatch ).toHaveBeenCalledWith(
+					receiveSharedBlocks( [
+						{
+							sharedBlock: {
+								id: 123,
+								title: 'My cool block',
+								content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 							},
-						] )
-					);
-					expect( dispatch ).toHaveBeenCalledWith( {
-						type: 'FETCH_SHARED_BLOCKS_SUCCESS',
-						id: 123,
-					} );
+							parsedBlock: expect.objectContaining( {
+								name: 'core/test-block',
+								attributes: { name: 'Big Bird' },
+							} ),
+						},
+					] )
+				);
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
+					id: 123,
 				} );
 			} );
 

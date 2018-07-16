@@ -21,10 +21,13 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML } ) => ( {
-		onClick: () => rawHandler( {
-			HTML: getBlockContent( block ),
-			mode: 'BLOCKS',
-			canUserUseUnfilteredHTML,
-		} ).then( ( content ) => dispatch( 'core/editor' ).replaceBlocks( block.uid, content ) ),
+		onClick: async () => dispatch( 'core/editor' ).replaceBlocks(
+			block.uid,
+			await rawHandler( {
+				HTML: getBlockContent( block ),
+				mode: 'BLOCKS',
+				canUserUseUnfilteredHTML,
+			} )
+		),
 	} ) ),
 )( BlockConvertButton );

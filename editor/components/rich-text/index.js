@@ -258,7 +258,7 @@ export class RichText extends Component {
 	 *
 	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
 	 */
-	onPaste( event ) {
+	async onPaste( event ) {
 		const dataTransfer =
 			event.clipboardData ||
 			event.dataTransfer ||
@@ -275,27 +275,27 @@ export class RichText extends Component {
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! HTML ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
-			rawHandler( {
+			const content = await rawHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
-			} ).then( ( content ) => {
-				const shouldReplace = this.props.onReplace && this.isEmpty();
-
-				// Allows us to ask for this information when we get a report.
-				window.console.log( 'Received item:\n\n', file );
-
-				if ( shouldReplace ) {
-					// Necessary to allow the paste bin to be removed without errors.
-					this.props.setTimeout( () => this.props.onReplace( content ) );
-				} else if ( this.props.onSplit ) {
-					// Necessary to get the right range.
-					// Also done in the TinyMCE paste plugin.
-					this.props.setTimeout( () => this.splitContent( content ) );
-				}
-
-				event.preventDefault();
 			} );
+
+			const shouldReplace = this.props.onReplace && this.isEmpty();
+
+			// Allows us to ask for this information when we get a report.
+			window.console.log( 'Received item:\n\n', file );
+
+			if ( shouldReplace ) {
+				// Necessary to allow the paste bin to be removed without errors.
+				this.props.setTimeout( () => this.props.onReplace( content ) );
+			} else if ( this.props.onSplit ) {
+				// Necessary to get the right range.
+				// Also done in the TinyMCE paste plugin.
+				this.props.setTimeout( () => this.splitContent( content ) );
+			}
+
+			event.preventDefault();
 		}
 
 		this.pastedPlainText = plainText;
@@ -312,7 +312,7 @@ export class RichText extends Component {
 	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered
 	 *                                     by TinyMCE.
 	 */
-	onPastePreProcess( event ) {
+	async onPastePreProcess( event ) {
 		const HTML = this.isPlainTextPaste ? '' : event.content;
 
 		event.preventDefault();
@@ -350,27 +350,27 @@ export class RichText extends Component {
 			mode = 'AUTO';
 		}
 
-		rawHandler( {
+		const content = await rawHandler( {
 			HTML,
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
 			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
-		} ).then( ( content ) => {
-			if ( typeof content === 'string' ) {
-				this.editor.insertContent( content );
-			} else if ( this.props.onSplit ) {
-				if ( ! content.length ) {
-					return;
-				}
-
-				if ( shouldReplace ) {
-					this.props.onReplace( content );
-				} else {
-					this.splitContent( content, { paste: true } );
-				}
-			}
 		} );
+
+		if ( typeof content === 'string' ) {
+			this.editor.insertContent( content );
+		} else if ( this.props.onSplit ) {
+			if ( ! content.length ) {
+				return;
+			}
+
+			if ( shouldReplace ) {
+				this.props.onReplace( content );
+			} else {
+				this.splitContent( content, { paste: true } );
+			}
+		}
 	}
 
 	/**
