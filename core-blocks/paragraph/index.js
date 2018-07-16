@@ -23,10 +23,10 @@ import {
 import {
 	getColorClass,
 	withColors,
-	AlignmentToolbar,
-	BlockControls,
+	MultiBlockAlignmentToolbar,
 	ContrastChecker,
 	InspectorControls,
+	MultiBlockControls,
 	PanelColor,
 	RichText,
 } from '@wordpress/editor';
@@ -206,17 +206,16 @@ class ParagraphBlock extends Component {
 		} = attributes;
 
 		const fontSize = this.getFontSize();
-
 		return (
 			<Fragment>
-				<BlockControls>
-					<AlignmentToolbar
+				<MultiBlockControls>
+					<MultiBlockAlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
-				</BlockControls>
+				</MultiBlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<FontSizePicker
