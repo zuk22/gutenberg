@@ -14,6 +14,8 @@ export { default as ContrastChecker } from './contrast-checker';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
+export { default as MultiBlockAlignmentToolbar } from './alignment-toolbar/multi-block';
+export { default as MultiBlockControls } from './block-controls/multi-block-controls';
 export { default as PanelColor } from './panel-color';
 export { default as PlainText } from './plain-text';
 export { default as RichText } from './rich-text';
