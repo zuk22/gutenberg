@@ -13,6 +13,7 @@ import {
 	switchToBlockType,
 	createBlock,
 	serialize,
+	isSharedBlock,
 	getDefaultBlockForPostFormat,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
@@ -39,6 +40,7 @@ import {
 	removeNotice,
 	saveSharedBlock,
 	insertBlock,
+	removeBlocks,
 	selectBlock,
 	removeBlock,
 	resetBlocks,
@@ -545,7 +547,13 @@ export default {
 		}
 
 		const { id } = action;
-		const { dispatch } = store;
+		const { getState, dispatch } = store;
+
+		// Remove any blocks that reference this shared block
+		const allBlocks = getBlocks( getState() );
+		const associatedBlocks = allBlocks.filter( ( block ) => isSharedBlock( block ) && block.attributes.ref === id );
+		const associatedBlockUids = associatedBlocks.map( ( block ) => block.uid );
+		dispatch( removeBlocks( associatedBlockUids ) );
 
 		const transactionId = uniqueId();
 
