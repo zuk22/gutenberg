@@ -582,9 +582,9 @@ export default {
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const state = store.getState();
 		const oldBlock = getBlock( state, action.uid );
-		const reducerKey = 'core/editor-shared-' + oldBlock.attributes.ref;
-		const referencedBlock = select( reducerKey ).getBlocks()[ 0 ];
-		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
+		const { getEntityRecord } = select( 'core' );
+		const sharedBlock = getEntityRecord( 'postType', 'wp_block', oldBlock.attributes.ref );
+		const [ newBlock ] = parse( sharedBlock.content.raw );
 		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
 	},
 	CONVERT_BLOCK_TO_SHARED( action, store ) {
