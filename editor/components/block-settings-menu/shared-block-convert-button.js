@@ -52,7 +52,7 @@ export function SharedBlockConvertButton( {
 
 export default compose( [
 	withSelect( ( select, { uid } ) => {
-		const { getBlock, getSharedBlock } = select( 'core/editor' );
+		const { getBlock } = select( 'core/editor' );
 		const { getFallbackBlockName } = select( 'core/blocks' );
 
 		const block = getBlock( uid );
@@ -64,7 +64,7 @@ export default compose( [
 			// Hide 'Convert to Shared Block' on Classic blocks. Showing it causes a
 			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
 			isVisible: block.name !== getFallbackBlockName(),
-			isStaticBlock: ! isSharedBlock( block ) || ! getSharedBlock( block.attributes.ref ),
+			isStaticBlock: ! isSharedBlock( block ),
 		};
 	} ),
 	withDispatch( ( dispatch, { uid, onToggle = noop } ) => {
