@@ -512,7 +512,7 @@ export default {
 		const { id, title } = sharedBlock;
 		const { dispatch } = store;
 
-		const data = { title, content };
+		const data = { title, content, status: 'publish' };
 		const path = `/wp/v2/${ basePath }`;
 		const method = 'POST';
 
