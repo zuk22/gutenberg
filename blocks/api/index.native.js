@@ -12,3 +12,4 @@ export {
 	registerBlockType,
 	getBlockType,
 } from './registration';
+export { getPhrasingContentSchema } from './raw-handling';
