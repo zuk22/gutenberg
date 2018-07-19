@@ -75,7 +75,7 @@ const isFirstOrOnlyBlockSelectedHOC = createHigherOrderComponent( ( OriginalComp
 	return ( props ) => {
 		return (
 			<Consumer>
-				{ ( { isSelected, uid } ) => ( isSelected || ( uid === props.firstMultiSelectedBlockUid && props.allSelectedBlocksOfSameType ) ) && (
+				{ ( { isSelected, clientId } ) => ( isSelected || ( clientId === props.getFirstMultiSelectedBlockClientId && props.allSelectedBlocksOfSameType ) ) && (
 					<OriginalComponent { ...props } />
 				) }
 			</Consumer>
@@ -88,12 +88,12 @@ export const isFirstOrOnlyBlockSelected = ( component ) => {
 		withSelect( ( select ) => {
 			const {
 				getMultiSelectedBlocks,
-				getFirstMultiSelectedBlockUid,
+				getFirstMultiSelectedBlockClientId,
 				isMultiSelecting,
 			} = select( 'core/editor' );
 			const allSelectedBlocksOfSameType = uniq( getMultiSelectedBlocks().map( ( { name } ) => name ) ).length === 1;
 			return {
-				firstMultiSelectedBlockUid: getFirstMultiSelectedBlockUid(),
+				getFirstMultiSelectedBlockClientId: getFirstMultiSelectedBlockClientId(),
 				isSelecting: isMultiSelecting(),
 				selectedBlocks: getMultiSelectedBlocks(),
 				allSelectedBlocksOfSameType,

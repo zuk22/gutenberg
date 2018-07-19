@@ -74,7 +74,7 @@ export const withMultiBlockSupport = ( component, attributeName ) => createHighe
 					[ attributeName ]: newValue,
 				};
 				for ( let i = 0; i < props.multiSelectedBlocks.length; i++ ) {
-					newProps.onMultiBlockChange( props.multiSelectedBlocks[ i ].uid, newAttributes );
+					newProps.onMultiBlockChange( props.multiSelectedBlocks[ i ].clientId, newAttributes );
 				}
 			};
 		}
