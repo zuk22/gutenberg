@@ -221,6 +221,27 @@ class VideoEdit extends Component {
 							onChange={ this.toggleAttribute( 'muted' ) }
 							checked={ muted }
 						/>
+						<div className="core-blocks-video__poster">
+							<p>
+								{ __( 'Poster Image' ) }
+							</p>
+							<MediaUpload
+								title={ 'Select Poster Image' }
+								onSelect={ this.onSelectPoster }
+								type="image"
+								modalClass="editor-post-featured-image__media-modal"
+								render={ ( { open } ) => (
+									<Button isDefault onClick={ open }>
+										{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+									</Button>
+								) }
+							/>
+							{ !! this.props.attributes.poster &&
+								<Button onClick={ this.onRemovePoster } isLink isDestructive>
+									{ __( 'Remove Poster Image' ) }
+								</Button>
+							}
+						</div>
 					</PanelBody>
 					<PanelBody title={ __( 'Sources' ) }>
 						{ sources.map( ( source ) => {
@@ -310,28 +331,6 @@ class VideoEdit extends Component {
 								</Button>
 							) ) }
 						</ButtonGroup>
-					</PanelBody>
-					<PanelBody title={ __( 'Poster' ) }>
-						<div>
-							{ ! this.props.attributes.poster &&
-								<MediaUpload
-									title={ 'Select Poster Image' }
-									onSelect={ this.onSelectPoster }
-									type="image"
-									modalClass="editor-post-featured-image__media-modal"
-									render={ ( { open } ) => (
-										<Button isDefault onClick={ open }>
-											{ __( 'Select Poster Image' ) }
-										</Button>
-									) }
-								/>
-							}
-							{ !! this.props.attributes.poster &&
-								<Button onClick={ this.onRemovePoster } isLink isDestructive>
-									{ __( 'Remove Poster Image' ) }
-								</Button>
-							}
-						</div>
 					</PanelBody>
 					<PanelBody title={ __( 'Subtitles' ) }>
 						{ subtitles.map( ( subtitle, index ) => {
