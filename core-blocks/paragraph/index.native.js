@@ -1,17 +1,28 @@
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
+//import { isFinite, find, omit } from 'lodash';
+
 import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, renderToString, compose } from '@wordpress/element';
+import { 
+	Component, 
+	concatChildren,
+	renderToString, 
+	compose 
+} from '@wordpress/element';
 import RCTAztecView from 'react-native-aztec';
 import { parse, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	withFallbackStyles,
 } from '@wordpress/components';
 
-import { RichText, 	withColors, } from '@wordpress/editor';
+import { RichText, 	withColors, getColorClass } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -25,7 +36,7 @@ const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 /*	const editableNode = node.querySelector( '[contenteditable="true"]' );
 	//verify if editableNode is available, before using getComputedStyle.
 	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;*/
-	console.log(ownProps.attributes);
+	//console.log(ownProps.attributes);
 	const computedStyles = null;
 	return {
 		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
@@ -34,7 +45,7 @@ const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	};
 } );
 
-console.log(FallbackStyles);
+//console.log(FallbackStyles);
 
 
 export const name = 'core/paragraph';
@@ -85,7 +96,7 @@ const _minHeight = 50;
 class ParagraphBlock extends Component {
 	constructor() {
 		super( ...arguments );
-		//console.log('ParagraphBlock');
+		//console.log('ParagraphBlock->constructor');
 		//console.log(...arguments)
 	}
 	render() {
@@ -104,7 +115,6 @@ class ParagraphBlock extends Component {
 			fallbackFontSize,
 			style,
 		} = this.props;
-
 		return (
 			<View>
 				<RichText
@@ -149,6 +159,8 @@ export const settings = {
 
 	keywords: [ __( 'text' ) ],
 
+	supports,
+
 	attributes: schema,
 
 	transforms: {
@@ -185,7 +197,27 @@ export const settings = {
 			customFontSize,
 		} = attributes;
 
-		return <p>{attributes.content}</p>;
+		const textClass = getColorClass( 'color', textColor );
+		const backgroundClass = getColorClass( 'background-color', backgroundColor );
+		const fontSizeClass = fontSize && `is-${ fontSize }-text`;
+
+		const className = classnames( {
+			'has-background': backgroundColor || customBackgroundColor,
+			'has-drop-cap': dropCap,
+			[ fontSizeClass ]: fontSizeClass,
+			[ textClass ]: textClass,
+			[ backgroundClass ]: backgroundClass,
+		} );
+
+		// Not used yet
+		const styles = {
+			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+			color: textClass ? undefined : customTextColor,
+			fontSize: fontSizeClass ? undefined : customFontSize,
+			textAlign: align,
+		};
+
+		return <p class={className}>{attributes.content}</p>;
 		/*return (
 			<RichText.Content
 				tagName="p"
