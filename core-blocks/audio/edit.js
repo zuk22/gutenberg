@@ -39,7 +39,7 @@ class AudioEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, noticeOperations, setAttributes } = this.props;
 		const { id, src = '' } = attributes;
 
 		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
@@ -50,6 +50,11 @@ class AudioEdit extends Component {
 					filesList: [ file ],
 					onFileChange: ( [ { url } ] ) => {
 						setAttributes( { src: url } );
+					},
+					onError: ( e ) => {
+						setAttributes( { src: undefined, id: undefined } );
+						this.setState( { editing: true } );
+						noticeOperations.createErrorNotice( e );
 					},
 					allowedType: 'audio',
 				} );
