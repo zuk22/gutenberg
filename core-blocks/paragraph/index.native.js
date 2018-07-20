@@ -17,7 +17,10 @@ import {
 	compose 
 } from '@wordpress/element';
 import RCTAztecView from 'react-native-aztec';
-import { parse, getPhrasingContentSchema } from '@wordpress/blocks';
+import { 
+	parse, 
+	getPhrasingContentSchema 
+} from '@wordpress/blocks';
 import {
 	withFallbackStyles,
 } from '@wordpress/components';
@@ -146,7 +149,6 @@ class ParagraphBlock extends Component {
 	}
 }
 
-
 export const settings = {
 
 	title: __( 'Paragraph' ),
@@ -217,7 +219,7 @@ export const settings = {
 			textAlign: align,
 		};
 
-		return <p class={className}>{attributes.content}</p>;
+		return <p>{attributes.content}</p>;
 		/*return (
 			<RichText.Content
 				tagName="p"

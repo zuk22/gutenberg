@@ -3,6 +3,7 @@
  */
 import {
 	createElement,
+	cloneElement,
 	Component,
 } from 'react';
 import {
@@ -41,6 +42,16 @@ export { createElement };
  * A base class to create WordPress Components (Refs, state and lifecycle hooks)
  */
 export { Component };
+
+/**
+ * Creates a copy of an element with extended props.
+ *
+ * @param {WPElement} element Element
+ * @param {?Object}   props   Props to apply to cloned element
+ *
+ * @return {WPElement} Cloned element.
+ */
+export { cloneElement };
 
 /**
  * Renders a given element into a string.
