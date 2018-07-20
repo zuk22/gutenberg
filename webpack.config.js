@@ -103,6 +103,7 @@ const gutenbergPackages = [
 	'is-shallow-equal',
 	'keycodes',
 	'plugins',
+	'redux-routine',
 	'shortcode',
 	'viewport',
 ];
@@ -234,6 +235,7 @@ const config = {
 			'deprecated',
 			'dom-ready',
 			'is-shallow-equal',
+			'redux-routine',
 		].map( camelCaseDash ) ),
 	],
 	stats: {
