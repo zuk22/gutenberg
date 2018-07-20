@@ -8,15 +8,15 @@
 /**
  * External dependencies
  */
+const { promisify } = require( 'util' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-const glob = require( 'glob' );
+let glob = require( 'glob' );
 const babel = require( '@babel/core' );
 const chalk = require( 'chalk' );
-const mkdirp = require( 'mkdirp' );
+let mkdirp = require( 'mkdirp' );
 const sass = require( 'node-sass' );
 const postcss = require( 'postcss' );
-const deasync = require( 'deasync' );
 
 /**
  * Internal dependencies
@@ -35,6 +35,15 @@ const BUILD_DIR = {
 	style: 'build-style',
 };
 const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
+
+// Promisification
+const readFile = promisify( fs.readFile );
+const writeFile = promisify( fs.writeFile );
+const exists = promisify( fs.exists );
+const transformFile = promisify( babel.transformFile );
+const renderSass = promisify( sass.render );
+glob = promisify( glob );
+mkdirp = promisify( mkdirp );
 
 /**
  * Get the package name for a specified file
@@ -66,17 +75,22 @@ function getBuildPath( file, buildFolder ) {
  *
  * @param {string} file    File path to build
  * @param {boolean} silent Show logs
+ *
+ * @return {Promise} Promise resolving when file is built.
  */
 function buildFile( file, silent ) {
-	buildFileFor( file, silent, 'main' );
-	buildFileFor( file, silent, 'module' );
+	return Promise.all( [
+		buildFileFor( file, silent, 'main' ),
+		buildFileFor( file, silent, 'module' ),
+	] );
 }
 
-function buildStyle( packagePath ) {
+async function buildStyle( packagePath ) {
 	const styleFile = path.resolve( packagePath, SRC_DIR, 'style.scss' );
 	const outputFile = path.resolve( packagePath, BUILD_DIR.style, 'style.css' );
-	mkdirp.sync( path.dirname( outputFile ) );
-	const builtSass = sass.renderSync( {
+
+	const contents = await readFile( styleFile, 'utf8' );
+	const builtSass = await renderSass( {
 		file: styleFile,
 		includePaths: [ path.resolve( __dirname, '../../edit-post/assets/stylesheets' ) ],
 		data: (
@@ -88,18 +102,18 @@ function buildStyle( packagePath ) {
 				'animations',
 				'z-index',
 			].map( ( imported ) => `@import "${ imported }";` ).join( ' ' )	+
-			fs.readFileSync( styleFile, 'utf8' )
+			contents
 		),
 	} );
 
-	const postCSSSync = ( callback ) => {
-		postcss( require( './post-css-config' ) )
-			.process( builtSass.css, { from: 'src/app.css', to: 'dest/app.css' } )
-			.then( ( result ) => callback( null, result ) );
-	};
+	const result = postcss( require( './post-css-config' ) ).process( builtSass.css, {
+		from: 'src/app.css',
+		to: 'dest/app.css',
+	} );
 
-	const result = deasync( postCSSSync )();
-	fs.writeFileSync( outputFile, result.css );
+	await mkdirp( path.dirname( outputFile ) );
+
+	return writeFile( outputFile, result.css );
 }
 
 /**
@@ -109,14 +123,16 @@ function buildStyle( packagePath ) {
  * @param {boolean} silent      Show logs
  * @param {string}  environment Dist environment (node or es5)
  */
-function buildFileFor( file, silent, environment ) {
+async function buildFileFor( file, silent, environment ) {
 	const buildDir = BUILD_DIR[ environment ];
 	const destPath = getBuildPath( file, buildDir );
 	const babelOptions = getBabelConfig( environment );
 
-	mkdirp.sync( path.dirname( destPath ) );
-	const transformed = babel.transformFileSync( file, babelOptions ).code;
-	fs.writeFileSync( destPath, transformed );
+	const transformed = ( await transformFile( file, babelOptions ) ).code;
+
+	await mkdirp( path.dirname( destPath ) );
+	await writeFile( destPath, transformed );
+
 	if ( ! silent ) {
 		process.stdout.write(
 			chalk.green( '  \u2022 ' ) +
@@ -132,34 +148,42 @@ function buildFileFor( file, silent, environment ) {
  * Build the provided package path
  *
  * @param {string} packagePath absolute package path
+ *
+ * @return {Promise} Promise resolving when package is built.
  */
-function buildPackage( packagePath ) {
+async function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const files = glob.sync( `${ srcDir }/**/*.js`, {
+	const files = await glob( `${ srcDir }/**/*.js`, {
 		ignore: `${ srcDir }/**/test/**/*.js`,
 		nodir: true,
 	} );
 
-	process.stdout.write( `${ path.basename( packagePath ) }\n` );
-
-	files.forEach( ( file ) => buildFile( file, true ) );
-
-	// Building styles
-	const styleFile = path.resolve( srcDir, 'style.scss' );
-	if ( fs.existsSync( styleFile ) ) {
-		buildStyle( packagePath );
+	async function buildPackageStyleIfApplicable() {
+		const styleFile = path.resolve( srcDir, 'style.scss' );
+		if ( await exists( styleFile ) ) {
+			return buildStyle( packagePath );
+		}
 	}
 
-	process.stdout.write( `${ DONE }\n` );
+	return Promise.all( [
+		...files.map( ( file ) => buildFile( file, true ) ),
+		buildPackageStyleIfApplicable(),
+	] ).then( () => {
+		process.stdout.write( `${ path.basename( packagePath ) }\n` );
+		process.stdout.write( `${ DONE }\n` );
+	} );
 }
 
 const files = process.argv.slice( 2 );
 
 if ( files.length ) {
-	files.forEach( buildFile );
+	Promise.all( files.map( buildFile ) );
 } else {
 	process.stdout.write( chalk.inverse( '>> Building packages \n' ) );
-	getPackages()
-		.forEach( buildPackage );
-	process.stdout.write( '\n' );
+
+	Promise.all( [
+		getPackages().map( buildPackage ),
+	] ).then( () => {
+		process.stdout.write( '\n' );
+	} );
 }
