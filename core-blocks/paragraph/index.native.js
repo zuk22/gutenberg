@@ -1,55 +1,21 @@
-/**
- * External dependencies
- */
-import classnames from 'classnames';
-//import { isFinite, find, omit } from 'lodash';
-
 import { View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { 
-	Component, 
-	concatChildren,
-	renderToString, 
-	compose 
-} from '@wordpress/element';
-import RCTAztecView from 'react-native-aztec';
-import { 
-	parse, 
-	getPhrasingContentSchema 
-} from '@wordpress/blocks';
 import {
-	withFallbackStyles,
-} from '@wordpress/components';
-
-import { RichText, 	withColors, getColorClass } from '@wordpress/editor';
+	Component,
+} from '@wordpress/element';
+import {
+	getPhrasingContentSchema,
+} from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-
-//const { getComputedStyle } = window;
-
-const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
-/*	const editableNode = node.querySelector( '[contenteditable="true"]' );
-	//verify if editableNode is available, before using getComputedStyle.
-	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;*/
-	//console.log(ownProps.attributes);
-	const computedStyles = null;
-	return {
-		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
-		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
-		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
-	};
-} );
-
-//console.log(FallbackStyles);
-
 
 export const name = 'core/paragraph';
 
@@ -97,49 +63,40 @@ const supports = {
 const _minHeight = 50;
 
 class ParagraphBlock extends Component {
-	constructor() {
+	/*constructor() {
 		super( ...arguments );
-		//console.log('ParagraphBlock->constructor');
-		//console.log(...arguments)
-	}
+		console.log('ParagraphBlock->constructor');
+		console.log(...arguments)
+	}*/
 	render() {
 		const {
 			attributes,
 			setAttributes,
-			mergeBlocks,
-			onReplace,
-			className,
-			backgroundColor,
-			textColor,
-			setBackgroundColor,
-			setTextColor,
-			fallbackBackgroundColor,
-			fallbackTextColor,
-			fallbackFontSize,
+			//className,
 			style,
 		} = this.props;
 		return (
 			<View>
 				<RichText
 					content={ { contentTree: attributes.content, eventCount: attributes.eventCount } }
-					style={ style, [ 
-						{ minHeight: Math.max( _minHeight,  attributes.aztecHeight != null ? attributes.aztecHeight : 0) },
+					style={ style, [
+						{ minHeight: Math.max( _minHeight, attributes.aztecHeight !== null ? attributes.aztecHeight : 0 ) },
 					] }
 					onChange={ ( event ) => {
 						//console.log(event);
-						setAttributes({
+						setAttributes( {
 							...this.props.attributes,
 							content: event.content,
 							eventCount: event.eventCount,
-							});
-						}
+						} );
 					}
-					onContentSizeChange= { ( event ) => {
-						setAttributes({
+					}
+					onContentSizeChange={ ( event ) => {
+						setAttributes( {
 							...this.props.attributes,
 							aztecHeight: event.aztecHeight,
-							}); 
-						}
+						} );
+					}
 					}
 					placeholder={ __( 'Write Write!!' ) }
 					aria-label={ __( 'test' ) }
@@ -181,52 +138,9 @@ export const settings = {
 		],
 	},
 
-	edit: ParagraphBlock, /*compose( [
-		//withColors( 'backgroundColor', { textColor: 'color' } ),
-		FallbackStyles,
-	] )( ParagraphBlock ),*/
+	edit: ParagraphBlock,
 
 	save( { attributes } ) {
-		const {
-			align,
-			content,
-			dropCap,
-			backgroundColor,
-			textColor,
-			customBackgroundColor,
-			customTextColor,
-			fontSize,
-			customFontSize,
-		} = attributes;
-
-		const textClass = getColorClass( 'color', textColor );
-		const backgroundClass = getColorClass( 'background-color', backgroundColor );
-		const fontSizeClass = fontSize && `is-${ fontSize }-text`;
-
-		const className = classnames( {
-			'has-background': backgroundColor || customBackgroundColor,
-			'has-drop-cap': dropCap,
-			[ fontSizeClass ]: fontSizeClass,
-			[ textClass ]: textClass,
-			[ backgroundClass ]: backgroundClass,
-		} );
-
-		// Not used yet
-		const styles = {
-			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-			color: textClass ? undefined : customTextColor,
-			fontSize: fontSizeClass ? undefined : customFontSize,
-			textAlign: align,
-		};
-
-		return <p>{attributes.content}</p>;
-		/*return (
-			<RichText.Content
-				tagName="p"
-				//style={ styles }
-				//className={ className ? className : undefined }
-				value={ content }
-			/>
-		);*/
+		return <p>{ attributes.content }</p>;
 	},
 };

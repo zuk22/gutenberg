@@ -9,7 +9,6 @@ import {
 import {
 	camelCase,
 	flowRight,
-	isString,
 	upperFirst,
 } from 'lodash';
 
@@ -73,8 +72,6 @@ export { serialize as renderToString };
  * @return {WPElement} Dangerously-rendering element.
  */
 export { RawHTML };
-
-
 
 /**
  * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function

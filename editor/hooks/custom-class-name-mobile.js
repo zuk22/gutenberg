@@ -8,9 +8,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { 
+import {
 	hasBlockSupport,
-	getSaveContent, 
+	getSaveContent,
 	parseWithAttributeSchema,
 } from '@wordpress/blocks';
 

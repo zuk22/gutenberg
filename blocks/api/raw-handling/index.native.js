@@ -1,8 +1,8 @@
 
 /*
-  
-Can't call 
- 
+
+Can't call
+
 import {
 	getPhrasingContentSchema,
 } from './utils';
@@ -13,7 +13,7 @@ directly since there are some other variables/imports missing
 /**
  * External dependencies
  */
-import { omit, mergeWith, includes, noop } from 'lodash';
+import { omit } from 'lodash';
 
 const phrasingContentSchema = {
 	strong: {},
