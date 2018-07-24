@@ -58,11 +58,14 @@ export function DefaultBlockAppender( {
 				value={ showPrompt ? value : '' }
 			/>
 			<InserterWithShortcuts rootClientId={ rootClientId } layout={ layout } />
-			<Inserter position="top right">
-				<DotTip id="core/editor.inserter">
-					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
-				</DotTip>
-			</Inserter>
+			<Inserter
+				position="top right"
+				dotTip={
+					<DotTip id="core/editor.inserter">
+						{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
+					</DotTip>
+				}
+			/>
 		</div>
 	);
 }

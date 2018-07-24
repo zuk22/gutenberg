@@ -20,7 +20,7 @@ import Dashicon from '../dashicon';
 // is common to apply a ref to the button element (only supported in class)
 class IconButton extends Component {
 	render() {
-		const { icon, children, label, className, tooltip, focus, shortcut, ...additionalProps } = this.props;
+		const { icon, children, label, className, tooltip, dotTip, focus, shortcut, ...additionalProps } = this.props;
 		const classes = classnames( 'components-icon-button', className );
 		const tooltipText = tooltip || label;
 
@@ -43,6 +43,7 @@ class IconButton extends Component {
 		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
 				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
+				{ ! showTooltip && dotTip }
 				{ children }
 			</Button>
 		);
@@ -52,6 +53,18 @@ class IconButton extends Component {
 				<Tooltip text={ tooltipText } shortcut={ shortcut }>
 					{ element }
 				</Tooltip>
+			);
+		}
+
+		// Tooltip and DotTip can not be applied inside each other or their behavior gets broken.
+		// DotTip appear close to their parent in dom so we need a div to wrap the DotTip
+		// and the element with tooltip so DotTip appears on the expected position.
+		if ( dotTip && showTooltip ) {
+			element = (
+				<div>
+					{ element }
+					{ dotTip }
+				</div>
 			);
 		}
 

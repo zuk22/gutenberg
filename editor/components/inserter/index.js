@@ -37,6 +37,7 @@ class Inserter extends Component {
 			position,
 			title,
 			children,
+			dotTip,
 			onInsertBlock,
 			rootClientId,
 		} = this.props;
@@ -61,6 +62,7 @@ class Inserter extends Component {
 						className="editor-inserter__toggle"
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
+						dotTip={ dotTip }
 					>
 						{ children }
 					</IconButton>
