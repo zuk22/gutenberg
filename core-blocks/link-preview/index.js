@@ -9,7 +9,7 @@ import { uniq, indexOf } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 import { Button, IconButton, Placeholder, Spinner } from '@wordpress/components';
 
 import './style.scss';
@@ -102,7 +102,7 @@ const edit = class extends Component {
 			// we've only got a url, so fetch the rest from the API
 			const apiURL = `/gutenberg/v1/opengraph?${ stringify( { url } ) }`;
 			this.setState( { mode: this.MODES.FETCH } );
-			apiRequest( { path: apiURL } )
+			apiFetch( { path: apiURL } )
 				.then(
 					( obj ) => {
 						if ( this.unmounting ) {
