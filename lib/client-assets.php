@@ -79,6 +79,13 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
 
 	wp_register_script(
+		'wp-tinymce-annotations',
+		gutenberg_url( 'editor/components/rich-text/annotations/tinymce-plugin.js' ),
+		array( 'wp-tinymce' ),
+		true
+	);
+
+	wp_register_script(
 		'wp-autop',
 		gutenberg_url( 'build/autop/index.js' ),
 		array(),
@@ -460,6 +467,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-plugins',
 			'wp-viewport',
 			'wp-tinymce',
+			'wp-tinymce-annotations',
 			'tinymce-latest-lists',
 			'tinymce-latest-paste',
 			'tinymce-latest-table',

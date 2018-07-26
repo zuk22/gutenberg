@@ -25,7 +25,7 @@ import {
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { Slot } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { rawHandler, children } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -872,11 +872,11 @@ export class RichText extends Component {
 						</Fragment>
 					) }
 				</Autocomplete>
-				<Annotations
+				{ this.editor && <Annotations
 					annotations={ this.props.annotations }
-					containerRef={ this.containerRef }
 					editor={ this.editor }
-				/>
+					onMove={ this.props.onMoveAnnotation }
+				/> }
 			</div>
 		);
 	}
@@ -923,6 +923,16 @@ const RichTextContainer = compose( [
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			annotations: select( 'core/editor' ).getAnnotationsForBlock( props.clientId ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			onMoveAnnotation( uid, xpath ) {
+				dispatch( 'core/editor' ).moveAnnotation( uid, xpath );
+			},
+			onRemoveAnnotation( uid ) {
+				dispatch( 'core/editor' ).removeAnnotation( uid );
+			},
 		};
 	} ),
 	withSafeTimeout,

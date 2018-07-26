@@ -767,27 +767,27 @@ export function unregisterToken( name ) {
 	};
 }
 
-const getXPathNodeIndex = (node) => {
+const getXPathNodeIndex = ( node ) => {
 	let typeIndex = 1; // Default index.
 
-	if (!node.parentNode || !node.parentNode.hasChildNodes()) {
+	if ( ! node.parentNode || ! node.parentNode.hasChildNodes() ) {
 		return typeIndex;
 	}
 
 	const childNodes = node.parentNode.childNodes;
 
-	for (let i = 0; i < childNodes.length; i++) {
-		if (childNodes[i] === node) {
+	for ( let i = 0; i < childNodes.length; i++ ) {
+		if ( childNodes[ i ] === node ) {
 			break;
 		}
 
-		if (childNodes[i].nodeType !== node.nodeType) {
+		if ( childNodes[ i ].nodeType !== node.nodeType ) {
 			continue;
 		}
 
-		switch (childNodes[i].nodeType) {
+		switch ( childNodes[ i ].nodeType ) {
 			case Node.ELEMENT_NODE:
-				typeIndex += childNodes[i].tagName === node.tagName ? 1 : 0;
+				typeIndex += childNodes[ i ].tagName === node.tagName ? 1 : 0;
 				break;
 
 			case Node.TEXT_NODE:
@@ -800,25 +800,25 @@ const getXPathNodeIndex = (node) => {
 	return typeIndex;
 };
 
-const getTagName = (element) => {
+const getTagName = ( element ) => {
 	return element.tagName.toLowerCase();
 };
 
-const getXPathSelector = (root, node) => {
+const getXPathSelector = ( root, node ) => {
 	const selectors = [];
 
-	while (node.parentNode) {
-		if (node === root) {
+	while ( node.parentNode ) {
+		if ( node === root ) {
 			break;
 		}
 
-		switch (node.nodeType) {
+		switch ( node.nodeType ) {
 			case Node.ELEMENT_NODE:
-				selectors.unshift(getTagName(node) + '[' + getXPathNodeIndex(node) + ']');
+				selectors.unshift( getTagName( node ) + '[' + getXPathNodeIndex( node ) + ']' );
 				break;
 
 			case Node.TEXT_NODE:
-				selectors.unshift('text()[' + getXPathNodeIndex(node) + ']');
+				selectors.unshift( 'text()[' + getXPathNodeIndex( node ) + ']' );
 				break;
 
 			default: // e.g., comments, processing instructions.
@@ -828,11 +828,11 @@ const getXPathSelector = (root, node) => {
 		node = node.parentNode;
 	}
 
-	return selectors.join('/');
+	return selectors.join( '/' );
 };
 
-const getClosestElement = (node) => {
-	switch (node.nodeType) {
+const getClosestElement = ( node ) => {
+	switch ( node.nodeType ) {
 		case Node.ELEMENT_NODE:
 			return node;
 
@@ -873,27 +873,38 @@ export function addAnnotationOnSelection( block, id = uuid() ) {
 		}
 	}
 
-	console.log( range );
-
-	return addAnnotation(
+	return addAnnotation( {
 		block,
-		getXPathSelector( editable, range.startContainer ),
-		range.startOffset,
-		getXPathSelector( editable, range.endContainer ),
-		range.endOffset,
+		startXPath: getXPathSelector( editable, range.startContainer ),
+		startOffset: range.startOffset,
+		endXPath: getXPathSelector( editable, range.endContainer ),
+		endOffset: range.endOffset,
 		id,
-	);
+	} );
 }
+
+// console shortcut: wp.data.dispatch( "core/editor" ).addAnnotation( { block: wp.data.select( "core/editor" ).getBlockOrder()[0], startXPath: "text()[1]", startOffset: 50, endXPath: "text()[1]", endOffset: 100 } );
 
 /**
  * Adds an annotation to a piece of text in a block.
  *
+ * @param {Object} annotation         The annotation to add.
+ * @param {string} block              The block to add the annotation to.
+ * @param {string} startXPath         The XPath where the annotation should start.
+ * @param {number} startOffset        The offset where the annotation should start.
+ * @param {string} endXPath           The XPath where the annotation should end.
+ * @param {number} endOffset          The offset where the annotation should end.
+ * @param {string} [source="default"] The source that added the annotation.
+ * @param {string} [id=uuid()]        The ID the annotation should have. Generates a UUID by default.
+ *
+ * @return {Object} Action object.
  */
-export function addAnnotation( block, startXPath, startOffset, endXPath, endOffset, id = uuid() ) {
+export function addAnnotation( { block, startXPath, startOffset, endXPath, endOffset, source = 'default', id = uuid() } ) {
 	return {
 		type: 'ANNOTATION_ADD',
 		id,
 		block,
+		source,
 		startXPath,
 		startOffset,
 		endXPath,
@@ -901,9 +912,46 @@ export function addAnnotation( block, startXPath, startOffset, endXPath, endOffs
 	};
 }
 
+/**
+ * Removes an annotation with a specific ID.
+ *
+ * @param {string} annotationId The annotation to remove.
+ *
+ * @return {Object} Action object.
+ */
 export function removeAnnotation( annotationId ) {
 	return {
 		type: 'ANNOTATION_REMOVE',
 		annotationId,
+	};
+}
+
+/**
+ * Removes all annotations of a specific source.
+ *
+ * @param {string} source The source to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeAnnotationsBySource( source ) {
+	return {
+		type: 'ANNOTATION_REMOVE_SOURCE',
+		source,
+	};
+}
+
+/**
+ * Moves an annotation to a different XPath.
+ *
+ * @param {string} annotationId The annotation to change.
+ * @param {Object} xpath        The new location for the annotation.
+ *
+ * @return {Object} Action object.
+ */
+export function moveAnnotation( annotationId, xpath ) {
+	return {
+		type: 'ANNOTATION_MOVE',
+		annotationId,
+		xpath,
 	};
 }

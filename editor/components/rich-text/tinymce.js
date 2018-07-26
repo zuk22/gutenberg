@@ -166,9 +166,11 @@ export default class TinyMCE extends Component {
 			formats: {
 				strikethrough: { inline: 'del' },
 			},
+			content_style: '.wp-annotation-marker { background-color: yellow; }',
 		} );
 
 		settings.plugins.push( 'paste' );
+		settings.plugins.push( 'wp-annotations' );
 
 		tinymce.init( {
 			...settings,
