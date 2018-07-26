@@ -3353,7 +3353,7 @@
 	var d = c( 24 ), e = function ( editor ) {
 		editor.experimental.annotator.register( d.e(), {
 			decorate: function ( a, b ) {
-				return { attributes: {}, classes: [ d.b() ] }
+				return { attributes: { "data-mce-bogus": "1" }, classes: [ d.b() ] }
 			}
 		} ), editor.addCommand( d.c(), function ( b, c ) {
 			var e = c.uid;
