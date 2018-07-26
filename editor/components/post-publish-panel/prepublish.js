@@ -18,6 +18,9 @@ import PostVisibility from '../post-visibility';
 import PostVisibilityLabel from '../post-visibility/label';
 import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
+import PostTaxonomiesCheck from '../post-taxonomies/check';
+import PostTaxonomies from '../post-taxonomies';
+import TaxonomyPanel from '../../../edit-post/components/sidebar/post-taxonomies/taxonomy-panel';
 
 function PostPublishPanelPrepublish( {
 	hasPublishAction,
@@ -40,6 +43,19 @@ function PostPublishPanelPrepublish( {
 						<span className="editor-post-publish-panel__link" key="label"><PostScheduleLabel /></span>,
 					] }>
 						<PostSchedule />
+					</PanelBody>
+					<PanelBody initialOpen={ false } title={ [
+						'Tip: Add tags to your post', // TODO: add ability to translate once this is stable
+					] }>
+						<PostTaxonomiesCheck>
+							<PostTaxonomies taxonomyWrapper={ ( content, taxonomy ) => {
+								return (
+									<TaxonomyPanel taxonomy={ taxonomy }>
+										{ content }
+									</TaxonomyPanel>
+								);
+							} } />
+						</PostTaxonomiesCheck>
 					</PanelBody>
 					{ children }
 				</Fragment>
