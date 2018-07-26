@@ -63,6 +63,7 @@ class Annotations extends Component {
 		// Catch here because componentDidCatch catches only in child components.
 		} catch ( error ) {
 			console.error( 'Error occurred in anotations module', error );
+			this.props.onError();
 		}
 
 		return null;

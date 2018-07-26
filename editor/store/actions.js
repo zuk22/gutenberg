@@ -885,6 +885,9 @@ export function addAnnotationOnSelection( block, id = uuid() ) {
 
 // console shortcut: wp.data.dispatch( "core/editor" ).addAnnotation( { block: wp.data.select( "core/editor" ).getBlockOrder()[0], startXPath: "text()[1]", startOffset: 50, endXPath: "text()[1]", endOffset: 100 } );
 
+// Known limitations:
+// * Annotations cannot overlap.
+
 /**
  * Adds an annotation to a piece of text in a block.
  *

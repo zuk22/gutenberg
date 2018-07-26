@@ -876,6 +876,7 @@ export class RichText extends Component {
 					annotations={ this.props.annotations }
 					editor={ this.editor }
 					onMove={ this.props.onMoveAnnotation }
+					onError={ () => this.props.annotations.forEach( ( annotation ) => this.props.onRemoveAnnotation( annotation.id ) ) }
 				/> }
 			</div>
 		);
