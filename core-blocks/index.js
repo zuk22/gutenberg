@@ -5,6 +5,7 @@ import {
 	registerBlockType,
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
+	setMissingTypeHandlerName,
 } from '@wordpress/blocks';
 
 /**
@@ -31,6 +32,7 @@ import * as html from './html';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
@@ -74,6 +76,7 @@ export const registerCoreBlocks = () => {
 		html,
 		latestComments,
 		latestPosts,
+		missing,
 		more,
 		nextpage,
 		preformatted,
@@ -92,4 +95,5 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	setUnknownTypeHandlerName( freeform.name );
+	setMissingTypeHandlerName( missing.name );
 };

@@ -71,6 +71,8 @@ export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK
 
 export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLOCK_NAME' );
 
+export const missingBlockName = createBlockNameSetterReducer( 'SET_MISSING_BLOCK_NAME' );
+
 /**
  * Reducer managing the categories
  *
@@ -91,5 +93,6 @@ export default combineReducers( {
 	blockTypes,
 	defaultBlockName,
 	fallbackBlockName,
+	missingBlockName,
 	categories,
 } );

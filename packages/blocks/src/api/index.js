@@ -30,6 +30,8 @@ export {
 	unregisterBlockType,
 	setUnknownTypeHandlerName,
 	getUnknownTypeHandlerName,
+	setMissingTypeHandlerName,
+	getMissingTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
 	getDefaultBlockForPostFormat,

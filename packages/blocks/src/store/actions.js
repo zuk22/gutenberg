@@ -60,6 +60,22 @@ export function setFallbackBlockName( name ) {
 }
 
 /**
+ * Returns an action object used to set the name of the block used for unregistered block types.
+ *
+ * @param {string} name Block name.
+ *
+ * @return {Object} Action object.
+ *
+ * @todo Consider a clearer name. Perhaps "Substitute" or "Unregistered".
+ */
+export function setMissingBlockName( name ) {
+	return {
+		type: 'SET_MISSING_BLOCK_NAME',
+		name,
+	};
+}
+
+/**
  * Returns an action object used to set block categories.
  *
  * @param {Object[]} categories Block categories.

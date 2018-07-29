@@ -64,6 +64,17 @@ export function getFallbackBlockName( state ) {
 }
 
 /**
+ * Returns the name of the missing block name.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Missing block name.
+ */
+export function getMissingBlockName( state ) {
+	return state.missingBlockName;
+}
+
+/**
  * Returns an array with the child blocks of a given block.
  *
  * @param {Object} state     Data state.

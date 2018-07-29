@@ -212,6 +212,24 @@ export function getUnknownTypeHandlerName() {
 }
 
 /**
+ * Assigns name of block handling unknown block types.
+ *
+ * @param {string} name Block name.
+ */
+export function setMissingTypeHandlerName( name ) {
+	dispatch( 'core/blocks' ).setMissingBlockName( name );
+}
+
+/**
+ * Retrieves name of block handling unknown block types, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog name.
+ */
+export function getMissingTypeHandlerName() {
+	return select( 'core/blocks' ).getMissingBlockName();
+}
+/**
  * Assigns the default block name.
  *
  * @param {string} name Block name.

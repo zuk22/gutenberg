@@ -15,7 +15,11 @@ import { parse as grammarParse } from '@wordpress/block-serialization-spec-parse
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import {
+	getBlockType,
+	getUnknownTypeHandlerName,
+	getMissingTypeHandlerName,
+} from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
 import { getCommentDelimitedContent } from './serializer';
@@ -284,30 +288,27 @@ export function getMigratedBlock( block ) {
  * @return {?Object} An initialized block object (if possible).
  */
 export function createBlockWithFallback( blockNode ) {
+	const { blockName: originalName } = blockNode;
 	let {
-		blockName: name,
 		attrs: attributes,
 		innerBlocks = [],
 		innerHTML,
 	} = blockNode;
+	const fallbackBlock = getUnknownTypeHandlerName();
+	const missingBlock = getMissingTypeHandlerName();
 
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
-	innerHTML = innerHTML.trim();
+	const originalUndelimitedContent = innerHTML = innerHTML.trim();
 
 	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandlerName();
+	let name = originalName || fallbackBlock;
 
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
-
-	// Try finding the type for known block name, else fall back again.
-	let blockType = getBlockType( name );
-
-	const fallbackBlock = getUnknownTypeHandlerName();
 
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
@@ -316,14 +317,18 @@ export function createBlockWithFallback( blockNode ) {
 		innerHTML = autop( innerHTML ).trim();
 	}
 
+	// Try finding the type for known block name, else fall back again.
+	let blockType = getBlockType( name );
+
 	if ( ! blockType ) {
 		// If detected as a block which is not registered, preserve comment
-		// delimiters in content of unknown type handler.
+		// delimiters in content of missing type handler.
 		if ( name ) {
 			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
 		}
 
-		name = fallbackBlock;
+		name = missingBlock;
+		attributes = {};
 		blockType = getBlockType( name );
 	}
 
@@ -347,6 +352,11 @@ export function createBlockWithFallback( blockNode ) {
 	// the block. When both match, the block is marked as valid.
 	if ( name !== fallbackBlock ) {
 		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
+	}
+
+	if ( name === missingBlock ) {
+		block.originalName = originalName;
+		block.originalUndelimitedContent = originalUndelimitedContent;
 	}
 
 	// Preserve original content for future use in case the block is parsed as
