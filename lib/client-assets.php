@@ -357,19 +357,23 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'editor',
 			'lodash',
+			'moment',
+			'wp-api-fetch',
+			'wp-autop',
 			'wp-blob',
 			'wp-blocks',
 			'wp-components',
 			'wp-compose',
+			'wp-data',
 			'wp-core-data',
-			'wp-element',
 			'wp-editor',
+			'wp-element',
 			'wp-html-entities',
 			'wp-i18n',
 			'wp-keycodes',
 			'wp-viewport',
-			'wp-api-fetch',
 		),
+
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
 	);
