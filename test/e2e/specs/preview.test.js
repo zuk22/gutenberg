@@ -14,7 +14,9 @@ import {
 	publishPost,
 } from '../support/utils';
 
-describe( 'Preview', () => {
+// Temporary disabled test suite because it isn't predictable on Travis.
+// See: https://github.com/WordPress/gutenberg/issues/6956.
+describe.skip( 'Preview', () => {
 	beforeAll( async () => {
 		await newDesktopBrowserPage();
 	} );
