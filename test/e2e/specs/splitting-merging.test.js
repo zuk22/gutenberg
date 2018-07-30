@@ -70,4 +70,23 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'Should delete wholly-selected block contents', async () => {
+		// Regression Test: When all of a paragraph is selected, pressing
+		// backspace should delete the contents, not merge to previous.
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Foo' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Bar' );
+
+		// Select text.
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowLeft', 3 );
+		await page.keyboard.up( 'Shift' );
+
+		// Delete selection.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
