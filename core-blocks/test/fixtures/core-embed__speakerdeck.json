@@ -1,10 +1,10 @@
 [
     {
         "clientId": "_clientId_0",
-        "name": "core-embed/reverbnation",
+        "name": "core-embed/speakerdeck",
         "isValid": true,
         "attributes": {
-            "url": "https://reverbnation.com/",
+            "url": "https://speakerdeck.com/",
             "caption": {
                 "formats": [
                     null,
@@ -39,13 +39,12 @@
                     null,
                     null,
                     null,
-                    null,
                     null
                 ],
-                "text": "Embedded content from reverbnation"
+                "text": "Embedded content from speakerdeck"
             }
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-reverbnation wp-block-embed\">\n    https://reverbnation.com/\n    <figcaption>Embedded content from reverbnation</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-speakerdeck wp-block-embed\">\n\thttps://speakerdeck.com/\n\t<figcaption>Embedded content from speakerdeck</figcaption>\n</figure>"
     }
 ]

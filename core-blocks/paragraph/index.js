@@ -34,7 +34,6 @@ import {
 import {
 	createBlock,
 	getPhrasingContentSchema,
-	children,
 } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 
@@ -246,10 +245,9 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
-		source: 'children',
+		type: 'object',
+		source: 'rich-text',
 		selector: 'p',
-		default: [],
 	},
 	align: {
 		type: 'string',
@@ -425,10 +423,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: RichText.concat( attributes.content, attributesToMerge.content ),
 		};
 	},
 
