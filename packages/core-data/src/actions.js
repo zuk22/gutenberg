@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { castArray } from 'lodash';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns an action object used in signalling that terms have been received
@@ -13,6 +14,11 @@ import { castArray } from 'lodash';
  * @return {Object} Action object.
  */
 export function receiveTerms( taxonomy, terms ) {
+	deprecated( 'receiveTerms action', {
+		version: '3.6.0',
+		alternative: 'receiveEntityRecords action',
+		plugin: 'Gutenberg',
+	} );
 	return {
 		type: 'RECEIVE_TERMS',
 		taxonomy,
