@@ -226,9 +226,9 @@ export const settings = {
 
 		if ( 'left' === align || 'right' === align ) {
 			return (
-				<aside>
+				<div>
 					{ figure }
-				</aside>
+				</div>
 			);
 		}
 
