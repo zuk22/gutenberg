@@ -89,4 +89,19 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'Should delete an empty first line', async () => {
+		// Regression Test: When a paragraph block has line break, and the first
+		// line has no text, pressing backspace at the start of the second line
+		// should remove the first.
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.up( 'Shift' );
+
+		// Delete he soft line break.
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
