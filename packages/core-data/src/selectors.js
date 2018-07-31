@@ -8,6 +8,7 @@ import { map, find, get, filter } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -36,6 +37,11 @@ function isResolving( selectorName, ...args ) {
  * @return {Array} Categories list.
  */
 export function getTerms( state, taxonomy ) {
+	deprecated( 'getTerms selector', {
+		version: '3.6.0',
+		alternative: 'getEntityRecords selector',
+		plugin: 'Gutenberg',
+	} );
 	return state.terms[ taxonomy ];
 }
 
@@ -47,6 +53,11 @@ export function getTerms( state, taxonomy ) {
  * @return {Array} Categories list.
  */
 export function getCategories( state ) {
+	deprecated( 'getCategories selector', {
+		version: '3.6.0',
+		alternative: 'getEntityRecords selector',
+		plugin: 'Gutenberg',
+	} );
 	return getTerms( state, 'categories' );
 }
 
